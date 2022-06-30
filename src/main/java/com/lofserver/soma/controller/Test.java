@@ -1,5 +1,6 @@
 package com.lofserver.soma.controller;
 
+<<<<<<< Updated upstream
 import com.lofserver.soma.domain.TeamEntity;
 import com.lofserver.soma.domain.UserTeamlistEntity;
 import com.lofserver.soma.dto.UserIdDto;
@@ -51,5 +52,16 @@ public class Test {
         }
 
         return userTeamInfoListDto;
+=======
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class Test {
+    @GetMapping("/test")
+    public String test(){
+        return "hello";
+>>>>>>> Stashed changes
     }
 }
