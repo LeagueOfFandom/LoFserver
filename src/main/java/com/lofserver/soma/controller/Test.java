@@ -1,19 +1,14 @@
 package com.lofserver.soma.controller;
 
-<<<<<<< Updated upstream
 import com.lofserver.soma.domain.TeamEntity;
 import com.lofserver.soma.domain.UserTeamlistEntity;
 import com.lofserver.soma.dto.UserIdDto;
 import com.lofserver.soma.dto.UserTeamInfoDto;
-import com.lofserver.soma.dto.UserTeamInfoListDto;
 import com.lofserver.soma.repository.TeamRepository;
 import com.lofserver.soma.repository.UserTeamlistRepository;
-import com.lofserver.soma.service.LofService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,40 +23,26 @@ public class Test {
     private TeamRepository teamRepository;
     @Autowired
     private UserTeamlistRepository userTeamlistRepository;
+
     @GetMapping("/test")
-    public List<UserTeamInfoDto> test(@RequestBody UserIdDto userIdDto){
-        List<UserTeamInfoDto> userTeamInfoListDto = new ArrayList<>();
+    public List<UserTeamInfoDto> test() {
 
-        Long l = new Long(1);
-        List<TeamEntity> teamEntities = teamRepository.findAll();
-        List<UserTeamlistEntity> userTeamlistEntities = userTeamlistRepository.findAllByUserId(l);
+        List<UserTeamInfoDto> userTeamInfoListDto = new ArrayList<>(); // 유저의 관심 팀 넣을 리스트
+        List<TeamEntity> teamEntities = teamRepository.findAll(); // 모든 팀 정보
+        List<UserTeamlistEntity> userTeamlistEntities = userTeamlistRepository.findAllByUserId(1L); // 유저 아이디로 검색
 
-
-        for(int i = 0; i < teamEntities.size(); i++) {
-
+        for (int i = 0; i < teamEntities.size(); i++) {
             boolean teamCheck = false;
             Long teamId = teamEntities.get(i).getTeamId();
 
             //유저가 선택한 팀 인지 판단하기.
-            for(int j = 0; j < userTeamlistEntities.size(); j++)
-                if(teamId == userTeamlistEntities.get(j).getTeamId())
+            for (int j = 0; j < userTeamlistEntities.size(); j++)
+                if (teamId == userTeamlistEntities.get(j).getTeamId())
                     teamCheck = true;
 
-            userTeamInfoListDto.add(new UserTeamInfoDto(teamEntities.get(i),teamCheck));
-            log.info(userTeamInfoListDto.toString());
+            userTeamInfoListDto.add(new UserTeamInfoDto(teamEntities.get(i), teamCheck));
         }
 
         return userTeamInfoListDto;
-=======
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class Test {
-    @GetMapping("/test")
-    public String test(){
-        return "hello";
->>>>>>> Stashed changes
     }
 }
