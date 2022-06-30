@@ -8,16 +8,15 @@ import java.util.List;
 
 @Getter
 @ToString
+@NoArgsConstructor
 public class UserTeamInfoListDto {
     private List<UserTeamInfoDto> userTeamInfoDtoList;
 
     public UserTeamInfoListDto(List<UserTeamInfoDto> userTeamInfoDtoList) {
         this.userTeamInfoDtoList = userTeamInfoDtoList;
     }
-
     public void addTeamInfo(UserTeamInfoDto userTeamInfoDto) {
-
         this.userTeamInfoDtoList.add(userTeamInfoDto);
-
     }
+
 }

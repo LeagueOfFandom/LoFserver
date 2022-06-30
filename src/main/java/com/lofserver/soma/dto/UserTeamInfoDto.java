@@ -8,6 +8,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
+@NoArgsConstructor
 public class UserTeamInfoDto {
     private Long teamId;
     private String teamName;
