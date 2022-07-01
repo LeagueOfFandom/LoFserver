@@ -9,7 +9,6 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Table(name = "team_table")
-@ToString
 public class TeamEntity {
 
     @Id

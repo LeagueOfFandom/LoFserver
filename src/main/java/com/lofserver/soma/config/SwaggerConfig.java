@@ -15,13 +15,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableAutoConfiguration
 public class SwaggerConfig {
-
     private final String version = "v1";
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Example API")
-                .description("Swagger 소개를 위한 example")
+                .title("User API")
+                .description("User 관련 API들 입니다.")
                 .build();
     }
 

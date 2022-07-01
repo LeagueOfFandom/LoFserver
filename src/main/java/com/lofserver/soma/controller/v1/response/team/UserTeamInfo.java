@@ -1,20 +1,16 @@
-package com.lofserver.soma.dto;
+package com.lofserver.soma.controller.v1.response.team;
 
 import com.lofserver.soma.domain.TeamEntity;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@ToString
 @Getter
-public class UserTeamInfoDto {
+public class UserTeamInfo {
     private Long teamId;
     private String teamName;
     private String teamImg;
     private boolean teamCheck;
 
-    public UserTeamInfoDto(TeamEntity teamEntity, boolean teamCheck) {
+    public UserTeamInfo(TeamEntity teamEntity, boolean teamCheck) {
 
         this.teamId = teamEntity.getTeamId();
         this.teamName = teamEntity.getTeamName();

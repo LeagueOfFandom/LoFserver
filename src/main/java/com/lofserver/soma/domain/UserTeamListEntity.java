@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Table(name = "user_teamlist_table")
-public class UserTeamlistEntity {
+public class UserTeamListEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userTeamlistId;
@@ -18,7 +18,7 @@ public class UserTeamlistEntity {
     @Column
     private Long teamId;
 
-    public UserTeamlistEntity(Long userTeamlistId, Long userId, Long teamId) {
+    public UserTeamListEntity(Long userTeamlistId, Long userId, Long teamId) {
         this.userTeamlistId = userTeamlistId;
         this.userId = userId;
         this.teamId = teamId;
