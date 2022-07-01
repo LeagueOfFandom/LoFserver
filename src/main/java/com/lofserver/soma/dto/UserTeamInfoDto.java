@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @ToString
+@Getter
 public class UserTeamInfoDto {
     private Long teamId;
     private String teamName;

@@ -8,6 +8,9 @@ import com.lofserver.soma.dto.UserTeamInfoListDto;
 import com.lofserver.soma.repository.TeamRepository;
 import com.lofserver.soma.repository.UserTeamlistRepository;
 import com.lofserver.soma.service.LofService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+@ApiResponses({
+        @ApiResponse(code = 200, message = "!!Success!!"),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+})
 @RestController
 @Slf4j
 public class Test {
@@ -27,13 +35,13 @@ public class Test {
     private TeamRepository teamRepository;
     @Autowired
     private UserTeamlistRepository userTeamlistRepository;
-    @GetMapping("/test")
+    @ApiOperation(value = "테스트 고고", notes = "가즈아")
+    @PostMapping("/test")
     public List<UserTeamInfoDto> test(@RequestBody UserIdDto userIdDto){
         List<UserTeamInfoDto> userTeamInfoListDto = new ArrayList<>();
 
-        Long l = new Long(1);
         List<TeamEntity> teamEntities = teamRepository.findAll();
-        List<UserTeamlistEntity> userTeamlistEntities = userTeamlistRepository.findAllByUserId(l);
+        List<UserTeamlistEntity> userTeamlistEntities = userTeamlistRepository.findAllByUserId(userIdDto.getUserId());
 
 
         for(int i = 0; i < teamEntities.size(); i++) {
