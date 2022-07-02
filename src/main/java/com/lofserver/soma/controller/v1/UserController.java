@@ -30,6 +30,7 @@ import java.util.ArrayList;
 public class UserController {
     @Autowired
     private LofService lofService;
+    //github to gitlab test
 
     @ApiOperation(value = "유저 등록 Api", notes = "client에서 device id를 주면 server에서 User id와 함께 새로운 User는 false, 기존 User는 true를 반환한다.")
     @PostMapping("/getUserId")
