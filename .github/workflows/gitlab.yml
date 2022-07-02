@@ -20,7 +20,7 @@ jobs:
       - name: Set remot repository
         env:
           gitlab_url: ${{ secrets.TARGET_URL }}
-          gitlab_username: ${{sercrets.TARGET_USERNAME}}
+          gitlab_username: ${{secrets.TARGET_USERNAME}}
           gitlab_token: ${{ secrets.TARGET_TOKEN }}
         run: |
           git remote add gitlab
