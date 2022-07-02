@@ -35,18 +35,18 @@ public class LofService {
         List<UserTeamInfo> userTeamInfoList = new ArrayList<>();
 
         List<TeamEntity> teamEntityList = teamRepository.findAll();
-        List<TeamEntity> userTeamEntityList = teamUserRepository.findTeamEntityByUserEntity(userEntity);
+        List<TeamEntity> userTeamEntityList = teamUserRepository.select(userEntity);
 
         teamEntityList.forEach(teamEntity -> {
-            if(userTeamEntityList.contains(teamEntity)) userTeamInfoList.add(new UserTeamInfo(teamEntity, true));
-            else userTeamInfoList.add(new UserTeamInfo(teamEntity, false));
+            if(userTeamEntityList != null && userTeamEntityList.contains(teamEntity)) userTeamInfoList.add(new UserTeamInfo(teamEntity, true));
+            userTeamInfoList.add(new UserTeamInfo(teamEntity, false));
         });
 
         return new UserTeamInfoList(userTeamInfoList);
     }
 
     public UserId makeUserId(UserTokenDto userTokenDto){
-        UserEntity userEntity = userRepository.findUserEntityByDeviceId(userTokenDto.getToken());
+        UserEntity userEntity = userRepository.findUserEntityByToken(userTokenDto.getToken());
 
         //등록되지 않은 유저라면
         if(userEntity == null)

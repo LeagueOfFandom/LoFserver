@@ -16,7 +16,7 @@ public class TeamEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long teamId;
     @Column
-    private Long teamLeague;
+    private Long leagueId;
     @Column
     private String teamName;
     @Column
@@ -26,7 +26,7 @@ public class TeamEntity {
     private List<TeamUserEntity> teamUserEntityList;
     public TeamEntity(Long teamId, Long leagueId, String teamName, String teamImg) {
         this.teamId = teamId;
-        this.teamLeague = leagueId;
+        this.leagueId = leagueId;
         this.teamName = teamName;
         this.teamImg = teamImg;
     }
