@@ -24,6 +24,12 @@ public class TeamEntity {
 
     @OneToMany(mappedBy = "teamEntity")
     private List<TeamUserEntity> teamUserEntityList;
+
+    @OneToMany(mappedBy = "homeId")
+    private List<MatchLckEntity> homeMatchLckEntityList;
+
+    @OneToMany(mappedBy = "awayId")
+    private List<MatchLckEntity> awayMatchLckEntityList;
     public TeamEntity(Long teamId, Long leagueId, String teamName, String teamImg) {
         this.teamId = teamId;
         this.leagueId = leagueId;

@@ -16,15 +16,15 @@ public class MatchUserEntity {
 
     @ManyToOne
     @JoinColumn(name = "matchId")
-    private MatchLckEntity matchId;
+    private MatchLckEntity matchLckEntity;
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    private UserEntity userId;
+    private UserEntity userEntity;
 
-    public MatchUserEntity(Long matchUserId, MatchLckEntity matchId, UserEntity userId) {
+    public MatchUserEntity(Long matchUserId, MatchLckEntity matchLckEntity, UserEntity userEntity) {
         this.matchUserId = matchUserId;
-        this.matchId = matchId;
-        this.userId = userId;
+        this.matchLckEntity = matchLckEntity;
+        this.userEntity = userEntity;
     }
 }

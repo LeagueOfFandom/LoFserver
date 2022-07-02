@@ -30,8 +30,6 @@ import java.util.ArrayList;
 public class UserController {
     @Autowired
     private LofService lofService;
-    //github to gitlab test
-    //github to gitlab test2
 
     @ApiOperation(value = "유저 등록 Api", notes = "client에서 device id를 주면 server에서 User id와 함께 새로운 User는 false, 기존 User는 true를 반환한다.")
     @PostMapping("/getUserId")
@@ -48,6 +46,7 @@ public class UserController {
     @ApiOperation(value = "유저의 Fandom list 설정 Api", notes = "client에서 User id와 함께 Fandom으로 설정한 팀들을 post하면 server에서 업데이트를 진행한다.")
     @PostMapping("/updateUserFandom")
     public void updateUserFandom(@RequestBody UserFandomDto userFandomDto){
+        lofService.setFandomList(userFandomDto);
     }
 
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.")
@@ -59,7 +58,7 @@ public class UserController {
     @ApiOperation(value = "User의 경기 알람 설정 Api", notes = "client에서 User가 선택한 경기의 알람여부를 보내주면 server에서 업데이트를 진행한다.")
     @PostMapping("/updateUserAlarm")
     public void updateUserAlarm(@RequestBody UserAlarmDto userAlarmDto){
-
+        lofService.setMatchAlarm(userAlarmDto);
     }
 
 }

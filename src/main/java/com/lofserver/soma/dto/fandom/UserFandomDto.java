@@ -9,5 +9,5 @@ import java.util.List;
 @NoArgsConstructor
 public class UserFandomDto {
     private Long userId;
-    private List<TeamId> teamIds;
+    private List<TeamId> teamIdList;
 }

@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface TeamUserRepository extends JpaRepository<TeamUserEntity,Long> {
-    @Query("select tu.teamEntity from TeamUserEntity tu where tu.userEntity = ?1")
-    List<TeamEntity> select(UserEntity userEntity);
+    @Query("select tu.teamEntity from TeamUserEntity tu where tu.userEntity.userId = ?1")
+    List<TeamEntity> findTeamEntityByUserId(Long userId);
 }

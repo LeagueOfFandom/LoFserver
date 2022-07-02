@@ -22,9 +22,17 @@ public class UserSelectEntity {
     @Column
     private Long matchId;
 
-    public UserSelectEntity(Long userSelectId, UserEntity userEntity, Long matchId) {
+    @Column
+    private Boolean alarm;
+
+    public UserSelectEntity(Long userSelectId, UserEntity userEntity, Long matchId, Boolean alarm) {
         this.userSelectId = userSelectId;
         this.userEntity = userEntity;
         this.matchId = matchId;
+        this.alarm = alarm;
+    }
+
+    public void setAlarm(Boolean alarm) {
+        this.alarm = alarm;
     }
 }
