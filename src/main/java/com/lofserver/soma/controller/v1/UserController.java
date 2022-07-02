@@ -4,7 +4,7 @@ import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.dto.UserAlarmDto;
-import com.lofserver.soma.dto.UserDeviceDto;
+import com.lofserver.soma.dto.UserTokenDto;
 import com.lofserver.soma.dto.UserIdDto;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
 import com.lofserver.soma.dto.fandom.UserFandomDto;
@@ -35,8 +35,8 @@ public class UserController {
 
     @ApiOperation(value = "유저 등록 Api", notes = "client에서 device id를 주면 server에서 User id와 함께 새로운 User는 false, 기존 User는 true를 반환한다.")
     @PostMapping("/getUserId")
-    public UserId getUserId(@RequestBody UserDeviceDto userDeviceDto){
-        return lofService.makeUserId(userDeviceDto);
+    public UserId getUserId(@RequestBody UserTokenDto userTokenDto){
+        return lofService.makeUserId(userTokenDto);
     }
 
     @ApiOperation(value = "유저가 선택한 팀 Api", notes = "client에서 User id를 주면 해당 User가 선택한 팀들의 List를 server에서 반환한다.")

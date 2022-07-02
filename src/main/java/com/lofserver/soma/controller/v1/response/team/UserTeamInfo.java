@@ -1,6 +1,6 @@
 package com.lofserver.soma.controller.v1.response.team;
 
-import com.lofserver.soma.domain.TeamEntity;
+import com.lofserver.soma.entity.TeamEntity;
 import lombok.Getter;
 
 @Getter

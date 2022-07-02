@@ -1,14 +1,15 @@
-package com.lofserver.soma.domain;
+package com.lofserver.soma.entity;
 
 
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @NoArgsConstructor
 @Entity
 @Getter
-@Table(name = "team_table")
+@Table(name = "team")
 public class TeamEntity {
 
     @Id
@@ -21,6 +22,8 @@ public class TeamEntity {
     @Column
     private String teamImg;
 
+    @OneToMany(mappedBy = "teamEntity")
+    private List<TeamUserEntity> teamUserEntityList;
     public TeamEntity(Long teamId, Long leagueId, String teamName, String teamImg) {
         this.teamId = teamId;
         this.teamLeague = leagueId;
