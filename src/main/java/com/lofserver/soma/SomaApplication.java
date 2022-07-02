@@ -9,5 +9,5 @@ public class SomaApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SomaApplication.class, args);
 	}
-	// gitlab 수정확인
+	// git develop
 }
