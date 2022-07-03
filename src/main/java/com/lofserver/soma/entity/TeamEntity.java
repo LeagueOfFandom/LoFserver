@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "team")
+@ToString
 public class TeamEntity {
 
     @Id

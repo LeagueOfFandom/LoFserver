@@ -20,11 +20,11 @@ public class MatchLckEntity {
     private Long matchId;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "homeId")
     private TeamEntity homeId;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "awayId")
     private TeamEntity awayId;
 
     @Column

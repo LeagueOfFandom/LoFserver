@@ -9,6 +9,7 @@ import com.lofserver.soma.dto.fandom.TeamId;
 import com.lofserver.soma.dto.fandom.UserFandomDto;
 import com.lofserver.soma.entity.*;
 import com.lofserver.soma.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.List;
 
 
 @Service
+@Slf4j
 public class LofService {
 
 
@@ -44,7 +46,7 @@ public class LofService {
 
         teamEntityList.forEach(teamEntity -> {
             if(userTeamEntityList.contains(teamEntity)) userTeamInfoList.add(new UserTeamInfo(teamEntity, true));
-            userTeamInfoList.add(new UserTeamInfo(teamEntity, false));
+            else userTeamInfoList.add(new UserTeamInfo(teamEntity, false));
         });
 
         return new UserTeamInfoList(userTeamInfoList);
@@ -96,12 +98,19 @@ public class LofService {
 
         //기존 fandom 삭제
         teamEntityList.forEach(teamEntity -> {
-            matchUserRepository.deleteMatchUserEntitiesByTeamId(teamEntity.getTeamId());
+            log.info(teamEntity.toString());
+            teamUserRepository.deleteTeamUserEntitiesByUserEntity(userEntity);
+            matchUserRepository.deleteMatchUserEntitiesByMatchLckEntity_HomeIdOrMatchLckEntity_AwayId(teamEntity, teamEntity);
         });
 
         //새로운 fandom 추가
         teamIdList.forEach(teamId -> {
-            List<MatchLckEntity> matchLckEntityList = teamRepository.findById(teamId.getTeamId()).orElse(null).getHomeMatchLckEntityList();
+            TeamEntity teamEntity = teamRepository.findById(teamId.getTeamId()).orElse(null);
+            teamUserRepository.save(new TeamUserEntity(null, userEntity, teamEntity));
+
+            List<MatchLckEntity> matchLckEntityList = teamEntity.getHomeMatchLckEntityList();
+            matchLckEntityList.addAll(teamEntity.getAwayMatchLckEntityList());
+
             matchLckEntityList.forEach(matchLckEntity -> {
                 matchUserRepository.save(new MatchUserEntity(null, matchLckEntity, userEntity));
             });
