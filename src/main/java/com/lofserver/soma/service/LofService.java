@@ -1,9 +1,12 @@
 package com.lofserver.soma.service;
 
 import com.lofserver.soma.controller.v1.response.UserId;
+import com.lofserver.soma.controller.v1.response.match.Match;
+import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
 import com.lofserver.soma.dto.UserAlarmDto;
+import com.lofserver.soma.dto.UserIdDto;
 import com.lofserver.soma.dto.UserTokenDto;
 import com.lofserver.soma.dto.fandom.TeamId;
 import com.lofserver.soma.dto.fandom.UserFandomDto;
@@ -12,8 +15,7 @@ import com.lofserver.soma.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -121,5 +123,36 @@ public class LofService {
             setMatchUserAlarm(new UserAlarmDto(userFandomDto.getUserId(), userSelectEntity.getMatchId(), userSelectEntity.getAlarm()));
         });
     }
+
+    //user의 fandom list의 따른 경기 내역제공
+    public MatchList getUserMatchList(UserIdDto userIdDto){
+        UserEntity userEntity = userRepository.findById(userIdDto.getUserId()).orElse(null);
+        List<TeamEntity> teamEntityList = teamUserRepository.findTeamEntityByUserId(userIdDto.getUserId());
+        List<MatchLckEntity> matchLckEntityList = new ArrayList<>();
+        List<Match> matchList = new ArrayList<>();
+
+        //중복 없이 해당 fandom의 경기를 배열에 저장.
+        teamEntityList.forEach(teamEntity -> {
+            matchLckEntityList.addAll(teamEntity.getHomeMatchLckEntityList());
+            matchLckEntityList.addAll(teamEntity.getAwayMatchLckEntityList());
+        });
+
+        matchLckEntityList.forEach(matchLckEntity -> {
+            if(matchUserRepository.findByMatchLckEntityAndUserEntity(matchLckEntity, userEntity) != null)
+                matchList.add(matchLckEntity.toMatch(false,"add after",true));
+            else matchList.add(matchLckEntity.toMatch(false,"add after",false));
+        });
+
+        Collections.sort(matchList, new Comparator<Match>() {
+            @Override
+            public int compare(Match o1, Match o2) {
+                if(o1.getMatchDate().compareTo(o2.getMatchDate()) == 0)
+                    return o1.getMatchTime().compareTo(o2.getMatchTime());
+                return o1.getMatchDate().compareTo(o2.getMatchDate());
+            }
+        });
+        return new MatchList(matchList);
+    }
+
 
 }

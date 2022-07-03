@@ -52,7 +52,7 @@ public class UserController {
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.")
     @PostMapping("/getUserMatches")
     public MatchList getMatchList(@RequestBody UserIdDto userIdDto){
-        return new MatchList(new ArrayList<Match>());
+        return lofService.getUserMatchList(userIdDto);
     }
 
     @ApiOperation(value = "User의 경기 알람 설정 Api", notes = "client에서 User가 선택한 경기의 알람여부를 보내주면 server에서 업데이트를 진행한다.")
