@@ -105,17 +105,17 @@ public class LofService {
             matchUserRepository.deleteMatchUserEntitiesByMatchLckEntity_HomeIdOrMatchLckEntity_AwayId(teamEntity, teamEntity);
         });
 
+        HashSet<MatchLckEntity> matchLckEntityList = new HashSet<>();
         //새로운 fandom 추가
         teamIdList.forEach(teamId -> {
             TeamEntity teamEntity = teamRepository.findById(teamId.getTeamId()).orElse(null);
             teamUserRepository.save(new TeamUserEntity(null, userEntity, teamEntity));
 
-            List<MatchLckEntity> matchLckEntityList = teamEntity.getHomeMatchLckEntityList();
+            matchLckEntityList.addAll(teamEntity.getHomeMatchLckEntityList());
             matchLckEntityList.addAll(teamEntity.getAwayMatchLckEntityList());
-
-            matchLckEntityList.forEach(matchLckEntity -> {
-                matchUserRepository.save(new MatchUserEntity(null, matchLckEntity, userEntity));
-            });
+        });
+        matchLckEntityList.forEach(matchLckEntity -> {
+            matchUserRepository.save(new MatchUserEntity(null, matchLckEntity, userEntity));
         });
 
         //사용자 설정 덮어쓰기
@@ -128,7 +128,7 @@ public class LofService {
     public MatchList getUserMatchList(UserIdDto userIdDto){
         UserEntity userEntity = userRepository.findById(userIdDto.getUserId()).orElse(null);
         List<TeamEntity> teamEntityList = teamUserRepository.findTeamEntityByUserId(userIdDto.getUserId());
-        List<MatchLckEntity> matchLckEntityList = new ArrayList<>();
+        HashSet<MatchLckEntity> matchLckEntityList = new HashSet<>();
         List<Match> matchList = new ArrayList<>();
 
         //중복 없이 해당 fandom의 경기를 배열에 저장.
@@ -138,6 +138,7 @@ public class LofService {
         });
 
         matchLckEntityList.forEach(matchLckEntity -> {
+            log.info(matchLckEntity.getMatchId().toString());
             if(matchUserRepository.findByMatchLckEntityAndUserEntity(matchLckEntity, userEntity) != null)
                 matchList.add(matchLckEntity.toMatch(false,"add after",true));
             else matchList.add(matchLckEntity.toMatch(false,"add after",false));
@@ -153,6 +154,4 @@ public class LofService {
         });
         return new MatchList(matchList);
     }
-
-
 }
