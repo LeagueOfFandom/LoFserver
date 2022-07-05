@@ -1,24 +1,28 @@
-package com.lofserver.soma.domain;
+package com.lofserver.soma.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @NoArgsConstructor
 @Entity
 @Getter
-@Table(name = "user_table")
+@Table(name = "users")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     @Column
-    private String deviceId;
+    private String token;
 
-    public UserEntity(Long userId, String deviceId) {
+    @OneToMany(mappedBy = "userEntity")
+    private List<TeamUserEntity> teamUserEntityList;
+
+    public UserEntity(Long userId, String token) {
         this.userId = userId;
-        this.deviceId = deviceId;
+        this.token = token;
     }
 }

@@ -16,13 +16,13 @@ public class Match {
     private Long homeScore;
     private String homeImg;
     private String awayName;
-    private String awayScore;
+    private Long awayScore;
     private String awayImg;
     private Boolean live;
     private String liveLink;
     private Boolean alarm;
 
-    public Match(Long matchId, LocalDate matchDate, LocalTime matchTime, String homeName, Long homeScore, String homeImg, String awayName, String awayScore, String awayImg, Boolean live, String liveLink, Boolean alarm) {
+    public Match(Long matchId, LocalDate matchDate, LocalTime matchTime, String homeName, Long homeScore, String homeImg, String awayName, Long awayScore, String awayImg, Boolean live, String liveLink, Boolean alarm) {
         this.matchId = matchId;
         this.matchDate = matchDate;
         this.matchTime = matchTime;

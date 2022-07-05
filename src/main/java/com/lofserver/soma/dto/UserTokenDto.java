@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserDeviceDto {
-    private String deviceId;
+public class UserTokenDto {
+    private String token;
 }
