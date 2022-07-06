@@ -1,12 +1,11 @@
 package com.lofserver.soma.controller.v1;
 
 import com.lofserver.soma.controller.v1.response.UserId;
-import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
-import com.lofserver.soma.dto.UserAlarmDto;
-import com.lofserver.soma.dto.UserTokenDto;
-import com.lofserver.soma.dto.UserIdDto;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
+import com.lofserver.soma.dto.UserAlarmDto;
+import com.lofserver.soma.dto.UserIdDto;
+import com.lofserver.soma.dto.UserTokenDto;
 import com.lofserver.soma.dto.fandom.UserFandomDto;
 import com.lofserver.soma.service.LofService;
 import io.swagger.annotations.ApiOperation;
@@ -17,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
 
 @ApiResponses({
         @ApiResponse(code = 200, message = "!!Success!!"),
@@ -45,8 +42,9 @@ public class UserController {
 
     @ApiOperation(value = "유저의 Fandom list 설정 Api", notes = "client에서 User id와 함께 Fandom으로 설정한 팀들을 post하면 server에서 업데이트를 진행한다.")
     @PostMapping("/updateUserFandom")
-    public void updateUserFandom(@RequestBody UserFandomDto userFandomDto){
+    public String updateUserFandom(@RequestBody UserFandomDto userFandomDto){
         lofService.setFandomList(userFandomDto);
+        return "success";
     }
 
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.")
@@ -57,8 +55,9 @@ public class UserController {
 
     @ApiOperation(value = "User의 경기 알람 설정 Api", notes = "client에서 User가 선택한 경기의 알람여부를 보내주면 server에서 업데이트를 진행한다.")
     @PostMapping("/updateUserAlarm")
-    public void updateUserAlarm(@RequestBody UserAlarmDto userAlarmDto){
+    public String updateUserAlarm(@RequestBody UserAlarmDto userAlarmDto){
         lofService.setMatchAlarm(userAlarmDto);
+        return "success";
     }
 
 }
