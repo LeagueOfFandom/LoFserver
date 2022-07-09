@@ -40,9 +40,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          aws deploy create-deployment 
+          aws deploy create-deployment
           --application-name lof-application
           --deployment-group-name lof-group
-          --file-exists-behavior OVERWRITE 
+          --file-exists-behavior OVERWRITE
           --s3-location bucket=lof-deploy,bundleType=jar,key=soma-0.0.1-SNAPSHOT.jar
           --region ap-northeast-2
