@@ -1,0 +1,11 @@
+version: 0.0
+os: linux
+files:
+  - source:  /
+    destination: /home/app
+    overwrite: yes
+hooks:
+  ApplicationStart:
+    - location: scripts/deploy.sh
+      timeout: 60
+      runas: root
