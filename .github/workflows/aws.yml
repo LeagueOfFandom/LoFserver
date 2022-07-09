@@ -37,7 +37,4 @@ jobs:
          
       - name: Code Deploy
         run: | 
-          aws deploy create-deployment
-          --application-name lof-application
-          --deployment-group-name lof-group
-          --s3-location bucket=lof-deploy,bundleType=jar,key=soma-0.0.1-SNAPSHOT.jar
+          aws deploy create-deployment --application-name lof-application --deployment-group-name lof-group --s3-location bucket=lof-deploy,bundleType=jar,key=soma-0.0.1-SNAPSHOT.jar
