@@ -32,6 +32,12 @@ jobs:
         
       - name: Copy Jar
         run: cp ./build/libs/*.jar ./deploy
+        
+      - name: Copy appspec.yml
+        run: cp appspec.yml ./deploy
+
+      - name: Copy script
+        run: cp ./scripts/*.sh ./deploy
 
       - name: Make zip file
         run: zip -r ./lof.zip ./deploy
