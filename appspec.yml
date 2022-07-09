@@ -10,6 +10,6 @@ permissions:
     mode: 777
 hooks:
   ApplicationStart:
-    - location: scripts/deploy.sh
+    - location: deploy.sh
       timeout: 300
       runas: root
