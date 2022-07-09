@@ -34,10 +34,10 @@ jobs:
          source: './build/libs'
          dest: 's3://lof-deploy/libs'
          flags: --recursive
+         
       - name: Code Deploy
         run: | 
           aws deploy create-deployment
-          --deployment-config-name CodeDeployDefault.AllAtOnce
           --application-name lof-application
           --deployment-group-name lof-group
           --s3-location bucket=lof-deploy,bundleType=jar,key=soma-0.0.1-SNAPSHOT.jar
