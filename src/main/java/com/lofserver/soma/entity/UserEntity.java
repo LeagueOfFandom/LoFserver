@@ -17,12 +17,19 @@ public class UserEntity {
     private Long userId;
     @Column
     private String token;
+    @Column
+    private String deviceId;
 
     @OneToMany(mappedBy = "userEntity")
     private List<TeamUserEntity> teamUserEntityList;
 
-    public UserEntity(Long userId, String token) {
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public UserEntity(Long userId, String token, String deviceId) {
         this.userId = userId;
         this.token = token;
+        this.deviceId = deviceId;
     }
 }

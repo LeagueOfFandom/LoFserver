@@ -7,6 +7,7 @@ import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserIdDto;
+import com.lofserver.soma.dto.UserMatchListDto;
 import com.lofserver.soma.dto.UserTokenDto;
 import com.lofserver.soma.dto.fandom.TeamId;
 import com.lofserver.soma.dto.fandom.UserFandomDto;
@@ -56,12 +57,14 @@ public class LofService {
 
     //token에 따른 userid 반환.
     public UserId makeUserId(UserTokenDto userTokenDto){
-        UserEntity userEntity = userRepository.findUserEntityByToken(userTokenDto.getToken());
+        UserEntity userEntity = userRepository.findUserEntityByDeviceId(userTokenDto.getDeviceId());
 
         //등록되지 않은 유저라면
         if(userEntity == null)
-            return new UserId(userRepository.save(new UserEntity(null, userTokenDto.getToken())).getUserId(), false);
+            return new UserId(userRepository.save(new UserEntity(null, userTokenDto.getToken(), userTokenDto.getDeviceId())).getUserId(), false);
         //등록된 유저라면
+        userEntity.setToken(userTokenDto.getToken());
+        userRepository.flush();
         return new UserId(userEntity.getUserId(), true);
     }
 
@@ -125,11 +128,16 @@ public class LofService {
     }
 
     //user의 fandom list의 따른 경기 내역제공
-    public MatchList getUserMatchList(UserIdDto userIdDto){
-        UserEntity userEntity = userRepository.findById(userIdDto.getUserId()).orElse(null);
-        List<TeamEntity> teamEntityList = teamUserRepository.findTeamEntityByUserId(userIdDto.getUserId());
+    public MatchList getUserMatchList(UserMatchListDto userMatchListDto){
+        UserEntity userEntity = userRepository.findById(userMatchListDto.getUserId()).orElse(null);
+        List<TeamEntity> teamEntityList = teamUserRepository.findTeamEntityByUserId(userMatchListDto.getUserId());
         HashSet<MatchLckEntity> matchLckEntityList = new HashSet<>();
         List<Match> matchList = new ArrayList<>();
+
+        //팀을 선택 안했다면 전부 보내준다.
+        if(teamEntityList.isEmpty() || userMatchListDto.isAll()){
+            teamEntityList = teamRepository.findAll();
+        }
 
         //중복 없이 해당 fandom의 경기를 배열에 저장.
         teamEntityList.forEach(teamEntity -> {
@@ -138,7 +146,6 @@ public class LofService {
         });
 
         matchLckEntityList.forEach(matchLckEntity -> {
-            log.info(matchLckEntity.getMatchId().toString());
             if(matchUserRepository.findByMatchLckEntityAndUserEntity(matchLckEntity, userEntity) != null)
                 matchList.add(matchLckEntity.toMatch(false,"add after",true));
             else matchList.add(matchLckEntity.toMatch(false,"add after",false));
@@ -152,6 +159,8 @@ public class LofService {
                 return o1.getMatchDate().compareTo(o2.getMatchDate());
             }
         });
+
+
         return new MatchList(matchList);
     }
 }
