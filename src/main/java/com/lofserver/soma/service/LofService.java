@@ -1,20 +1,27 @@
 package com.lofserver.soma.service;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
-import com.lofserver.soma.dto.UserAlarmDto;
-import com.lofserver.soma.dto.UserIdDto;
-import com.lofserver.soma.dto.UserMatchListDto;
-import com.lofserver.soma.dto.UserTokenDto;
+import com.lofserver.soma.dto.*;
 import com.lofserver.soma.dto.fandom.TeamId;
 import com.lofserver.soma.dto.fandom.UserFandomDto;
+import com.lofserver.soma.dto.fcm.FcmData;
+import com.lofserver.soma.dto.fcm.FcmResponse;
+import com.lofserver.soma.dto.fcm.FcmSend;
 import com.lofserver.soma.entity.*;
 import com.lofserver.soma.repository.*;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -162,5 +169,25 @@ public class LofService {
 
 
         return new MatchList(matchList);
+    }
+    public void post(){
+        String url = "https://fcm.googleapis.com/fcm/send";
+        String key = "AAAA2e5oM2A:APA91bFkeAZM_08Vbliwn3C5_IR2jWF1GPgAS_9YYp071tRNyFossJP23OOTFMjwFq7HQW4HMU7K5XKee32u3cx8ioAlylFxK7SruyNO1iJy3sacuir-29GdosKdlKCBl6B_YfZj0xjd";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        headers.set("Authorization", "key=" + key);
+        JSONObject jsonObject = new JSONObject();
+        JSONObject dataJson = new JSONObject();
+        dataJson.put("title", "test");
+        dataJson.put("message","gogo");
+        jsonObject.put("to","cg3cyj_MQeGkyUdy-GlRRP:APA91bFxesdZIaWVkeYquENONz-qmdpUWXN77zG3_rWykDk1O7q41MhEtniuNAa_Q7hbmQeBbXLUL3qlvgBfkdHyP7vbffL_f_6JG8QdeLe_b0PGzXy2zArXC370mgzbdp11vQcoHoYx");
+        jsonObject.put("data", dataJson);
+        log.info(jsonObject.toJSONString());
+
+        HttpEntity<String> requestEntity = new HttpEntity<String>(jsonObject.toJSONString(),headers);
+
+        ResponseEntity<FcmResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, FcmResponse.class);
+
     }
 }
