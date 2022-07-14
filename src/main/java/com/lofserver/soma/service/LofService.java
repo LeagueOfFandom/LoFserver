@@ -135,7 +135,7 @@ public class LofService {
         List<Match> matchList = new ArrayList<>();
 
         //팀을 선택 안했다면 전부 보내준다.
-        if(teamEntityList.isEmpty() || userMatchListDto.isAll()){
+        if(teamEntityList.isEmpty() || userMatchListDto.getIsAll()){
             teamEntityList = teamRepository.findAll();
         }
 

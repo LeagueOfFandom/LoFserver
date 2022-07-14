@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserMatchListDto {
     private Long userId;
-    private boolean isAll;
+    private Boolean isAll;
 }
