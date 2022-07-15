@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserTokenDto {
+public class UserDto {
     private String deviceId;
     private String token;
 }

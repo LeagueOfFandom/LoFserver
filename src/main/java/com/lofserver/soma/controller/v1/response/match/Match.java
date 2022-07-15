@@ -2,12 +2,9 @@ package com.lofserver.soma.controller.v1.response.match;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Getter
 public class Match {
@@ -19,16 +16,16 @@ public class Match {
     private LocalTime matchTime;
     @ApiModelProperty(example = "농심 레드포스")
     private String homeName;
-    @ApiModelProperty(example = "0")
-    private Long homeScore;
-    @ApiModelProperty(example = "https://")
-    private String homeImg;
     @ApiModelProperty(example = "DRX")
     private String awayName;
-    @ApiModelProperty(example = "2")
-    private Long awayScore;
+    @ApiModelProperty(example = "https://")
+    private String homeImg;
     @ApiModelProperty(example = "https://")
     private String awayImg;
+    @ApiModelProperty(example = "0")
+    private Long homeScore;
+    @ApiModelProperty(example = "2")
+    private Long awayScore;
     @ApiModelProperty(example = "true")
     private Boolean live;
     @ApiModelProperty(example = "https://")
@@ -36,16 +33,16 @@ public class Match {
     @ApiModelProperty(example = "true")
     private Boolean alarm;
 
-    public Match(Long matchId, LocalDate matchDate, LocalTime matchTime, String homeName, Long homeScore, String homeImg, String awayName, Long awayScore, String awayImg, Boolean live, String liveLink, Boolean alarm) {
+    public Match(Long matchId, LocalDate matchDate, LocalTime matchTime, String homeName, String awayName, String homeImg, String awayImg, Long homeScore, Long awayScore, Boolean live, String liveLink, Boolean alarm) {
         this.matchId = matchId;
         this.matchDate = matchDate;
         this.matchTime = matchTime;
         this.homeName = homeName;
-        this.homeScore = homeScore;
-        this.homeImg = homeImg;
         this.awayName = awayName;
-        this.awayScore = awayScore;
+        this.homeImg = homeImg;
         this.awayImg = awayImg;
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
         this.live = live;
         this.liveLink = liveLink;
         this.alarm = alarm;

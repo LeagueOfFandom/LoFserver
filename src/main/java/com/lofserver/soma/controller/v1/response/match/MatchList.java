@@ -7,7 +7,6 @@ import java.util.List;
 @Getter
 public class MatchList {
     private List<Match> matchList;
-
     public MatchList(List<Match> matchList) {
         this.matchList = matchList;
     }
