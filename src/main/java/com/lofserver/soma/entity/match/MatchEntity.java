@@ -34,4 +34,9 @@ public class MatchEntity {
     public Match toMatch(String livelink, Boolean alarm){
         return new Match(matchId, matchInfo.getMatchDate(), matchInfo.getMatchTime(),matchInfo.getHomeName(),matchInfo.getAwayName(),matchInfo.getHomeImg(),matchInfo.getAwayImg(),homeScore,awayScore,live,livelink,alarm);
     }
+
+    public MatchEntity(Long homeScore, Long awayScore){
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
+    }
 }
