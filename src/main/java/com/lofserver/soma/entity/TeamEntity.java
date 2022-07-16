@@ -1,40 +1,33 @@
 package com.lofserver.soma.entity;
 
 
-import lombok.*;
+import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
+import lombok.Getter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@NoArgsConstructor
 @Entity
 @Getter
 @Table(name = "team")
-@ToString
 public class TeamEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long teamId;
-    @Column
-    private Long leagueId;
-    @Column
-    private String teamName;
-    @Column
-    private String teamImg;
-
-    @OneToMany(mappedBy = "teamEntity")
-    private List<TeamUserEntity> teamUserEntityList;
-
-    @OneToMany(mappedBy = "homeId")
-    private List<MatchLckEntity> homeMatchLckEntityList;
-
-    @OneToMany(mappedBy = "awayId")
-    private List<MatchLckEntity> awayMatchLckEntityList;
-    public TeamEntity(Long teamId, Long leagueId, String teamName, String teamImg) {
-        this.teamId = teamId;
-        this.leagueId = leagueId;
-        this.teamName = teamName;
-        this.teamImg = teamImg;
+    @Column(name = "id")
+    private Long teamId; //임의로 생성된 team id.
+    @Column(name = "name")
+    private String teamName; //team 이름.
+    @Column(name = "img")
+    private String teamImg; //team의 img link.
+    @Type(type = "json")
+    @Column(name = "match_list", columnDefinition = "json")
+    private Set<Long> teamMatchList = new HashSet<>(); //team의 경기 lisk.
+    public void delMatch(Long matchId){
+        teamMatchList.remove(matchId);
+    }
+    public void addMatch(Long matchId){
+        teamMatchList.add(matchId);
     }
 }

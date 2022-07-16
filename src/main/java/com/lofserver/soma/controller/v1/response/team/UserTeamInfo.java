@@ -16,7 +16,6 @@ public class UserTeamInfo {
     private boolean teamCheck;
 
     public UserTeamInfo(TeamEntity teamEntity, boolean teamCheck) {
-
         this.teamId = teamEntity.getTeamId();
         this.teamName = teamEntity.getTeamName();
         this.teamImg = teamEntity.getTeamImg();
