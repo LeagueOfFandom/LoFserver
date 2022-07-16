@@ -35,8 +35,10 @@ public class MatchEntity {
         return new Match(matchId, matchInfo.getMatchDate(), matchInfo.getMatchTime(),matchInfo.getHomeName(),matchInfo.getAwayName(),matchInfo.getHomeImg(),matchInfo.getAwayImg(),homeScore,awayScore,live,livelink,alarm);
     }
 
-    public MatchEntity(Long homeScore, Long awayScore){
+    public MatchEntity(MatchInfo matchinfo, Long homeScore, Long awayScore, Boolean live){
+        this.matchInfo = matchinfo;
         this.homeScore = homeScore;
         this.awayScore = awayScore;
+        this.live = live;
     }
 }

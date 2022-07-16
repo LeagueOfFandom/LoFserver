@@ -15,4 +15,11 @@ public class MatchInfo {
     private String awayName;
     private String homeImg;
     private String awayImg;
+
+    public MatchInfo(LocalDate matchDate, LocalTime matchTime, String homeName, String awayName){
+        this.matchDate = matchDate;
+        this.matchTime = matchTime;
+        this.homeName = homeName;
+        this.awayName = awayName;
+    }
 }
