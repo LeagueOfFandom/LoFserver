@@ -3,7 +3,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
     url: jdbc:mariadb://database-1.c9zwet69f9b0.ap-northeast-2.rds.amazonaws.com:3306/lof
-    password: 1234
+    password: soma17030
   mvc:
     path match:
       matching-strategy: ant_path_matcher
