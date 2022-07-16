@@ -1,0 +1,11 @@
+ALTER table team convert to charset utf8;
+INSERT INTO team(id, name, img, match_list) VALUES (null,'담원 기아','https://d654rq93y7j8z.cloudfront.net/teamImg/DWG KIA.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'농심 레드포스','https://d654rq93y7j8z.cloudfront.net/teamImg/NongShim REDFORCE.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'kt 롤스터','https://d654rq93y7j8z.cloudfront.net/teamImg/kt Rolster.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'한화생명e스포츠','https://d654rq93y7j8z.cloudfront.net/teamImg/Hanwha Life Esports.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'DRX','https://d654rq93y7j8z.cloudfront.net/teamImg/DRX.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'리브 샌드박스','https://d654rq93y7j8z.cloudfront.net/teamImg/Liiv SANDBOX.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'프레딧 브리온','https://d654rq93y7j8z.cloudfront.net/teamImg/Fredit BRION.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'T1','https://d654rq93y7j8z.cloudfront.net/teamImg/T1.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'젠지','https://d654rq93y7j8z.cloudfront.net/teamImg/Gen.G.png','[]');
+INSERT INTO team(id, name, img, match_list) VALUES (null,'광동 프릭스','https://d654rq93y7j8z.cloudfront.net/teamImg/KWANGDONG FREECS.png','[]');
