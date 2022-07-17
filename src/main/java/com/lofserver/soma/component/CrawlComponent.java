@@ -1,42 +1,82 @@
-package com.lofserver.soma.service;
+package com.lofserver.soma.component;
 
+import com.lofserver.soma.entity.TeamEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
 import com.lofserver.soma.entity.match.MatchInfo;
 import com.lofserver.soma.repository.MatchRepository;
 import com.lofserver.soma.repository.TeamRepository;
-import com.lofserver.soma.repository.UserRepository;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.stereotype.Service;
-import org.jsoup.Connection;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-@Service
-public class CrawlService {
+@Component
+@Slf4j
+public class CrawlComponent implements ApplicationRunner {
 
-    private final UserRepository userRepository;
-    private final TeamRepository teamRepository;
+    String fandom_url = "https://lol.fandom.com/wiki/LCK/2022_Season/Summer_Season";
     private final MatchRepository matchRepository;
 
-    public CrawlService(UserRepository userRepository, TeamRepository teamRepository, MatchRepository matchRepository) {
-        this.userRepository = userRepository;
-        this.teamRepository = teamRepository;
+    private final TeamRepository teamRepository;
+
+    public CrawlComponent(MatchRepository matchRepository, TeamRepository teamRepository) {
         this.matchRepository = matchRepository;
+        this.teamRepository = teamRepository;
     }
 
-    public void getMatchScheduleList() { // 서비스에서 호출할 메소드
-        final String matchInfo = "https://lol.fandom.com/wiki/LCK/2022_Season/Summer_Season";
-        Connection conn = Jsoup.connect(matchInfo); // 커넥션 생성
+    //모든 경기 설정 함수.
+    @Override
+    public void run(ApplicationArguments args) throws Exception{
+        setAllMatchList();
+    }
+    public Boolean setAllMatchList(){
+        Document document = null;
         try {
-            Document document = conn.get(); // document 객체 생성
-            getMatchScheduleList(document);
-        } catch (IOException ignored) {
+            document = Jsoup.connect(fandom_url).get();
+        } catch (IOException e) {
+            log.info("fandom_url connection fail");
+            return false;
         }
-        return;
-    }
+        Elements elements = document.select("tr[class^=ml-allw ml-w]").select("tr[class*=ml-row]");
+        elements.forEach(element -> {
+            LocalDate matchDate = LocalDate.parse(element.attr("data-date"), DateTimeFormatter.ISO_DATE);
+            LocalTime matchTime = LocalTime.parse(element.select("span[class^=ofl-toggle-3-5 ofl-toggler-3-all]").text());
+            String homeTeam = element.select("td[class^=matchlist-team1]").attr("data-teamhighlight");
+            String awayTeam = element.select("td[class^=matchlist-team2]").attr("data-teamhighlight");
+            String liveLink = element.select("a[target=_blank]").attr("href");
+            Elements scoreElements = element.select("td[class^=matchlist-score]");
+            Long homeScore = 0L;
+            Long awayScore = 0L;
+            if(scoreElements.size() != 0) {
+                homeScore = Long.parseLong(scoreElements.get(0).text());
+                awayScore = Long.parseLong(scoreElements.get(1).text());
+            }
 
+            TeamEntity teamEntityHome = teamRepository.findByTeamName(homeTeam);
+            TeamEntity teamEntityAway = teamRepository.findByTeamName(awayTeam);
+
+            Long matchId = matchRepository.save(new MatchEntity(homeScore,awayScore,false,new MatchInfo(matchDate,matchTime,teamEntityHome.getTeamId(), teamEntityAway.getTeamId(),liveLink))).getMatchId();
+            teamEntityHome.addMatch(matchId);
+            teamEntityAway.addMatch(matchId);
+            teamRepository.save(teamEntityHome);
+            teamRepository.save(teamEntityAway);
+        });
+
+        return true;
+    }
+/*
     public void getMatchScheduleList(Document document) { // 크롤링 값들을 리스트로 반환
         Elements elements = document.select("#matchlist-content-wrapper tbody tr");
 
@@ -102,5 +142,5 @@ public class CrawlService {
             }
         }
         return;
-    }
+    }*/
 }

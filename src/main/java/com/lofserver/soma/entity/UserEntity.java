@@ -1,8 +1,10 @@
 package com.lofserver.soma.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.*;
@@ -11,6 +13,7 @@ import java.util.*;
 @Entity
 @Getter
 @Table(name = "lof_user")
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

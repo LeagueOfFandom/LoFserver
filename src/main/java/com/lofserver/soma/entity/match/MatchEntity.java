@@ -2,19 +2,21 @@ package com.lofserver.soma.entity.match;
 
 
 import com.lofserver.soma.controller.v1.response.match.Match;
+import com.lofserver.soma.entity.TeamEntity;
+import com.lofserver.soma.repository.TeamRepository;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
 @NoArgsConstructor
 @Entity
 @Getter
 @Table(name = "match_lck")
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 public class MatchEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,14 +33,16 @@ public class MatchEntity {
     private MatchInfo matchInfo; //match 에 대한 상세 정보. 추후 vs 정보등 추가.
 
     //client로 보내줄 match 형태로 link와 alarm을 추가하여 변경.
-    public Match toMatch(String livelink, Boolean alarm){
-        return new Match(matchId, matchInfo.getMatchDate(), matchInfo.getMatchTime(),matchInfo.getHomeName(),matchInfo.getAwayName(),matchInfo.getHomeImg(),matchInfo.getAwayImg(),homeScore,awayScore,live,livelink,alarm);
+    public Match toMatch(Boolean alarm, TeamRepository teamRepository, String language){
+        TeamEntity teamEntityHome = teamRepository.findById(matchInfo.getHomeTeamId()).orElse(null);
+        TeamEntity teamEntityAway = teamRepository.findById(matchInfo.getAwayTeamId()).orElse(null);
+        return new Match(matchId, matchInfo.getMatchDate(), matchInfo.getMatchTime(),teamEntityHome.getTeamNameList().get(language),teamEntityAway.getTeamNameList().get(language),teamEntityHome.getTeamImg(),teamEntityAway.getTeamImg(),homeScore,awayScore,matchInfo.getLiveLink(),alarm);
     }
 
-    public MatchEntity(MatchInfo matchinfo, Long homeScore, Long awayScore, Boolean live){
-        this.matchInfo = matchinfo;
+    public MatchEntity(Long homeScore, Long awayScore, Boolean live, MatchInfo matchInfo) {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
         this.live = live;
+        this.matchInfo = matchInfo;
     }
 }

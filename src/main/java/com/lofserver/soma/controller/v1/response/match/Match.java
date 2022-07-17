@@ -26,14 +26,12 @@ public class Match {
     private Long homeScore;
     @ApiModelProperty(example = "2")
     private Long awayScore;
-    @ApiModelProperty(example = "true")
-    private Boolean live;
     @ApiModelProperty(example = "https://")
     private String liveLink;
     @ApiModelProperty(example = "true")
     private Boolean alarm;
 
-    public Match(Long matchId, LocalDate matchDate, LocalTime matchTime, String homeName, String awayName, String homeImg, String awayImg, Long homeScore, Long awayScore, Boolean live, String liveLink, Boolean alarm) {
+    public Match(Long matchId, LocalDate matchDate, LocalTime matchTime, String homeName, String awayName, String homeImg, String awayImg, Long homeScore, Long awayScore, String liveLink, Boolean alarm) {
         this.matchId = matchId;
         this.matchDate = matchDate;
         this.matchTime = matchTime;
@@ -43,7 +41,6 @@ public class Match {
         this.awayImg = awayImg;
         this.homeScore = homeScore;
         this.awayScore = awayScore;
-        this.live = live;
         this.liveLink = liveLink;
         this.alarm = alarm;
     }

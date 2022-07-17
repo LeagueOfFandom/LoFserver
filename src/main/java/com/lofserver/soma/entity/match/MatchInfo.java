@@ -1,25 +1,23 @@
 package com.lofserver.soma.entity.match;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
-@Setter
 public class MatchInfo {
     private LocalDate matchDate;
     private LocalTime matchTime;
-    private String homeName;
-    private String awayName;
-    private String homeImg;
-    private String awayImg;
+    private Long homeTeamId;
+    private Long awayTeamId;
+    private String liveLink;
 
-    public MatchInfo(LocalDate matchDate, LocalTime matchTime, String homeName, String awayName){
+    public MatchInfo(LocalDate matchDate, LocalTime matchTime, Long homeTeamId, Long awayTeamId, String liveLink) {
         this.matchDate = matchDate;
-        this.matchTime = matchTime;
-        this.homeName = homeName;
-        this.awayName = awayName;
+        this.homeTeamId = homeTeamId;
+        this.awayTeamId = awayTeamId;
+        this.liveLink = liveLink;
     }
+        this.matchTime = matchTime;
 }

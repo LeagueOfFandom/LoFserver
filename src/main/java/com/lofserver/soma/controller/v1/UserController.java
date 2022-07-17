@@ -10,6 +10,7 @@ import com.lofserver.soma.service.LofService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,10 @@ import org.springframework.web.bind.annotation.*;
         @ApiResponse(code = 500, message = "Internal Server Error")
 })
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    @Autowired
-    private LofService lofService;
+    private final LofService lofService;
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.")
     @GetMapping("/matchList")
     public MatchList getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all")Boolean isAll){
