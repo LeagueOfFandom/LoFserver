@@ -16,6 +16,7 @@ import com.lofserver.soma.entity.match.MatchInfo;
 import com.lofserver.soma.repository.MatchRepository;
 import com.lofserver.soma.repository.TeamRepository;
 import com.lofserver.soma.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpEntity;
@@ -30,18 +31,14 @@ import java.util.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class LofService {
 
-    private String livelink = "https://www.twitch.tv/lck_korea";
     //필요한 Jpa 선언.
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
-    public LofService(UserRepository userRepository, TeamRepository teamRepository, MatchRepository matchRepository) {
-        this.userRepository = userRepository;
-        this.teamRepository = teamRepository;
-        this.matchRepository = matchRepository;
-    }
+    private String language = "ko_KR";
 
     //user의 matchList반환 함수.
     public MatchList getMatchList(Long userId, Boolean isAll){
@@ -61,9 +58,9 @@ public class LofService {
             matchListID.addAll(matchRepository.findAllId());
             matchListID.forEach(matchId -> {
                 //설정한 값이 있다면 설정한 값으로 진행한다.
-                if(userSelected.containsKey(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(livelink, userSelected.get(matchId)));
+                if(userSelected.containsKey(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(userSelected.get(matchId), teamRepository,language));
                 //선택한 팀이 없으므로 전부 false로 진행한다.
-                else matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(livelink, false));
+                else matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(false,teamRepository,language));
             });
         }
         //전부를 보내준다.
@@ -77,11 +74,11 @@ public class LofService {
 
             matchListID.forEach(matchId -> {
                 //설정한 값이 있다면 설정한 값으로 진행한다.
-                if(userSelected.containsKey(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(livelink, userSelected.get(matchId)));
+                if(userSelected.containsKey(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(userSelected.get(matchId),teamRepository,language));
                 //선택한 팀이라면 알람을 보내준다.
-                else if(matchListByTeam.contains(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(livelink, true));
+                else if(matchListByTeam.contains(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(true,teamRepository,language));
                 //아니라면 안보낸다.
-                else matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(livelink, false));
+                else matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(false,teamRepository,language));
             });
         }
         //해당 팀 정보만 보내준다.
@@ -91,8 +88,8 @@ public class LofService {
             });
             matchListID.forEach(matchId -> {
                 //설정한 값이 있다면 설정한 값으로 진행한다.
-                if(userSelected.containsKey(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(livelink, userSelected.get(matchId)));
-                else matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(livelink, true));
+                if(userSelected.containsKey(matchId)) matchList.add(matchRepository.findById(matchId).orElse(null).toMatch(userSelected.get(matchId),teamRepository,language));
+                else matchList.add(matchRepository.findById(matchId).orElse(null).toMatch( true,teamRepository,language));
             });
         }
         return new MatchList(matchList);
@@ -108,8 +105,8 @@ public class LofService {
         List<UserTeamInfo> userTeamInfoList = new ArrayList<>();
         //모든 팀에 대해 user의 선택 값 적용하여 제공.
         teamRepository.findAll().forEach(teamEntity -> {
-            if(userEntity.getTeamList().contains(teamEntity.getTeamId())) userTeamInfoList.add(new UserTeamInfo(teamEntity,true));
-            else userTeamInfoList.add(new UserTeamInfo(teamEntity, false));
+            if(userEntity.getTeamList().contains(teamEntity.getTeamId())) userTeamInfoList.add(new UserTeamInfo(teamEntity,true,language));
+            else userTeamInfoList.add(new UserTeamInfo(teamEntity, false,language));
         });
 
         return new UserTeamInfoList(userTeamInfoList);
