@@ -9,20 +9,14 @@ import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.dto.fcm.FcmResponse;
-import com.lofserver.soma.entity.TeamEntity;
 import com.lofserver.soma.entity.UserEntity;
-import com.lofserver.soma.entity.match.MatchEntity;
-import com.lofserver.soma.entity.match.MatchInfo;
 import com.lofserver.soma.repository.MatchRepository;
 import com.lofserver.soma.repository.TeamRepository;
 import com.lofserver.soma.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -41,12 +35,13 @@ public class LofService {
     private String language = "ko_KR";
 
     //user의 matchList반환 함수.
-    public MatchList getMatchList(Long userId, Boolean isAll){
+    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll){
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
         List<Match> matchList = new ArrayList<>();
 
-        if(userEntity.equals(null)){ // id 없음 예외처리.
-            log.info("getMatchList", "해당 id 없음 :" + userId);
+        if(userEntity == null){ // id 없음 예외처리.
+            log.info("getMatchList" + "해당 id 없음 :" + userId);
+            return new ResponseEntity<>("해당 id 없음",HttpStatus.BAD_REQUEST);
         }
 
         List<Long> teamList = userEntity.getTeamList();
@@ -92,14 +87,15 @@ public class LofService {
                 else matchList.add(matchRepository.findById(matchId).orElse(null).toMatch( true,teamRepository,language));
             });
         }
-        return new MatchList(matchList);
+        return new ResponseEntity<>(new MatchList(matchList), HttpStatus.OK);
     }
     //user가 선택한 team list 제공 함수.
-    public UserTeamInfoList getTeamList(Long userId){
+    public ResponseEntity<?> getTeamList(Long userId){
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
 
-        if(userEntity.equals(null)){ // id 없음 예외처리.
-            log.info("getMatchList", "해당 id 없음 :" + userId);
+        if(userEntity == null){ // id 없음 예외처리.
+            log.info("getTeamList: "+"해당 id 없음 :" + userId);
+            return new ResponseEntity<>("해당 id 없음",HttpStatus.BAD_REQUEST);
         }
 
         List<UserTeamInfo> userTeamInfoList = new ArrayList<>();
@@ -108,36 +104,46 @@ public class LofService {
             if(userEntity.getTeamList().contains(teamEntity.getTeamId())) userTeamInfoList.add(new UserTeamInfo(teamEntity,true,language));
             else userTeamInfoList.add(new UserTeamInfo(teamEntity, false,language));
         });
-
-        return new UserTeamInfoList(userTeamInfoList);
+        return new ResponseEntity<>(new UserTeamInfoList(userTeamInfoList),HttpStatus.OK );
     }
     //초기 user set 함수.
-    public UserId setUser(UserDto userDto){
+    public ResponseEntity<UserId> setUser(UserDto userDto){
         UserEntity userEntity = userRepository.findByDeviceId(userDto.getDeviceId());
         //없다면 저장한다.
-        if(userEntity == null) return new UserId(userRepository.save(new UserEntity(userDto.getToken(), userDto.getDeviceId())).getUserId(),false);
+        if(userEntity == null) return new ResponseEntity<>(new UserId(userRepository.save(new UserEntity(userDto.getToken(), userDto.getDeviceId())).getUserId(),false), HttpStatus.OK);
         //있다면 반환한다.
-        return new UserId(userEntity.getUserId(), true);
+        return new ResponseEntity<>(new UserId(userEntity.getUserId(), true), HttpStatus.OK);
     }
     //user의 팀 정보 수정.
-    public void setTeamList(UserTeamListDto userTeamListDto){
+    public ResponseEntity<String> setTeamList(UserTeamListDto userTeamListDto){
         UserEntity userEntity = userRepository.findById(userTeamListDto.getUserId()).orElse(null);
 
-        if(userEntity.equals(null)){ // id 없음 예외처리.
-            log.info("getMatchList", "해당 id 없음 :" + userTeamListDto.getUserId());
+        if(userEntity == null){ // id 없음 예외처리.
+            log.info("getMatchList: "+"해당 id 없음 :" + userTeamListDto.getUserId());
+            return new ResponseEntity<>("해당 user id 없음", HttpStatus.BAD_REQUEST);
+        }
+        if(!teamRepository.findAllId().containsAll(userTeamListDto.getTeamIdList())){
+            log.info("getMatchList: "+"팀 id 리스트 잘못됨" + userTeamListDto.getTeamIdList().toString());
+            return new ResponseEntity<>("해당 team id 없음", HttpStatus.BAD_REQUEST);
         }
         userEntity.setTeamList(userTeamListDto.getTeamIdList());
-        userRepository.flush();
+        userRepository.save(userEntity);
+        return new ResponseEntity<>("success", HttpStatus.OK);
     }
-    public void setAlarm(UserAlarmDto userAlarmDto){
+    public ResponseEntity<String> setAlarm(UserAlarmDto userAlarmDto){
         UserEntity userEntity = userRepository.findById(userAlarmDto.getUserId()).orElse(null);
 
-        if(userEntity.equals(null)){ // id 없음 예외처리.
-            log.info("getMatchList", "해당 id 없음 :" + userAlarmDto.getUserId());
+        if(userEntity == null){ // id 없음 예외처리.
+            log.info("setAlarm: " + "해당 id 없음 :" + userAlarmDto.getUserId());
+            return new ResponseEntity<>("해당 id 없음", HttpStatus.BAD_REQUEST);
         }
-
+        if(matchRepository.findById(userAlarmDto.getMatchId()).orElse(null) == null){
+            log.info("setAlarm: " + "해당 match id 없음 :" + userAlarmDto.getMatchId());
+            return new ResponseEntity<>("해당 match id 없음", HttpStatus.BAD_REQUEST);
+        }
         userEntity.addUserSelected(userAlarmDto.getMatchId(),userAlarmDto.getAlarm());
-        userRepository.flush();
+        userRepository.save(userEntity);
+        return new ResponseEntity<>("success", HttpStatus.OK);
     }
     public void post(){
 
