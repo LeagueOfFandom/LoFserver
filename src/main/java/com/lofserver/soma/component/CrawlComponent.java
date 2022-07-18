@@ -48,11 +48,6 @@ public class CrawlComponent implements ApplicationRunner {
         if(matchEntityList != null){
         }
     }
-    @Scheduled(cron = "0 * 17-23 * * *")
-    public void checkScore(MatchEntity matchEntity){
-        //종료 방법을 찾아 봤는데 ThreadPoolTaskScheduler등 다른 것을 이용해야 하는 것같음.
-        //현재 schedule은 실행시키면 종료가 안됨. 추가적으로 2개 동시 실행도 안되는듯.
-    }
 
     public void setAllMatchList(){//모든 매치 넣어주는 함수.
         Document document = null;
