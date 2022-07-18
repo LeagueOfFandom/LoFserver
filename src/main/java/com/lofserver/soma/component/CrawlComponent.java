@@ -14,6 +14,8 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -23,31 +25,42 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
+@EnableScheduling
+@RequiredArgsConstructor
 @Slf4j
 public class CrawlComponent implements ApplicationRunner {
 
     String fandom_url = "https://lol.fandom.com/wiki/LCK/2022_Season/Summer_Season";
     private final MatchRepository matchRepository;
-
     private final TeamRepository teamRepository;
-
-    public CrawlComponent(MatchRepository matchRepository, TeamRepository teamRepository) {
-        this.matchRepository = matchRepository;
-        this.teamRepository = teamRepository;
-    }
-
     //모든 경기 설정 함수.
     @Override
     public void run(ApplicationArguments args) throws Exception{
         setAllMatchList();
     }
-    public Boolean setAllMatchList(){
+
+    //매일 정각에 match 검색
+    @Scheduled(cron = "1 0 0 * * *")
+    public void monitoringLck(){
+        LocalDate localDate = LocalDate.now();
+        List<MatchEntity> matchEntityList = matchRepository.findByMatchDate(localDate);
+        //오늘 매치가 있으면 아래 실행.
+        if(matchEntityList != null){
+        }
+    }
+    @Scheduled(cron = "0 * 17-23 * * *")
+    public void checkScore(MatchEntity matchEntity){
+        //종료 방법을 찾아 봤는데 ThreadPoolTaskScheduler등 다른 것을 이용해야 하는 것같음.
+        //현재 schedule은 실행시키면 종료가 안됨. 추가적으로 2개 동시 실행도 안되는듯.
+    }
+
+    public void setAllMatchList(){//모든 매치 넣어주는 함수.
         Document document = null;
         try {
             document = Jsoup.connect(fandom_url).get();
         } catch (IOException e) {
             log.info("fandom_url connection fail");
-            return false;
+            return;
         }
         Elements elements = document.select("tr[class^=ml-allw ml-w]").select("tr[class*=ml-row]");
         elements.forEach(element -> {
@@ -74,7 +87,7 @@ public class CrawlComponent implements ApplicationRunner {
             teamRepository.save(teamEntityAway);
         });
 
-        return true;
+        return;
     }
 /*
     public void getMatchScheduleList(Document document) { // 크롤링 값들을 리스트로 반환
