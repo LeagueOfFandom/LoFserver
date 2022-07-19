@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
     TeamEntity findByTeamName(String teamName);
+    @Query("select te.teamId from TeamEntity te")
+    List<Long> findAllId();
 }
