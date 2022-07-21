@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -37,15 +39,37 @@ public class CrawlComponent implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception{
         setAllMatchList();
+        monitoringLck();
     }
 
-    //매일 정각에 match 검색
-    @Scheduled(cron = "1 0 0 * * *")
+    /*
+    @Scheduled(cron = "0 0 0 * * 4") // 수요일날 실행
+    public void monitoringWeek(){
+        monitoringLck(6L);
+    }
+    */
+
+    @Scheduled(cron = "0 0/5 17-23 * * *") // @Scheduled(cron = "10 * * * * *")
     public void monitoringLck(){
         LocalDate localDate = LocalDate.now();
-        List<MatchEntity> matchEntityList = matchRepository.findByMatchDate(localDate);
-        //오늘 매치가 있으면 아래 실행.
-        if(matchEntityList != null){
+
+        Long Week = 6L;
+        Long Order = 3L;
+
+        // 매일의 matchid를 list에 저장
+        // List<MatchEntity> matchEntityList = matchRepository.findByMatchDate(localDate);
+        List<MatchEntity> matchEntityList = new ArrayList<>();
+        matchRepository.findAll().forEach(match -> {
+            if(match.getMatchInfo().getMatchDate().toString().equals(localDate.toString())){
+                matchEntityList.add(match);
+            }
+        });
+
+        // 오늘 매치가 있으면 실행
+        if(matchEntityList.size()!=0){
+            log.info("오늘 경기가 있다면");
+            // checkTodayList(localDate.toString(), matchEntityList.get(0).getMatchId());
+           checkTodayList(Week, Order, matchEntityList.get(0).getMatchId());
         }
     }
 
@@ -81,74 +105,75 @@ public class CrawlComponent implements ApplicationRunner {
             teamRepository.save(teamEntityHome);
             teamRepository.save(teamEntityAway);
         });
-
         return;
     }
-/*
-    public void getMatchScheduleList(Document document) { // 크롤링 값들을 리스트로 반환
-        Elements elements = document.select("#matchlist-content-wrapper tbody tr");
 
-        String DateInLocal = "";
+    public void checkTodayList(Long Week, Long Order, Long matchId) {
+        MatchEntity matchEntity = matchRepository.findById(matchId).get();
 
-        for (Element element : elements) {
-
-            if(!element.select("td span.DateInLocal").isEmpty()) {
-                DateInLocal = element.text();
-                System.out.println(DateInLocal);
-            }
-
-            if(element.select("td").size() == 5){
-                String homeName="";
-                String awayName="";
-                long homeScore = 0;
-                long awayScore = 0;
-
-                for(int i=0; i<(element.select("td").size()); i++){
-                    if (i==0) {
-                        homeName = element.select("td").get(i).text();
-                        System.out.println("home" + homeName);
-                    }
-                    else if (i==1) {
-                        homeScore = Long.parseLong(element.select("td").get(i).text());
-                        System.out.println(homeScore);
-                    }
-                    else if(i==2) {
-                        awayScore= Long.parseLong(element.select("td").get(i).text());
-                        System.out.println(awayScore);
-                    }
-                    else if(i==3) continue;
-                    else if(i==4) {
-                        awayName= element.select("td").get(i).text();
-                        System.out.println("away" + awayName);
-                    }
-                }
-                System.out.println(awayScore);
-                matchRepository.save(new MatchEntity(homeScore, awayScore));
-                matchRepository.flush();
-            }
-
-            if(element.select("td").size() == 3){
-                String DateTime = "";
-                String homeName="";
-                String awayName="";
-                long homeScore = 0;
-                long awayScore = 0;
-
-                for(int i=0; i<(element.select("td").size()); i++){
-                    if (i==0) {
-                        homeName = element.select("td").get(i).text();
-                    }
-                    else if (i==1) {
-                        DateTime = element.select("td").get(i).text();
-                    }
-                    else if(i==2) {
-                        awayName= element.select("td").get(i).text();
-                    }
-                }
-                matchRepository.save(new MatchEntity(homeScore, awayScore), false);
-                matchRepository.flush();
-            }
+        Document document = null;
+        try {
+            document = Jsoup.connect(fandom_url).get();
+        } catch (IOException e) {
+            log.info("fandom_url connection fail");
+            return;
         }
-        return;
-    }*/
+
+        Elements elements = document.select("tr[class^=ml-allw ml-w"+Week.toString()+"]").select("tr[class*=ml-row]");
+        elements.forEach(element -> {
+            log.info(element.attr("data-initial-order")+ " " + Order.toString());
+            if(element.attr("data-initial-order").equals(Order.toString())){
+
+                // 시간 확인
+                LocalTime localTime = LocalTime.now();
+                if (!matchEntity.getLive()){
+                    if (localTime.isAfter(matchEntity.getMatchInfo().getMatchTime())) { // 경기 시간 지났으면
+                        matchEntity.setLive(true);
+                        matchRepository.save(matchEntity);
+                        matchRepository.flush();
+                        log.info("경기시작 후 " + matchRepository.findById(matchId).get().getLive());
+                    }
+                    else {
+                        log.info("경기시작 전");
+                    }
+                }
+
+                // 점수 확인
+                Long homeScore_ori =  matchEntity.getHomeScore();
+                Long awayScore_ori =  matchEntity.getAwayScore();
+                Elements scoreElements = element.select("td[class^=matchlist-score]");
+                Long homeScore = homeScore_ori;
+                Long awayScore = awayScore_ori;
+                if(scoreElements.size() != 0) {
+                    homeScore = Long.parseLong(scoreElements.get(0).text());
+                    awayScore = Long.parseLong(scoreElements.get(1).text());
+                }
+                log.info("이전 점수 home: " + homeScore_ori.toString() + " away: " + awayScore_ori.toString());
+                log.info("이후 점수 home: " + homeScore.toString() + " away: " + awayScore.toString());
+
+                // 점수가 업데이트 되었다면
+                if (homeScore_ori != homeScore || awayScore_ori != awayScore) {
+                    matchEntity.setHomeScore(homeScore);
+                    matchEntity.setAwayScore(awayScore);
+                    matchRepository.save(matchEntity);
+                    matchRepository.flush();
+                    log.info("라운드 종료 repo " + matchRepository.findById(matchId).get().getHomeScore() + " " +  matchRepository.findById(matchId).get().getAwayScore());
+                    log.info("라운드 종료 entity" + matchRepository.findById(matchId).get().getHomeScore() + " " +  matchRepository.findById(matchId).get().getAwayScore());
+
+                    if (homeScore == 2 || awayScore == 2) { // 게임 종료 & 라이브 변경
+                        matchEntity.setLive(false);
+                        matchRepository.save(matchEntity);
+                        matchRepository.flush();
+                        log.info("경기 종료 라이브변경" + matchRepository.findById(matchId).get().getLive());
+
+                        checkTodayList(Week, Order+1, matchId+1);
+                        return;
+                    }
+                    // fcm push
+                }
+
+            }
+        });
+    }
+
 }

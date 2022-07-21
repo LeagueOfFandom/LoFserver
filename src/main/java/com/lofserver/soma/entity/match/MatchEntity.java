@@ -7,6 +7,7 @@ import com.lofserver.soma.repository.TeamRepository;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -15,6 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Getter
+@Setter
 @Table(name = "match_lck")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class MatchEntity {
@@ -45,4 +47,7 @@ public class MatchEntity {
         this.live = live;
         this.matchInfo = matchInfo;
     }
+
+
+
 }

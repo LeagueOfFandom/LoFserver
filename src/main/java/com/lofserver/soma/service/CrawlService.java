@@ -58,25 +58,19 @@ public class CrawlService {
                 for(int i=0; i<(element.select("td").size()); i++){
                     if (i==0) {
                         homeName = element.select("td").get(i).text();
-                        System.out.println("home" + homeName);
                     }
                     else if (i==1) {
                         homeScore = Long.parseLong(element.select("td").get(i).text());
-                        System.out.println(homeScore);
                     }
                     else if(i==2) {
                         awayScore= Long.parseLong(element.select("td").get(i).text());
-                        System.out.println(awayScore);
                     }
                     else if(i==3) continue;
                     else if(i==4) {
                         awayName= element.select("td").get(i).text();
-                        System.out.println("away" + awayName);
                     }
                 }
-                System.out.println(awayScore);
-                matchRepository.save(new MatchEntity(homeScore, awayScore));
-                matchRepository.flush();
+
             }
 
             if(element.select("td").size() == 3){
@@ -97,8 +91,6 @@ public class CrawlService {
                         awayName= element.select("td").get(i).text();
                     }
                 }
-                matchRepository.save(new MatchEntity(homeScore, awayScore), false);
-                matchRepository.flush();
             }
         }
         return;

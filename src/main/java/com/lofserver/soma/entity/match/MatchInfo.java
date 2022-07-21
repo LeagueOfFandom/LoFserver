@@ -18,6 +18,7 @@ public class MatchInfo {
         this.homeTeamId = homeTeamId;
         this.awayTeamId = awayTeamId;
         this.liveLink = liveLink;
-    }
         this.matchTime = matchTime;
+    }
+
 }
