@@ -1,5 +1,6 @@
 package com.lofserver.soma.controller.v1;
 
+import com.lofserver.soma.component.CrawlComponent;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
     private final LofService lofService;
+    private final CrawlComponent crawlComponent;
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
     @GetMapping("/matchList")
     public ResponseEntity<?> getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll){
@@ -49,5 +51,4 @@ public class UserController {
     public ResponseEntity<String> setAlarm(@RequestBody UserAlarmDto userAlarmDto){
         return lofService.setAlarm(userAlarmDto);
     }
-
 }

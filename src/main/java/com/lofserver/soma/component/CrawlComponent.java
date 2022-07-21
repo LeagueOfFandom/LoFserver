@@ -1,22 +1,29 @@
 package com.lofserver.soma.component;
 
+import com.lofserver.soma.dto.fcm.FcmResponse;
 import com.lofserver.soma.entity.TeamEntity;
+import com.lofserver.soma.entity.UserEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
 import com.lofserver.soma.entity.match.MatchInfo;
 import com.lofserver.soma.repository.MatchRepository;
 import com.lofserver.soma.repository.TeamRepository;
-import lombok.NoArgsConstructor;
+import com.lofserver.soma.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -33,23 +40,94 @@ public class CrawlComponent implements ApplicationRunner {
     String fandom_url = "https://lol.fandom.com/wiki/LCK/2022_Season/Summer_Season";
     private final MatchRepository matchRepository;
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
+    private String language = "ko_KR";
+    private MatchEntity matchEntity;
+
+    private void setMatchEntity(MatchEntity matchEntity) {
+        this.matchEntity = matchEntity;
+    }
+
     //모든 경기 설정 함수.
     @Override
     public void run(ApplicationArguments args) throws Exception{
         setAllMatchList();
+        setMatchEntity(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
     }
-
     //매일 정각에 match 검색
-    @Scheduled(cron = "1 0 0 * * *")
-    public void monitoringLck(){
-        LocalDate localDate = LocalDate.now();
-        List<MatchEntity> matchEntityList = matchRepository.findByMatchDate(localDate);
-        //오늘 매치가 있으면 아래 실행.
-        if(matchEntityList != null){
+    @Scheduled(cron = "0 * * * * *")
+    private void monitoringLck(){
+        Document document = null;
+        try {
+            document = Jsoup.connect(fandom_url).get();
+        } catch (IOException e) {
+            log.info("fandom_url connection fail");
+            return;
         }
+        Elements elements = document.select("tr[class^=ml-allw ml-w]").select("tr[class*=ml-row]");
+        elements.forEach(element -> {
+            LocalDate matchDate = LocalDate.parse(element.attr("data-date"), DateTimeFormatter.ISO_DATE);
+            LocalTime matchTime = LocalTime.parse(element.select("span[class^=ofl-toggle-3-5 ofl-toggler-3-all]").text());
+            Elements scoreElements = element.select("td[class^=matchlist-score]");
+            Long homeScore = 0L;
+            Long awayScore = 0L;
+            if (scoreElements.size() != 0) {
+                homeScore = Long.parseLong(scoreElements.get(0).text());
+                awayScore = Long.parseLong(scoreElements.get(1).text());
+            } else if (homeScore == 0L && awayScore == 0L && matchEntity.getLive() == false) {
+                matchEntity.setLive(true);
+                post(matchRepository.save(matchEntity),true);
+            }
+            if(matchEntity.getMatchInfo().getMatchDate().equals(matchDate) && matchEntity.getMatchInfo().getMatchTime().equals(matchTime)){
+                if(homeScore != matchEntity.getHomeScore() || awayScore != matchEntity.getAwayScore()){
+                    matchEntity.setHomeScore(homeScore);
+                    matchEntity.setAwayScore(awayScore);
+                    //추후 db에 경기 수 넣어야할듯.
+                    if(homeScore == 2L || awayScore == 2L){
+                        matchEntity.setLive(false);
+                        post(matchRepository.save(matchEntity),false);
+                        matchEntity = matchRepository.save(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
+                    }
+                    else{
+                        matchEntity = matchRepository.save(matchEntity);
+                        post(matchEntity, false);
+                    }
+                }
+            }
+        });
+    }
+    private void post(MatchEntity matchEntity, Boolean start){
+        TeamEntity homeTeam = teamRepository.findById(matchEntity.getMatchInfo().getHomeTeamId()).orElse(null);
+        TeamEntity awayTeam = teamRepository.findById(matchEntity.getMatchInfo().getAwayTeamId()).orElse(null);
+
+        String url = "https://fcm.googleapis.com/fcm/send";
+        String key = "AAAA2e5oM2A:APA91bFkeAZM_08Vbliwn3C5_IR2jWF1GPgAS_9YYp071tRNyFossJP23OOTFMjwFq7HQW4HMU7K5XKee32u3cx8ioAlylFxK7SruyNO1iJy3sacuir-29GdosKdlKCBl6B_YfZj0xjd";
+        //header setting
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        headers.set("Authorization", "key=" + key);
+        //body setting
+        JSONObject dataJson = new JSONObject();
+        Long setCount = matchEntity.getAwayScore()+matchEntity.getHomeScore();
+        dataJson.put("title", homeTeam.getTeamNameList().get(language) + " vs " + awayTeam.getTeamNameList().get(language));
+        if(start) dataJson.put("message", "경기가 시작합니다!");
+        else dataJson.put("message", setCount + "세트가 종료 되었습니다.");
+        //user에게 fcm보내기
+        List<UserEntity> userEntityList = userRepository.findAllByTeamIdAndMatchId(matchEntity.getMatchInfo().getHomeTeamId(),matchEntity.getMatchId());
+        userEntityList.forEach(userEntity -> {
+            //make json
+            JSONObject userJsonObject = new JSONObject();
+            userJsonObject.put("to",userEntity.getToken());
+            userJsonObject.put("data", dataJson);
+            //send
+            HttpEntity<String> requestEntity = new HttpEntity<String>(userJsonObject.toJSONString(),headers);
+            ResponseEntity<FcmResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, FcmResponse.class);
+            log.info(response.getBody().toString());
+        });
     }
 
-    public void setAllMatchList(){//모든 매치 넣어주는 함수.
+    private void setAllMatchList(){//모든 매치 넣어주는 함수.
         Document document = null;
         try {
             document = Jsoup.connect(fandom_url).get();
@@ -81,74 +159,5 @@ public class CrawlComponent implements ApplicationRunner {
             teamRepository.save(teamEntityHome);
             teamRepository.save(teamEntityAway);
         });
-
-        return;
     }
-/*
-    public void getMatchScheduleList(Document document) { // 크롤링 값들을 리스트로 반환
-        Elements elements = document.select("#matchlist-content-wrapper tbody tr");
-
-        String DateInLocal = "";
-
-        for (Element element : elements) {
-
-            if(!element.select("td span.DateInLocal").isEmpty()) {
-                DateInLocal = element.text();
-                System.out.println(DateInLocal);
-            }
-
-            if(element.select("td").size() == 5){
-                String homeName="";
-                String awayName="";
-                long homeScore = 0;
-                long awayScore = 0;
-
-                for(int i=0; i<(element.select("td").size()); i++){
-                    if (i==0) {
-                        homeName = element.select("td").get(i).text();
-                        System.out.println("home" + homeName);
-                    }
-                    else if (i==1) {
-                        homeScore = Long.parseLong(element.select("td").get(i).text());
-                        System.out.println(homeScore);
-                    }
-                    else if(i==2) {
-                        awayScore= Long.parseLong(element.select("td").get(i).text());
-                        System.out.println(awayScore);
-                    }
-                    else if(i==3) continue;
-                    else if(i==4) {
-                        awayName= element.select("td").get(i).text();
-                        System.out.println("away" + awayName);
-                    }
-                }
-                System.out.println(awayScore);
-                matchRepository.save(new MatchEntity(homeScore, awayScore));
-                matchRepository.flush();
-            }
-
-            if(element.select("td").size() == 3){
-                String DateTime = "";
-                String homeName="";
-                String awayName="";
-                long homeScore = 0;
-                long awayScore = 0;
-
-                for(int i=0; i<(element.select("td").size()); i++){
-                    if (i==0) {
-                        homeName = element.select("td").get(i).text();
-                    }
-                    else if (i==1) {
-                        DateTime = element.select("td").get(i).text();
-                    }
-                    else if(i==2) {
-                        awayName= element.select("td").get(i).text();
-                    }
-                }
-                matchRepository.save(new MatchEntity(homeScore, awayScore), false);
-                matchRepository.flush();
-            }
-        }
-        return;
-    }*/
 }

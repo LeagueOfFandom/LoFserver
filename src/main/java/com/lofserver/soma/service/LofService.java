@@ -145,25 +145,5 @@ public class LofService {
         userRepository.save(userEntity);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
-    public void post(){
 
-        String url = "https://fcm.googleapis.com/fcm/send";
-        String key = "AAAA2e5oM2A:APA91bFkeAZM_08Vbliwn3C5_IR2jWF1GPgAS_9YYp071tRNyFossJP23OOTFMjwFq7HQW4HMU7K5XKee32u3cx8ioAlylFxK7SruyNO1iJy3sacuir-29GdosKdlKCBl6B_YfZj0xjd";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-        headers.set("Authorization", "key=" + key);
-        JSONObject jsonObject = new JSONObject();
-        JSONObject dataJson = new JSONObject();
-        dataJson.put("title", "test");
-        dataJson.put("message","gogo");
-        jsonObject.put("to","fDE7uf6PTySGj3x9IWMo4b:APA91bFPwq7U7mYF-9FeHSBQlz9RCsZIbPl0PGheEvkqm-lkpXkrt9kO3MOIqOlJpvfvVlr-t73G4TpyuS2Zb24G52kw6EMK3cidtdOdhQJhlJI-P3ev6woGoOo657pEh7TC3RjudTVU");
-        jsonObject.put("data", dataJson);
-        log.info(jsonObject.toJSONString());
-
-        HttpEntity<String> requestEntity = new HttpEntity<String>(jsonObject.toJSONString(),headers);
-
-        ResponseEntity<FcmResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, FcmResponse.class);
-
-    }
 }

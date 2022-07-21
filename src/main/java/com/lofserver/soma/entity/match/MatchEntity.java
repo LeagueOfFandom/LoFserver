@@ -38,6 +38,15 @@ public class MatchEntity {
         TeamEntity teamEntityAway = teamRepository.findById(matchInfo.getAwayTeamId()).orElse(null);
         return new Match(matchId, matchInfo.getMatchDate(), matchInfo.getMatchTime(),teamEntityHome.getTeamNameList().get(language),teamEntityAway.getTeamNameList().get(language),teamEntityHome.getTeamImg(),teamEntityAway.getTeamImg(),homeScore,awayScore,matchInfo.getLiveLink(),alarm);
     }
+    public void setHomeScore(Long homeScore) {
+        this.homeScore = homeScore;
+    }
+    public void setAwayScore(Long awayScore) {
+        this.awayScore = awayScore;
+    }
+    public void setLive(Boolean live) {
+        this.live = live;
+    }
 
     public MatchEntity(Long homeScore, Long awayScore, Boolean live, MatchInfo matchInfo) {
         this.homeScore = homeScore;
