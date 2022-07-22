@@ -12,4 +12,5 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Long> {
     List<Long> findAllId();
     @Query(value = "select * from match_lck where json_contains(match_info,?1,'$.matchDate')",nativeQuery = true)
     List<MatchEntity> findByMatchDate(LocalDate localDate);
+    MatchEntity findFirstByHomeScoreAndAwayScore(Long homeScore, Long awayScore);
 }
