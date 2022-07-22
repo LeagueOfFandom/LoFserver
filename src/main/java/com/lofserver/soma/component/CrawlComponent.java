@@ -74,9 +74,6 @@ public class CrawlComponent implements ApplicationRunner {
             if (scoreElements.size() != 0) {
                 homeScore = Long.parseLong(scoreElements.get(0).text());
                 awayScore = Long.parseLong(scoreElements.get(1).text());
-            } else if (homeScore == 0L && awayScore == 0L && matchEntity.getLive() == false) {
-                matchEntity.setLive(true);
-                post(matchRepository.save(matchEntity),true);
             }
             if(matchEntity.getMatchInfo().getMatchDate().equals(matchDate) && matchEntity.getMatchInfo().getMatchTime().equals(matchTime)){
                 if(homeScore != matchEntity.getHomeScore() || awayScore != matchEntity.getAwayScore()){
