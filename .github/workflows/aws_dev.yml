@@ -4,7 +4,6 @@ on:
   push:
     branches: [ "develop" ]
 
-name: Deploy String boot to Amanzon EC2
 env:
   S3_BUCKET_NAME: lof-deploy
   
