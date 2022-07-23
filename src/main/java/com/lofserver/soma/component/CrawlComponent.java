@@ -125,12 +125,19 @@ public class CrawlComponent implements ApplicationRunner {
         if(start) dataJson.put("message", "경기가 시작합니다!");
         else dataJson.put("message", setCount + "세트가 종료 되었습니다.");
         //user에게 fcm보내기
-        List<UserEntity> userEntityList = userRepository.findAllByTeamIdAndMatchId(matchEntity.getMatchInfo().getHomeTeamId(),matchEntity.getMatchId());
+        List<UserEntity> userEntityList = userRepository.findAll();
         userEntityList.forEach(userEntity -> {
             //make json
             JSONObject userJsonObject = new JSONObject();
             userJsonObject.put("to",userEntity.getToken());
             userJsonObject.put("data", dataJson);
+            //user가 해당 경기를 선택했다면
+            if(userEntity.getUserSelected().containsKey(matchEntity.getMatchId())){
+                if(userEntity.getUserSelected().get(matchEntity.getMatchId())) userJsonObject.put("isShow",true);
+                else userJsonObject.put("isShow",false);
+            }
+            else if(userEntity.getTeamList().contains(matchEntity.getMatchInfo().getAwayTeamId()) || userEntity.getTeamList().contains(matchEntity.getMatchInfo().getHomeTeamId())) userJsonObject.put("isShow",true);
+            else userJsonObject.put("isShow",false);
             //send
             HttpEntity<String> requestEntity = new HttpEntity<String>(userJsonObject.toJSONString(),headers);
             ResponseEntity<FcmResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, FcmResponse.class);
