@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -41,18 +42,16 @@ public class CrawlComponent implements ApplicationRunner {
     private final MatchRepository matchRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final NextMatch nextMatch;
     private String language = "ko_KR";
-    private MatchEntity matchEntity;
-
-    private void setMatchEntity(MatchEntity matchEntity) {
-        this.matchEntity = matchEntity;
-    }
+    //다음 경기에 대한 정보들
 
     //모든 경기 설정 함수.
     @Override
     public void run(ApplicationArguments args) throws Exception{
         setAllMatchList();
-        setMatchEntity(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
+        nextMatch.setMatchEntity(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
+        nextMatch.setLocalTime(LocalTime.now(ZoneId.of("Asia/Seoul")));
     }
     //매일 정각에 match 검색
     @Scheduled(cron = "0 * * * * *")
@@ -75,19 +74,34 @@ public class CrawlComponent implements ApplicationRunner {
                 homeScore = Long.parseLong(scoreElements.get(0).text());
                 awayScore = Long.parseLong(scoreElements.get(1).text());
             }
-            if(matchEntity.getMatchInfo().getMatchDate().equals(matchDate) && matchEntity.getMatchInfo().getMatchTime().equals(matchTime)){
-                if(homeScore != matchEntity.getHomeScore() || awayScore != matchEntity.getAwayScore()){
-                    matchEntity.setHomeScore(homeScore);
-                    matchEntity.setAwayScore(awayScore);
+            if(nextMatch.getMatchEntity().getMatchInfo().getMatchDate().equals(matchDate) && nextMatch.getMatchEntity().getMatchInfo().getMatchTime().equals(matchTime)){
+                //live여부 확인.
+                if(!nextMatch.getMatchEntity().getLive()){
+                    LocalTime localTime = LocalTime.now(ZoneId.of("Asia/Seoul")).plusMinutes(10);
+                    if(localTime.isAfter(nextMatch.getLocalTime())){
+                        nextMatch.getMatchEntity().setLive(true);
+                        post(nextMatch.getMatchEntity(),true);
+                    }
+                }
+                //경기 변동 여부 확인.
+                if(homeScore != nextMatch.getMatchEntity().getHomeScore() || awayScore != nextMatch.getMatchEntity().getAwayScore()){
+                    nextMatch.getMatchEntity().setHomeScore(homeScore);
+                    nextMatch.getMatchEntity().setAwayScore(awayScore);
                     //추후 db에 경기 수 넣어야할듯.
                     if(homeScore == 2L || awayScore == 2L){
-                        matchEntity.setLive(false);
-                        post(matchRepository.save(matchEntity),false);
-                        matchEntity = matchRepository.save(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
+                        nextMatch.getMatchEntity().setLive(false);
+                        post(matchRepository.save(nextMatch.getMatchEntity()),false);
+                        nextMatch.setMatchEntity(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
+                        //다음경기가 오늘이라면
+                        if(LocalDate.now(ZoneId.of("Asia/Seoul")).equals(nextMatch.getMatchEntity().getMatchInfo().getMatchDate())){
+                            if(LocalTime.now(ZoneId.of("Asia/Seoul")).plusMinutes(50).isAfter(nextMatch.getMatchEntity().getMatchInfo().getMatchTime())) nextMatch.setLocalTime(LocalTime.now(ZoneId.of("Asia/Seoul")).plusMinutes(50));
+                            else nextMatch.setLocalTime(nextMatch.getMatchEntity().getMatchInfo().getMatchTime());
+                        }
+                        else nextMatch.setLocalTime(nextMatch.getMatchEntity().getMatchInfo().getMatchTime());
                     }
                     else{
-                        matchEntity = matchRepository.save(matchEntity);
-                        post(matchEntity, false);
+                        matchRepository.save(nextMatch.getMatchEntity());
+                        post(nextMatch.getMatchEntity(), false);
                     }
                 }
             }
