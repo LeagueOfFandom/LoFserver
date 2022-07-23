@@ -42,7 +42,7 @@ public class CrawlComponent implements ApplicationRunner {
     private final MatchRepository matchRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
-    private final NextMatch nextMatch;
+    private NextMatch nextMatch = new NextMatch();
     private String language = "ko_KR";
     //다음 경기에 대한 정보들
 
@@ -141,7 +141,7 @@ public class CrawlComponent implements ApplicationRunner {
             //send
             HttpEntity<String> requestEntity = new HttpEntity<String>(userJsonObject.toJSONString(),headers);
             ResponseEntity<FcmResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, FcmResponse.class);
-            log.info(response.getBody().toString());
+            log.info(response.getBody().getSuccess().toString());
         });
     }
 
