@@ -8,7 +8,6 @@ import java.util.List;
 public class MatchList {
     private Match live;
     private List<Match> matchList;
-
     public MatchList(Match live, List<Match> matchList) {
         this.live = live;
         this.matchList = matchList;
