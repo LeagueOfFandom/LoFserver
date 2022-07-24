@@ -2,7 +2,7 @@ spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
-    url: jdbc:mariadb://database-1.c9zwet69f9b0.ap-northeast-2.rds.amazonaws.com:3306/lof
+    url: jdbc:mariadb://database-1.c9zwet69f9b0.ap-northeast-2.rds.amazonaws.com:3306/lof-dev
     password: soma17030
   mvc:
     path match:
