@@ -34,10 +34,10 @@ public class MatchEntity {
     private MatchInfo matchInfo; //match 에 대한 상세 정보. 추후 vs 정보등 추가.
 
     //client로 보내줄 match 형태로 link와 alarm을 추가하여 변경.
-    public MatchDetails toMatchDetails(Boolean alarm, TeamRepository teamRepository, String language){
+    public MatchDetails toMatchDetails(Boolean alarm, TeamRepository teamRepository){
         TeamEntity teamEntityHome = teamRepository.findById(matchInfo.getHomeTeamId()).orElse(null);
         TeamEntity teamEntityAway = teamRepository.findById(matchInfo.getAwayTeamId()).orElse(null);
-        return new MatchDetails(matchId, matchInfo.getMatchDate(), matchInfo.getMatchTime(),teamEntityHome.getTeamNameList().get(language),teamEntityAway.getTeamNameList().get(language),teamEntityHome.getTeamImg(),teamEntityAway.getTeamImg(),homeScore,awayScore,matchInfo.getLiveLink(),alarm);
+        return new MatchDetails(matchId, matchInfo.getMatchDate(), matchInfo.getMatchTime(),teamEntityHome.getTeamName(),teamEntityAway.getTeamName(),teamEntityHome.getTeamImg(),teamEntityAway.getTeamImg(),homeScore,awayScore,matchInfo.getLiveLink(),alarm);
     }
     public void setHomeScore(Long homeScore) {
         this.homeScore = homeScore;

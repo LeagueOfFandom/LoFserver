@@ -157,8 +157,8 @@ public class CrawlComponent implements ApplicationRunner {
         elements.forEach(element -> {
             LocalDate matchDate = LocalDate.parse(element.attr("data-date"), DateTimeFormatter.ISO_DATE);
             LocalTime matchTime = LocalTime.parse(element.select("span[class^=ofl-toggle-3-5 ofl-toggler-3-all]").text());
-            String homeTeam = element.select("td[class^=matchlist-team1]").attr("data-teamhighlight");
-            String awayTeam = element.select("td[class^=matchlist-team2]").attr("data-teamhighlight");
+            String homeTeam = element.select("td[class^=matchlist-team1]").select("span[class=teamname]").text();
+            String awayTeam = element.select("td[class^=matchlist-team2]").select("span[class=teamname]").text();
             String liveLink = element.select("a[target=_blank]").attr("href");
             Elements scoreElements = element.select("td[class^=matchlist-score]");
             Long homeScore = 0L;
