@@ -17,4 +17,4 @@ echo "> JAR NAME: $JAR_NAME"
 echo "> $JAR_NAME 에 실행권한 추가"
 chmod +x $JAR_NAME
 echo "> $JAR_NAME 실행"
-nohup /bin/java -javaagent:dd-java-agent.jar -Ddd.logs.injection=true -Ddd.service=my-app -Ddd.env=staging -jar $JAR_NAME 1>$REPOSITORY/lof.log 2>&1 &
+nohup /bin/java -javaagent:/home/app/dd-java-agent.jar -Ddd.logs.injection=true -Ddd.service=my-app -Ddd.env=staging -jar $JAR_NAME 1>$REPOSITORY/lof.log 2>&1 &
