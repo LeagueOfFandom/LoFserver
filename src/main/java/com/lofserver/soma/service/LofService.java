@@ -57,6 +57,7 @@ public class LofService {
                 MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
                 //설정한 값이 있다면 설정한 값으로 진행한다.
                 if(userSelected.containsKey(matchId)) {
+                    log.info("들어감?");
                     if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
                     else{
                         if(matchList.containsKey(matchEntity.getMatchInfo().getMatchDate())) {
@@ -162,7 +163,7 @@ public class LofService {
                             matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(true, teamRepository));
                         else {
                             List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
+                            matchDetailsList.add(matchEntity.toMatchDetails(true, teamRepository));
                             matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
                         }
                     }
