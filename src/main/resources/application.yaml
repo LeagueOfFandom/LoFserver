@@ -2,8 +2,8 @@ spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
-    url : ENC(+Yzas0bJ69SnWBcfkAC2naU/PLUkg7MlICgUPAq6j2pmDD0rnvgqRcxkP3m/IaRN)
-    password: ENC(xcgPUsZQpbGNtWjpQUGZfw==)
+    url : ENC(2kBwncqsGCr8VhEVdOvFbKTD+WkvjcZq/H/p2h/q4vxQPlG65/9Q00WxvCliMo+2sf2FdeOc6tsmA2coyCLCKki/byldpJKDx0IpLBpcNCmXhht5/TftM62OX6S1mB8S)
+    password: ENC(9Mqc1gH7836zm/3OdCq7kD6lxVFqucFo)
 
   mvc:
     path match:
