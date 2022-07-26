@@ -1,3 +1,4 @@
+/*
 import com.lofserver.soma.config.JasyptConfig;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.junit.jupiter.api.Test;
@@ -21,3 +22,4 @@ public class JasyptTest extends JasyptConfig {
         assertThat(plainText).isEqualTo(decryptedText);
     }
 }
+ */

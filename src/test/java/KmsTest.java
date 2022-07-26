@@ -1,4 +1,4 @@
-
+/*
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
@@ -62,4 +62,6 @@ public class KmsTest {
         }
     }
 }
+
+ */
 
