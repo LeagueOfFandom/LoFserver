@@ -25,6 +25,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.spring.web.json.Json;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -120,11 +121,16 @@ public class CrawlComponent implements ApplicationRunner {
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", "key=" + key);
         //body setting
-        JSONObject dataJson = new JSONObject();
+        JSONObject notificationJson = new JSONObject();
         Long setCount = matchEntity.getAwayScore()+matchEntity.getHomeScore();
-        dataJson.put("title", homeTeam.getTeamNameList().get(language) + " vs " + awayTeam.getTeamNameList().get(language));
-        if(start) dataJson.put("message", "경기가 시작합니다!");
-        else dataJson.put("message", setCount + "세트가 종료 되었습니다.");
+        notificationJson.put("title", homeTeam.getTeamNameList().get(language) + " vs " + awayTeam.getTeamNameList().get(language));
+        if(start) notificationJson.put("body", "경기가 시작합니다!");
+        else notificationJson.put("body", setCount + "세트가 종료 되었습니다.");
+
+        JSONObject dataJson = new JSONObject();
+        dataJson.put("homeScore",matchEntity.getHomeScore());
+        dataJson.put("awayScore",matchEntity.getAwayScore());
+
         //user에게 fcm보내기
         List<UserEntity> userEntityList = userRepository.findAll();
         userEntityList.forEach(userEntity -> {
@@ -133,12 +139,10 @@ public class CrawlComponent implements ApplicationRunner {
             userJsonObject.put("to",userEntity.getToken());
             userJsonObject.put("data", dataJson);
             //user가 해당 경기를 선택했다면
-            if(userEntity.getUserSelected().containsKey(matchEntity.getMatchId())){
-                if(userEntity.getUserSelected().get(matchEntity.getMatchId())) userJsonObject.put("isShow",true);
-                else userJsonObject.put("isShow",false);
-            }
-            else if(userEntity.getTeamList().contains(matchEntity.getMatchInfo().getAwayTeamId()) || userEntity.getTeamList().contains(matchEntity.getMatchInfo().getHomeTeamId())) userJsonObject.put("isShow",true);
-            else userJsonObject.put("isShow",false);
+            if(userEntity.getUserSelected().containsKey(matchEntity.getMatchId()) && userEntity.getUserSelected().get(matchEntity.getMatchId()))
+                userJsonObject.put("notification",notificationJson);
+            else if(userEntity.getTeamList().contains(matchEntity.getMatchInfo().getAwayTeamId()) || userEntity.getTeamList().contains(matchEntity.getMatchInfo().getHomeTeamId()))
+                userJsonObject.put("notification",notificationJson);
             //send
             HttpEntity<String> requestEntity = new HttpEntity<String>(userJsonObject.toJSONString(),headers);
             ResponseEntity<FcmResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, FcmResponse.class);
