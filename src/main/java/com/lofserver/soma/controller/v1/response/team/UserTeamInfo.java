@@ -15,9 +15,9 @@ public class UserTeamInfo {
     @ApiModelProperty(example = "true")
     private boolean teamCheck;
 
-    public UserTeamInfo(TeamEntity teamEntity, boolean teamCheck, String language) {
+    public UserTeamInfo(TeamEntity teamEntity, boolean teamCheck) {
         this.teamId = teamEntity.getTeamId();
-        this.teamName = teamEntity.getTeamNameList().get(language);
+        this.teamName = teamEntity.getTeamName();
         this.teamImg = teamEntity.getTeamImg();
         this.teamCheck = teamCheck;
     }

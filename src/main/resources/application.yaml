@@ -2,8 +2,9 @@ spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
-    url: jdbc:mariadb://database-1.c9zwet69f9b0.ap-northeast-2.rds.amazonaws.com:3306/lof
-    password: soma17030
+    url : ENC(2kBwncqsGCr8VhEVdOvFbKTD+WkvjcZq/H/p2h/q4vxQPlG65/9Q00WxvCliMo+2sf2FdeOc6tsmA2coyCLCKki/byldpJKDx0IpLBpcNCmXhht5/TftM62OX6S1mB8S)
+    password: ENC(9Mqc1gH7836zm/3OdCq7kD6lxVFqucFo)
+
   mvc:
     path match:
       matching-strategy: ant_path_matcher
@@ -19,3 +20,9 @@ spring:
       mode: always
 server:
   port: '80'
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+fcm:
+  keyId: 'AAAA2e5oM2A:APA91bFkeAZM_08Vbliwn3C5_IR2jWF1GPgAS_9YYp071tRNyFossJP23OOTFMjwFq7HQW4HMU7K5XKee32u3cx8ioAlylFxK7SruyNO1iJy3sacuir-29GdosKdlKCBl6B_YfZj0xjd'
