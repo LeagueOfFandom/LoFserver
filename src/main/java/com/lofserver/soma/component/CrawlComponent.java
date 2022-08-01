@@ -40,7 +40,7 @@ import java.util.List;
 @Slf4j
 public class CrawlComponent implements ApplicationRunner {
 
-    String fandom_url = "https://lol.fandom.com/wiki/LCK/2022_Season/Summer_Season";
+    String fandom_url = "https://lol.fandom.com/wiki/LCK/2022_Season";
     private final MatchRepository matchRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
@@ -51,7 +51,8 @@ public class CrawlComponent implements ApplicationRunner {
     //모든 경기 설정 함수.
     @Override
     public void run(ApplicationArguments args) throws Exception{
-        setAllMatchList();
+        setAllMatchList("/Spring_Season");
+        setAllMatchList("/Summer_Season");
         nextMatch.setMatchEntity(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
         nextMatch.setLocalTime(LocalTime.now(ZoneId.of("Asia/Seoul")));
     }
@@ -150,10 +151,10 @@ public class CrawlComponent implements ApplicationRunner {
         });
     }
 
-    private void setAllMatchList(){//모든 매치 넣어주는 함수.
+    private void setAllMatchList(String season){//모든 매치 넣어주는 함수.
         Document document = null;
         try {
-            document = Jsoup.connect(fandom_url).get();
+            document = Jsoup.connect(fandom_url + season).get();
         } catch (IOException e) {
             log.info("fandom_url connection fail");
             return;
@@ -168,11 +169,13 @@ public class CrawlComponent implements ApplicationRunner {
             Elements scoreElements = element.select("td[class^=matchlist-score]");
             Long homeScore = 0L;
             Long awayScore = 0L;
+            log.info(scoreElements.toString());
             if(scoreElements.size() != 0) {
-                homeScore = Long.parseLong(scoreElements.get(0).text());
-                awayScore = Long.parseLong(scoreElements.get(1).text());
+                if(!scoreElements.get(0).text().equals("W")) {
+                    homeScore = Long.parseLong(scoreElements.get(0).text());
+                    awayScore = Long.parseLong(scoreElements.get(1).text());
+                }
             }
-
             TeamEntity teamEntityHome = teamRepository.findByTeamName(homeTeam);
             TeamEntity teamEntityAway = teamRepository.findByTeamName(awayTeam);
 

@@ -10,7 +10,7 @@ import java.util.List;
 public interface MatchRepository extends JpaRepository<MatchEntity, Long> {
     @Query("SELECT ME.matchId from MatchEntity ME")
     List<Long> findAllId();
-    @Query(value = "select * from match_lck where json_contains(match_info,?1,'$.matchDate')",nativeQuery = true)
-    List<MatchEntity> findByMatchDate(LocalDate localDate);
+    @Query(value = "select * from match_lck where json_contains(match_info,?1,'$.homeTeamId') and json_contains(match_info,?2,'$.awayTeamId')",nativeQuery = true)
+    List<MatchEntity> findByHomeTeamIdAndAwayTeamId(Long homeTeamId, Long awayTeamId);
     MatchEntity findFirstByHomeScoreAndAwayScore(Long homeScore, Long awayScore);
 }
