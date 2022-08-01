@@ -29,8 +29,8 @@ public class UserController {
     private final LofService lofService;
     @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = TeamVsTeam.class)
     @GetMapping("/teamVSteam")
-    public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "homeTeam")String homeTeam, @RequestParam(value = "awayTeam")String awayTeam){
-        return lofService.getTeamVsTeam(homeTeam,awayTeam);
+    public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "matchId")Long matchId){
+        return lofService.getTeamVsTeam(matchId);
     }
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
     @GetMapping("/matchList")
