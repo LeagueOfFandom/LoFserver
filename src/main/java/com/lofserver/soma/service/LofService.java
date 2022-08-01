@@ -238,11 +238,12 @@ public class LofService {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getTeamVsTeam(String homeTeam, String awayTeam){
-        Long homeTeamId = teamRepository.findByTeamName(homeTeam).getTeamId();
-        Long awayTeamId = teamRepository.findByTeamName(awayTeam).getTeamId();
-        if(homeTeamId == null || awayTeamId == null)
-            return new ResponseEntity<>("해당 team명 없음",HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> getTeamVsTeam(Long matchId){
+        MatchEntity nowMatch = matchRepository.findById(matchId).orElse(null);
+        if(nowMatch == null)
+            return new ResponseEntity<>("해당 match 없음",HttpStatus.BAD_REQUEST);
+        Long homeTeamId = nowMatch.getMatchInfo().getHomeTeamId();
+        Long awayTeamId = nowMatch.getMatchInfo().getAwayTeamId();
 
         Long homeTeamWinGame = 0L, awayTeamWinGame = 0L,homeTeamWinSet = 0L,awayTeamWinSet = 0L;
         List<MatchEntity> matchEntityList = matchRepository.findByHomeTeamIdAndAwayTeamId(homeTeamId,awayTeamId);
@@ -264,6 +265,6 @@ public class LofService {
                 awayTeamWinGame += 1;
         }
 
-        return new ResponseEntity<>(new TeamVsTeam(homeTeam,homeTeamWinGame,homeTeamWinSet,awayTeam,awayTeamWinGame,awayTeamWinSet), HttpStatus.OK);
+        return new ResponseEntity<>(new TeamVsTeam(teamRepository.findById(homeTeamId).orElse(null).getTeamName(),homeTeamWinGame,homeTeamWinSet,teamRepository.findById(awayTeamId).orElse(null).getTeamName(),awayTeamWinGame,awayTeamWinSet), HttpStatus.OK);
     }
 }
