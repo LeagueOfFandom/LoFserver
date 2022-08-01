@@ -253,7 +253,7 @@ public class LofService {
             awayTeamWinSet += matchEntity.getAwayScore();
             if(matchEntity.getHomeScore() > matchEntity.getAwayScore())
                 homeTeamWinGame += 1;
-            else
+            else if(matchEntity.getHomeScore() < matchEntity.getAwayScore())
                 awayTeamWinGame += 1;
         }
         matchEntityList = matchRepository.findByHomeTeamIdAndAwayTeamId(awayTeamId,homeTeamId);
@@ -262,7 +262,7 @@ public class LofService {
             awayTeamWinSet += matchEntity.getHomeScore();
             if(matchEntity.getAwayScore() > matchEntity.getHomeScore())
                 homeTeamWinGame += 1;
-            else
+            else if(matchEntity.getAwayScore() < matchEntity.getHomeScore())
                 awayTeamWinGame += 1;
         }
         TeamEntity homeTeamEntity = teamRepository.findById(homeTeamId).orElse(null);
