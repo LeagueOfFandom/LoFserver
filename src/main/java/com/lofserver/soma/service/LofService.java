@@ -10,6 +10,7 @@ import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
+import com.lofserver.soma.entity.TeamEntity;
 import com.lofserver.soma.entity.UserEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
 import com.lofserver.soma.entity.match.MatchInfo;
@@ -264,7 +265,9 @@ public class LofService {
             else
                 awayTeamWinGame += 1;
         }
+        TeamEntity homeTeamEntity = teamRepository.findById(homeTeamId).orElse(null);
+        TeamEntity awayTeamEntity = teamRepository.findById(awayTeamId).orElse(null);
 
-        return new ResponseEntity<>(new TeamVsTeam(teamRepository.findById(homeTeamId).orElse(null).getTeamName(),homeTeamWinGame,homeTeamWinSet,teamRepository.findById(awayTeamId).orElse(null).getTeamName(),awayTeamWinGame,awayTeamWinSet), HttpStatus.OK);
+        return new ResponseEntity<>(new TeamVsTeam(homeTeamEntity.getTeamName(),homeTeamWinGame,homeTeamWinSet,homeTeamEntity.getTeamImg(),awayTeamEntity.getTeamName(),awayTeamWinGame,awayTeamWinSet,awayTeamEntity.getTeamImg()), HttpStatus.OK);
     }
 }
