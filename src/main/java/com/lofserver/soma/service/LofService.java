@@ -1,5 +1,6 @@
 package com.lofserver.soma.service;
 
+import com.lofserver.soma.controller.v1.response.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchDetails;
@@ -11,6 +12,7 @@ import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.entity.UserEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
+import com.lofserver.soma.entity.match.MatchInfo;
 import com.lofserver.soma.repository.MatchRepository;
 import com.lofserver.soma.repository.TeamRepository;
 import com.lofserver.soma.repository.UserRepository;
@@ -236,4 +238,32 @@ public class LofService {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
+    public ResponseEntity<?> getTeamVsTeam(String homeTeam, String awayTeam){
+        Long homeTeamId = teamRepository.findByTeamName(homeTeam).getTeamId();
+        Long awayTeamId = teamRepository.findByTeamName(awayTeam).getTeamId();
+        if(homeTeamId == null || awayTeamId == null)
+            return new ResponseEntity<>("해당 team명 없음",HttpStatus.BAD_REQUEST);
+
+        Long homeTeamWinGame = 0L, awayTeamWinGame = 0L,homeTeamWinSet = 0L,awayTeamWinSet = 0L;
+        List<MatchEntity> matchEntityList = matchRepository.findByHomeTeamIdAndAwayTeamId(homeTeamId,awayTeamId);
+        for(MatchEntity matchEntity : matchEntityList){
+            homeTeamWinSet += matchEntity.getHomeScore();
+            awayTeamWinSet += matchEntity.getAwayScore();
+            if(matchEntity.getHomeScore() > matchEntity.getAwayScore())
+                homeTeamWinGame += 1;
+            else
+                awayTeamWinGame += 1;
+        }
+        matchEntityList = matchRepository.findByHomeTeamIdAndAwayTeamId(awayTeamId,homeTeamId);
+        for(MatchEntity matchEntity : matchEntityList){
+            homeTeamWinSet += matchEntity.getAwayScore();
+            awayTeamWinSet += matchEntity.getHomeScore();
+            if(matchEntity.getAwayScore() > matchEntity.getHomeScore())
+                homeTeamWinGame += 1;
+            else
+                awayTeamWinGame += 1;
+        }
+
+        return new ResponseEntity<>(new TeamVsTeam(homeTeam,homeTeamWinGame,homeTeamWinSet,awayTeam,awayTeamWinGame,awayTeamWinSet), HttpStatus.OK);
+    }
 }

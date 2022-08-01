@@ -1,6 +1,7 @@
 package com.lofserver.soma.controller.v1;
 
 import com.lofserver.soma.component.CrawlComponent;
+import com.lofserver.soma.controller.v1.response.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
@@ -11,6 +12,7 @@ import com.lofserver.soma.service.LofService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
     private final LofService lofService;
-    private final CrawlComponent crawlComponent;
+    @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = TeamVsTeam.class)
+    @GetMapping("/teamVSteam")
+    public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "homeTeam")String homeTeam, @RequestParam(value = "awayTeam")String awayTeam){
+        return lofService.getTeamVsTeam(homeTeam,awayTeam);
+    }
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
     @GetMapping("/matchList")
     public ResponseEntity<?> getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll){
