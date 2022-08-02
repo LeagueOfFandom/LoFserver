@@ -4,6 +4,12 @@ spring:
       local: "localdb,common"
       server: "serverdb,common"
     active: local
+---
+
+spring:
+  config:
+    activate:
+      on-profile: common
   mvc:
     path match:
       matching-strategy: ant_path_matcher
@@ -17,14 +23,11 @@ spring:
         encoding: UTF-8
         continue-on-error: true
         mode: always
----
-
-spring:
-  config:
-    activate:
-      on-profile: common
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
+
+server:
+  port: 80
 
 ---
 
