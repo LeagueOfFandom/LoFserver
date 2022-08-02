@@ -2,23 +2,9 @@ spring:
   profiles:
     group:
       local: "localdb"
-      server: "server,common"
+      server: "server"
     active: local
-
 ---
-
-spring:
-  config:
-    activate:
-      on-profile: common
-cloud:
-  aws:
-    region:
-      static: ap-northeast-2
-      auto: false
-
----
-
 spring:
   config:
     activate:
@@ -28,11 +14,15 @@ aws:
     enabled: false
 
 ---
-
 spring:
   config:
     activate:
       on-profile: server
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+      auto: false
 aws:
   secretsmanager:
     name: lofmariadb

@@ -5,7 +5,6 @@ spring:
       server: "serverdb,common"
     active: local
 ---
-
 spring:
   config:
     activate:
@@ -30,7 +29,6 @@ server:
   port: 80
 
 ---
-
 spring:
   config:
     activate:
@@ -40,7 +38,6 @@ spring:
     username: root
     password: 1234
 ---
-
 spring:
   config:
     activate:
