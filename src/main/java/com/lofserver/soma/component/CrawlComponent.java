@@ -200,11 +200,10 @@ public class CrawlComponent implements ApplicationRunner {
         Elements elements = document.select("tr[class^=mhgame-]");
         elements.forEach(element -> {
             LocalDate localDate = LocalDate.parse(element.select("td[class=mhgame-result]").get(0).text(), DateTimeFormatter.ISO_DATE);
-            String blueTeam = element.select("td[class=mhgame-result]").get(2).select("a").attr("data-to-id").replace("_"," ");
-            String redTeam = element.select("td[class=mhgame-result]").get(3).select("a").attr("data-to-id").replace("_"," ");
-            log.info("team : "  + blueTeam);
-            //log.info(teamRepository.findIdByTeamName(blueTeam).toString());
-            //MatchEntity matchEntity = matchRepository.findByHomeTeamIdAndAwayTeamId();
+            String blueTeam = element.select("td[class=mhgame-result]").get(2).select("a").attr("href").substring(6).replace("_"," ");
+            String redTeam = element.select("td[class=mhgame-result]").get(3).select("a").attr("href").substring(6).replace("_"," ");
+            //MatchEntity matchEntity = matchRepository.findByTeamIdsAndMatchDate(teamRepository.findIdByTeamName(blueTeam),teamRepository.findIdByTeamName(redTeam),localDate);
+            //log.info(matchEntity.toString());
         });
 
 

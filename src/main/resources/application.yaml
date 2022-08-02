@@ -12,16 +12,16 @@ spring:
   mvc:
     path match:
       matching-strategy: ant_path_matcher
-    jpa:
-      show-sql: true
-      hibernate:
-        ddl-auto: create
-      defer-datasource-initialization: true
-    sql:
-      init:
-        encoding: UTF-8
-        continue-on-error: true
-        mode: always
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+  sql:
+    init:
+      encoding: UTF-8
+      continue-on-error: true
+      mode: always
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
 
