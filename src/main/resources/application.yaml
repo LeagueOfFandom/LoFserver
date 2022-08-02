@@ -43,6 +43,6 @@ spring:
     activate:
       on-profile: serverdb
   datasource:
-    url: ${lof.mariadb.url}
+    url: jdbc:mariadb://${lof.mariadb.url}:3306/lof
     username: root
     password: ${lof.mariadb.password}
