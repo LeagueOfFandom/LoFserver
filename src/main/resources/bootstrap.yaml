@@ -1,0 +1,39 @@
+spring:
+  profiles:
+    group:
+      local: "localdb"
+      server: "server,common"
+    active: local
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: common
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+      auto: false
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: localdb
+aws:
+  secretsmanager:
+    enabled: false
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: server
+aws:
+  secretsmanager:
+    name: lofmariadb
+    enabled: true
