@@ -36,6 +36,10 @@ public class TeamEntity {
     @Type(type = "json")
     @Column(name = "match_list", columnDefinition = "json")
     private Set<Long> teamMatchList = new HashSet<>(); //team의 경기 lisk.
+
+    @Type(type = "json")
+    @Column(name = "roster", columnDefinition = "json")
+    private Map<String, String> rosterName = new HashMap<>();
     public void delMatch(Long matchId){
         teamMatchList.remove(matchId);
     }

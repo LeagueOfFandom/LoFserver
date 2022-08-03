@@ -1,5 +1,6 @@
 package com.lofserver.soma.service;
 
+import com.lofserver.soma.controller.v1.response.Roster;
 import com.lofserver.soma.controller.v1.response.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
@@ -268,6 +269,21 @@ public class LofService {
         TeamEntity homeTeamEntity = teamRepository.findById(homeTeamId).orElse(null);
         TeamEntity awayTeamEntity = teamRepository.findById(awayTeamId).orElse(null);
 
-        return new ResponseEntity<>(new TeamVsTeam(homeTeamEntity.getTeamName(),homeTeamWinGame,homeTeamWinSet,homeTeamEntity.getTeamImg(),awayTeamEntity.getTeamName(),awayTeamWinGame,awayTeamWinSet,awayTeamEntity.getTeamImg()), HttpStatus.OK);
+        List<Roster> rosterList = new ArrayList<>();
+        List<String> line = new ArrayList<>() {
+            {
+                add("TOP");
+                add("JUNGLE");
+                add("MID");
+                add("BOTTOM");
+                add("SUPPORT");
+            }
+        };
+        line.forEach(lineName -> {
+           rosterList.add(new Roster("Home"+lineName,homeTeamEntity.getRosterName().get(lineName),"https://d654rq93y7j8z.cloudfront.net/line/" + lineName +".png"));
+           rosterList.add(new Roster("Away"+lineName,awayTeamEntity.getRosterName().get(lineName),"https://d654rq93y7j8z.cloudfront.net/line/" + lineName +".png"));
+        });
+
+        return new ResponseEntity<>(new TeamVsTeam(homeTeamEntity.getTeamName(),homeTeamWinGame,homeTeamWinSet,homeTeamEntity.getTeamImg(),awayTeamEntity.getTeamName(),awayTeamWinGame,awayTeamWinSet,awayTeamEntity.getTeamImg(), rosterList), HttpStatus.OK);
     }
 }

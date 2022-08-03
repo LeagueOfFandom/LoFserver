@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -177,6 +178,7 @@ public class CrawlComponent implements ApplicationRunner {
                     awayScore = Long.parseLong(scoreElements.get(1).text());
                 }
             }
+            log.info(homeTeam);
             TeamEntity teamEntityHome = teamRepository.findByTeamName(homeTeam);
             TeamEntity teamEntityAway = teamRepository.findByTeamName(awayTeam);
 
@@ -202,10 +204,34 @@ public class CrawlComponent implements ApplicationRunner {
             LocalDate localDate = LocalDate.parse(element.select("td[class=mhgame-result]").get(0).text(), DateTimeFormatter.ISO_DATE);
             String blueTeam = element.select("td[class=mhgame-result]").get(2).select("a").attr("href").substring(6).replace("_"," ");
             String redTeam = element.select("td[class=mhgame-result]").get(3).select("a").attr("href").substring(6).replace("_"," ");
-            //MatchEntity matchEntity = matchRepository.findByTeamIdsAndMatchDate(teamRepository.findIdByTeamName(blueTeam),teamRepository.findIdByTeamName(redTeam),localDate);
-            //log.info(matchEntity.toString());
+
+            Long blueTeamId = teamRepository.findIdByTeamName(blueTeam);
+            Long redTeamId = teamRepository.findIdByTeamName(redTeam);
+            log.info(localDate.toString() + blueTeamId + redTeamId);
+            log.info(localDate.getDayOfMonth() + "");
+            List<MatchEntity> matchEntity2 = matchRepository.findByTeamIdsAndMatchDate(blueTeamId, redTeamId,localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+            matchEntity2.forEach(matchEntity1 -> {
+                log.info(matchEntity1.getMatchId().toString());
+            });
+            MatchEntity matchEntity = matchEntity2.get(0);
+            Elements namelist = element.select("a[class=catlink-players pWAG pWAN to_hasTooltip]");
+            List<String> homelist = new ArrayList<>();
+            List<String> awaylist = new ArrayList<>();
+            if(matchEntity.getMatchInfo().getHomeTeamId() == blueTeamId){
+                for(int i = 0; i < 5; i++)
+                    homelist.add(namelist.get(i).text());
+                for(int i = 5; i < 10; i++)
+                    awaylist.add(namelist.get(i).text());
+            }
+            else{
+                for(int i = 0; i < 5; i++)
+                    awaylist.add(namelist.get(i).text());
+                for(int i = 5; i < 10; i++)
+                    homelist.add(namelist.get(i).text());
+            }
+            matchEntity.getMatchInfo().setHomeRoster(homelist);
+            matchEntity.getMatchInfo().setAwayRoster(awaylist);
+            matchRepository.save(matchEntity);
         });
-
-
     }
 }

@@ -2,6 +2,9 @@ package com.lofserver.soma.controller.v1.response;
 
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 public class TeamVsTeam {
     private String homeTeam;
@@ -13,7 +16,9 @@ public class TeamVsTeam {
     private Long awayWinSet;
     private String awayTeamImg;
 
-    public TeamVsTeam(String homeTeam, Long homeWinGame, Long homeWinSet, String homeTeamImg, String awayTeam, Long awayWinGame, Long awayWinSet, String awayTeamImg) {
+    private List<Roster> rosterList = new ArrayList<>();
+
+    public TeamVsTeam(String homeTeam, Long homeWinGame, Long homeWinSet, String homeTeamImg, String awayTeam, Long awayWinGame, Long awayWinSet, String awayTeamImg, List<Roster> rosterList) {
         this.homeTeam = homeTeam;
         this.homeWinGame = homeWinGame;
         this.homeWinSet = homeWinSet;
@@ -22,5 +27,6 @@ public class TeamVsTeam {
         this.awayWinGame = awayWinGame;
         this.awayWinSet = awayWinSet;
         this.awayTeamImg = awayTeamImg;
+        this.rosterList = rosterList;
     }
 }

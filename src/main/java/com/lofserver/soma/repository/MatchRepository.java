@@ -13,7 +13,7 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Long> {
     @Query(value = "select * from match_lck where json_contains(match_info,?1,'$.homeTeamId') and json_contains(match_info,?2,'$.awayTeamId')",nativeQuery = true)
     List<MatchEntity> findByHomeTeamIdAndAwayTeamId(Long homeTeamId, Long awayTeamId);
 
-    @Query(value = "select * from match_lck where( ((json_contains(match_info,?1,'$.homeTeamId') and json_contains(match_info,?2,'$.awayTeamId')) or (json_contains(match_info,?2,'$.homeTeamId') and json_contains(match_info,?1,'$.awayTeamId'))) and json_contains(match_info,?3,'$.matchDate') )",nativeQuery = true)
-    MatchEntity findByTeamIdsAndMatchDate(Long homeTeamId, Long awayTeamId, LocalDate matchDate);
+    @Query(value = "select * from match_lck where(json_contains(match_info,json_array(?3,?4,?5),'$.matchDate') and ((json_contains(match_info,?1,'$.homeTeamId') and json_contains(match_info,?2,'$.awayTeamId')) or (json_contains(match_info,?2,'$.homeTeamId') and json_contains(match_info,?1,'$.awayTeamId'))))",nativeQuery = true)
+    List<MatchEntity> findByTeamIdsAndMatchDate(Long homeTeamId, Long awayTeamId, int year, int month, int day);
     MatchEntity findFirstByHomeScoreAndAwayScore(Long homeScore, Long awayScore);
 }
