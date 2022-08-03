@@ -33,14 +33,9 @@ public class UserController {
         return lofService.getTeamVsTeam(matchId);
     }
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
-    @GetMapping("/afterMatchList")
-    public ResponseEntity<?> getAfterMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll){
-        return lofService.getAfterMatchList(userId, isAll, true);
-    }
-    @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
-    @GetMapping("/beforeMatchList")
-    public ResponseEntity<?> getBeforeMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll){
-        return lofService.getAfterMatchList(userId, isAll, false);
+    @GetMapping("/MatchList")
+    public ResponseEntity<?> getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "isAfter")Boolean isAfter){
+        return lofService.getAfterMatchList(userId, isAll, isAfter);
     }
 
     @ApiOperation(value = "유저가 선택한 팀 Api", notes = "client에서 User id를 주면 해당 User가 선택한 팀들의 List를 server에서 반환한다.", response = UserTeamInfoList.class)

@@ -60,7 +60,7 @@ public class LofService {
             matchListID.forEach(matchId -> {
                 MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
                 if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
-                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
+                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
                 //설정한 값이 있다면 설정한 값으로 진행한다.
                 if(userSelected.containsKey(matchId)) {
                     if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
@@ -101,7 +101,7 @@ public class LofService {
             matchListID.forEach(matchId -> {
                 MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
                 if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
-                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
+                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
                 //설정한 값이 있다면 설정한 값으로 진행한다.
                 if(userSelected.containsKey(matchId)) {
                     if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
@@ -151,7 +151,7 @@ public class LofService {
             matchListID.forEach(matchId -> {
                 MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
                 if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
-                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
+                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
                 //설정한 값이 있다면 설정한 값으로 진행한다.
                 if(userSelected.containsKey(matchId)) {
                     if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
