@@ -40,7 +40,7 @@ public class LofService {
     private final MatchRepository matchRepository;
 
     //user의 matchList반환 함수.
-    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll){
+    public ResponseEntity<?> getAfterMatchList(Long userId, Boolean isAll, Boolean isAfter){
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
         if(userEntity == null){ // id 없음 예외처리.
             log.info("getMatchList" + "해당 id 없음 :" + userId);
@@ -59,9 +59,10 @@ public class LofService {
             matchListID.addAll(matchRepository.findAllId());
             matchListID.forEach(matchId -> {
                 MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
+                if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
+                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
                 //설정한 값이 있다면 설정한 값으로 진행한다.
                 if(userSelected.containsKey(matchId)) {
-                    log.info("들어감?");
                     if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
                     else{
                         if(matchList.containsKey(matchEntity.getMatchInfo().getMatchDate())) {
@@ -99,6 +100,8 @@ public class LofService {
             });
             matchListID.forEach(matchId -> {
                 MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
+                if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
+                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
                 //설정한 값이 있다면 설정한 값으로 진행한다.
                 if(userSelected.containsKey(matchId)) {
                     if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
@@ -147,6 +150,8 @@ public class LofService {
             });
             matchListID.forEach(matchId -> {
                 MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
+                if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
+                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
                 //설정한 값이 있다면 설정한 값으로 진행한다.
                 if(userSelected.containsKey(matchId)) {
                     if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
@@ -174,13 +179,24 @@ public class LofService {
                 }
             });
         }
-        TreeSet<LocalDate> dateList = new TreeSet<>();
-        dateList.addAll(matchList.keySet());
 
         List<Match> returnMatchList = new ArrayList<>();
-        dateList.forEach(localDate -> {
-            returnMatchList.add(new Match(localDate,matchList.get(localDate)));
-        });
+        if(isAfter) {
+            TreeSet<LocalDate> dateList = new TreeSet<>();
+            dateList.addAll(matchList.keySet());
+            dateList.forEach(localDate -> {
+                returnMatchList.add(new Match(localDate, matchList.get(localDate)));
+            });
+        }
+        else{
+            NavigableSet<LocalDate> dateList = new TreeSet<>();
+            dateList.addAll(matchList.keySet());
+            dateList = dateList.descendingSet();
+            dateList.forEach(localDate -> {
+                returnMatchList.add(new Match(localDate, matchList.get(localDate)));
+            });
+        }
+
         return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList), returnMatchList), HttpStatus.OK);
     }
     //user가 선택한 team list 제공 함수.
