@@ -47,7 +47,7 @@ spring:
     activate:
       on-profile: serverdb
   datasource:
-    url: ${lof.mariadb.url}/lof
+    url: jdbc:mariadb://database-1.c9zwet69f9b0.ap-northeast-2.rds.amazonaws.com:3306/lof
     username: root
     password: ${lof.mariadb.password}
 slack:
