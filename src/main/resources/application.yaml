@@ -33,16 +33,22 @@ spring:
   config:
     activate:
       on-profile: localdb
+    import: localkey.yaml
   datasource:
     url: jdbc:mariadb://localhost:3306/lof
     username: root
     password: 1234
+
+slack:
+  token: ${localkey.slack-api.token}
 ---
 spring:
   config:
     activate:
       on-profile: serverdb
   datasource:
-    url: jdbc:mariadb://${lof.mariadb.url}:3306/lof
+    url: ${lof.mariadb.url}/lof
     username: root
     password: ${lof.mariadb.password}
+slack:
+  token: ${lof.slack.token}

@@ -25,5 +25,5 @@ cloud:
       auto: false
 aws:
   secretsmanager:
-    name: lofmariadb
+    name: lof
     enabled: true
