@@ -28,7 +28,6 @@ public class SlackNotifyService {
 
     @EventListener(ContextRefreshedEvent.class)
     public void onContextRefreshedEvent(ContextRefreshedEvent event) {
-        log.info("insert??");
         if (springProfile.equals("server")) {
             if (notifyChannelId == null)
                 initChannelId();
