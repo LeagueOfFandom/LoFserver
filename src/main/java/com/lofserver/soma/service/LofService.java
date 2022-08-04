@@ -14,19 +14,18 @@ import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.entity.TeamEntity;
 import com.lofserver.soma.entity.UserEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
-import com.lofserver.soma.entity.match.MatchInfo;
 import com.lofserver.soma.repository.MatchRepository;
 import com.lofserver.soma.repository.TeamRepository;
 import com.lofserver.soma.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 @Service

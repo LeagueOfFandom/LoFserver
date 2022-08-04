@@ -1,6 +1,5 @@
 package com.lofserver.soma.controller.v1;
 
-import com.lofserver.soma.component.CrawlComponent;
 import com.lofserver.soma.controller.v1.response.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
@@ -12,7 +11,6 @@ import com.lofserver.soma.service.LofService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
