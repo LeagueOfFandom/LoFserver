@@ -60,6 +60,7 @@ public class CrawlComponent implements ApplicationRunner {
     //매일 정각에 match 검색
     @Scheduled(cron = "0 * * * * *")
     private void monitoringLck(){
+        if(nextMatch.getMatchEntity() == null) return;
         Document document = null;
         try {
             document = Jsoup.connect(fandom_url + "/Summer_Season").get();
