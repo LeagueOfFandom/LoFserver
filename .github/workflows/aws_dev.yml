@@ -37,7 +37,7 @@ jobs:
         run: cp appspec.yml ./deploy
 
       - name: Copy script
-        run: cp ./scripts/*.sh ./deploy
+        run: cp ./scripts/dev/*.sh ./deploy
 
       - name: Make zip file 
         run: zip -r ./lof.zip ./deploy

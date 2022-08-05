@@ -14,7 +14,6 @@ import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.http.HttpEntity;
@@ -25,13 +24,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import springfox.documentation.spring.web.json.Json;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -40,7 +39,7 @@ import java.util.List;
 @Slf4j
 public class CrawlComponent implements ApplicationRunner {
 
-    String fandom_url = "https://lol.fandom.com/wiki/LCK/2022_Season/Summer_Season";
+    String fandom_url = "https://lol.fandom.com/wiki/LCK/2022_Season";
     private final MatchRepository matchRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
@@ -51,16 +50,20 @@ public class CrawlComponent implements ApplicationRunner {
     //모든 경기 설정 함수.
     @Override
     public void run(ApplicationArguments args) throws Exception{
-        setAllMatchList();
+        matchRepository.deleteAll();
+        setAllMatchList("/Spring_Season");
+        setAllMatchList("/Summer_Season");
+
         nextMatch.setMatchEntity(matchRepository.findFirstByHomeScoreAndAwayScore(0L,0L));
         nextMatch.setLocalTime(LocalTime.now(ZoneId.of("Asia/Seoul")));
     }
     //매일 정각에 match 검색
     @Scheduled(cron = "0 * * * * *")
     private void monitoringLck(){
+        if(nextMatch.getMatchEntity() == null) return;
         Document document = null;
         try {
-            document = Jsoup.connect(fandom_url).get();
+            document = Jsoup.connect(fandom_url + "/Summer_Season").get();
         } catch (IOException e) {
             log.info("fandom_url connection fail");
             return;
@@ -150,10 +153,10 @@ public class CrawlComponent implements ApplicationRunner {
         });
     }
 
-    private void setAllMatchList(){//모든 매치 넣어주는 함수.
+    private void setAllMatchList(String season){//모든 매치 넣어주는 함수
         Document document = null;
         try {
-            document = Jsoup.connect(fandom_url).get();
+            document = Jsoup.connect(fandom_url + season).get();
         } catch (IOException e) {
             log.info("fandom_url connection fail");
             return;
@@ -168,11 +171,14 @@ public class CrawlComponent implements ApplicationRunner {
             Elements scoreElements = element.select("td[class^=matchlist-score]");
             Long homeScore = 0L;
             Long awayScore = 0L;
+            //log.info(scoreElements.toString());
             if(scoreElements.size() != 0) {
-                homeScore = Long.parseLong(scoreElements.get(0).text());
-                awayScore = Long.parseLong(scoreElements.get(1).text());
+                if(!scoreElements.get(0).text().equals("W")) {
+                    homeScore = Long.parseLong(scoreElements.get(0).text());
+                    awayScore = Long.parseLong(scoreElements.get(1).text());
+                }
             }
-
+            log.info(homeTeam);
             TeamEntity teamEntityHome = teamRepository.findByTeamName(homeTeam);
             TeamEntity teamEntityAway = teamRepository.findByTeamName(awayTeam);
 
@@ -181,6 +187,51 @@ public class CrawlComponent implements ApplicationRunner {
             teamEntityAway.addMatch(matchId);
             teamRepository.save(teamEntityHome);
             teamRepository.save(teamEntityAway);
+        });
+        setMatchRoster(season);
+    }
+
+    private void setMatchRoster(String season){
+        Document document = null;
+        try {
+            document = Jsoup.connect(fandom_url + season + "/Match_History").get();
+        } catch (IOException e) {
+            log.info("fandom_url connection fail");
+            return;
+        }
+        Elements elements = document.select("tr[class^=mhgame-]");
+        elements.forEach(element -> {
+            LocalDate localDate = LocalDate.parse(element.select("td[class=mhgame-result]").get(0).text(), DateTimeFormatter.ISO_DATE);
+            String blueTeam = element.select("td[class=mhgame-result]").get(2).select("a").attr("href").substring(6).replace("_"," ");
+            String redTeam = element.select("td[class=mhgame-result]").get(3).select("a").attr("href").substring(6).replace("_"," ");
+
+            Long blueTeamId = teamRepository.findIdByTeamName(blueTeam);
+            Long redTeamId = teamRepository.findIdByTeamName(redTeam);
+            log.info(localDate.toString() + blueTeamId + redTeamId);
+            log.info(localDate.getDayOfMonth() + "");
+            List<MatchEntity> matchEntity2 = matchRepository.findByTeamIdsAndMatchDate(blueTeamId, redTeamId,localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+            matchEntity2.forEach(matchEntity1 -> {
+                log.info(matchEntity1.getMatchId().toString());
+            });
+            MatchEntity matchEntity = matchEntity2.get(0);
+            Elements namelist = element.select("a[class=catlink-players pWAG pWAN to_hasTooltip]");
+            List<String> homelist = new ArrayList<>();
+            List<String> awaylist = new ArrayList<>();
+            if(matchEntity.getMatchInfo().getHomeTeamId() == blueTeamId){
+                for(int i = 0; i < 5; i++)
+                    homelist.add(namelist.get(i).text());
+                for(int i = 5; i < 10; i++)
+                    awaylist.add(namelist.get(i).text());
+            }
+            else{
+                for(int i = 0; i < 5; i++)
+                    awaylist.add(namelist.get(i).text());
+                for(int i = 5; i < 10; i++)
+                    homelist.add(namelist.get(i).text());
+            }
+            matchEntity.getMatchInfo().setHomeRoster(homelist);
+            matchEntity.getMatchInfo().setAwayRoster(awaylist);
+            matchRepository.save(matchEntity);
         });
     }
 }

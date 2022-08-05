@@ -1,0 +1,30 @@
+spring:
+  profiles:
+    group:
+      local: "localdb,common"
+      devserver: "servercommon,common,serverdb"
+      mainserver: "servercommon,common,mainserverdb"
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: localdb
+aws:
+  secretsmanager:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: servercommon
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+      auto: false
+aws:
+  secretsmanager:
+    name: lof
+    enabled: true
