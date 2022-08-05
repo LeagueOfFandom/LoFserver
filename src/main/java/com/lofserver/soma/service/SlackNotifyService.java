@@ -41,7 +41,7 @@ public class SlackNotifyService {
 
             sendMessage(ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
                     .format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"))
-                    + " - main 서버를 기동합니다. \nSwagger:http://43.200.9.89/swagger-ui.html# \nDatadog: https://www.datadoghq.com/");
+                    + " - main 서버를 기동합니다. \nSwagger:https://leagueoffandom.site/swagger-ui.html# \nDatadog: https://www.datadoghq.com/");
         }
     }
 
