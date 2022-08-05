@@ -28,25 +28,40 @@ public class SlackNotifyService {
 
     @EventListener(ContextRefreshedEvent.class)
     public void onContextRefreshedEvent(ContextRefreshedEvent event) {
-        if (springProfile.equals("server")) {
+        if (springProfile.equals("devserver")) {
             if (notifyChannelId == null)
                 initChannelId();
 
             sendMessage(ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
                     .format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"))
-                    + " - 서버를 기동합니다. \nSwagger:http://43.200.9.89/swagger-ui.html# \nDatadog: https://www.datadoghq.com/");
+                    + " - dev 서버를 기동합니다. \nSwagger:http://43.200.9.89/swagger-ui.html# \nDatadog: https://www.datadoghq.com/");
+        }else if (springProfile.equals("mainserver")) {
+            if (notifyChannelId == null)
+                initChannelId();
+
+            sendMessage(ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
+                    .format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"))
+                    + " - main 서버를 기동합니다. \nSwagger:http://43.200.9.89/swagger-ui.html# \nDatadog: https://www.datadoghq.com/");
         }
     }
 
     @EventListener(ContextClosedEvent.class)
     public void onContextClosedEvent(ContextClosedEvent event) {
-        if (springProfile.equals("server")) {
+        if (springProfile.equals("devserver")) {
             if (notifyChannelId == null)
                 initChannelId();
 
             sendMessage(ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
                     .format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"))
-                    + " - 서버가 종료되었습니다.\nDatadog: https://www.datadoghq.com/");
+                    + " - dev 서버가 종료되었습니다.\nDatadog: https://www.datadoghq.com/");
+        }
+        else if (springProfile.equals("mainserver")) {
+            if (notifyChannelId == null)
+                initChannelId();
+
+            sendMessage(ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
+                    .format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"))
+                    + " - main 서버가 종료되었습니다.\nDatadog: https://www.datadoghq.com/");
         }
     }
 
