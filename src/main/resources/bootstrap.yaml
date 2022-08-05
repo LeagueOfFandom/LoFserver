@@ -2,7 +2,8 @@ spring:
   profiles:
     group:
       local: "localdb,common"
-      server: "serverdb,common"
+      devserver: "servercommon,common,serverdb"
+      mainserver: "servercommon,common,mainserverdb"
     active: local
 ---
 spring:
@@ -17,7 +18,7 @@ aws:
 spring:
   config:
     activate:
-      on-profile: serverdb
+      on-profile: servercommon
 cloud:
   aws:
     region:

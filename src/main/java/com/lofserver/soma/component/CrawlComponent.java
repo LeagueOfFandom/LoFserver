@@ -50,6 +50,7 @@ public class CrawlComponent implements ApplicationRunner {
     //모든 경기 설정 함수.
     @Override
     public void run(ApplicationArguments args) throws Exception{
+        matchRepository.deleteAll();
         setAllMatchList("/Spring_Season");
         setAllMatchList("/Summer_Season");
 
@@ -151,7 +152,7 @@ public class CrawlComponent implements ApplicationRunner {
         });
     }
 
-    private void setAllMatchList(String season){//모든 매치 넣어주는 함수.
+    private void setAllMatchList(String season){//모든 매치 넣어주는 함수
         Document document = null;
         try {
             document = Jsoup.connect(fandom_url + season).get();

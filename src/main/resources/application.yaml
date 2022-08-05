@@ -10,8 +10,6 @@ spring:
       matching-strategy: ant_path_matcher
   jpa:
     show-sql: true
-    hibernate:
-      ddl-auto: create
     defer-datasource-initialization: true
   sql:
     init:
@@ -29,6 +27,9 @@ spring:
     activate:
       on-profile: localdb
     import: localkey.yaml
+  jpa:
+    hibernate:
+      ddl-auto: create
   datasource:
     url: jdbc:mariadb://localhost:3306/lof
     username: root
@@ -43,6 +44,25 @@ spring:
   config:
     activate:
       on-profile: serverdb
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: ${lof.mariadb.url}/lofDev
+    username: root
+    password: ${lof.mariadb.password}
+slack:
+  token: ${lof.slack.token}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: mainserverdb
+  jpa:
+    hibernate:
+      ddl-auto: update
   datasource:
     url: ${lof.mariadb.url}/lof
     username: root
