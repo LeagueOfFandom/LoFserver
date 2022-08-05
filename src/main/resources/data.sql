@@ -1,5 +1,5 @@
 ALTER table team convert to charset utf8;
-DELETE * from team;
+DELETE from team;
 INSERT INTO team(id, name,name_list,img, match_list, roster) VALUES (null,'DK','{"ko_KR" : "담원 기아", "en_US" : "DWG KIA"}','https://d654rq93y7j8z.cloudfront.net/teamImg/DWG KIA.png','[]','{"TOP":"Nuguri","JUNGLE":"Canyon","MID":"ShowMaker","BOTTOM":"deokdam","SUPPORT":"Kellin"}');
 INSERT INTO team(id, name,name_list,img, match_list, roster) VALUES (null,'NS','{"ko_KR" : "농심 레드포스", "en_US" : "Nongshim RedForce"}','https://d654rq93y7j8z.cloudfront.net/teamImg/NongShim REDFORCE.png','[]','{"TOP":"Canna","JUNGLE":"Dread","MID":"Bdd","BOTTOM":"Ghost","SUPPORT":"Effort"}');
 INSERT INTO team(id, name,name_list,img, match_list, roster) VALUES (null,'KT','{"ko_KR" : "kt 롤스터", "en_US" : "KT Rolster"}','https://d654rq93y7j8z.cloudfront.net/teamImg/kt Rolster.png','[]','{"TOP":"Rascal","JUNGLE":"Cuzz","MID":"VicLa","BOTTOM":"Aiming","SUPPORT":"Life"}');
