@@ -33,13 +33,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class LofService {
 
-    //필요한 Jpa 선언.
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
 
     //user의 matchList반환 함수.
-    public ResponseEntity<?> getAfterMatchList(Long userId, Boolean isAll, Boolean isAfter){
+    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, Boolean isAfter){
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
         if(userEntity == null){ // id 없음 예외처리.
             log.info("getMatchList" + "해당 id 없음 :" + userId);
@@ -53,131 +52,64 @@ public class LofService {
         TreeSet<Long> matchListID = new TreeSet<>();
         Map<Long, Boolean> userSelected = userEntity.getUserSelected();
 
-        //선택한 팀이 없으면 전부 보여준다.
-        if(teamList.isEmpty()){
+        //선택한 팀이 없거나 전부 보여달라고 하면 모든 경기 추가.
+        if(teamList.isEmpty() || isAll)
             matchListID.addAll(matchRepository.findAllId());
-            matchListID.forEach(matchId -> {
-                MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
-                if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
-                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
-                //설정한 값이 있다면 설정한 값으로 진행한다.
-                if(userSelected.containsKey(matchId)) {
-                    if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                    else{
-                        if(matchList.containsKey(matchEntity.getMatchInfo().getMatchDate())) {
-                            matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                        }
-                        else {
-                            List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                            matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
-                        }
-                    }
-                }
-                //선택한 팀이 없으므로 전부 false로 진행한다.
-                else {
-                    if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(false, teamRepository));
-                    else {
-                        if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                            matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(false, teamRepository));
-                        else {
-                            List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(false, teamRepository));
-                            matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
-                        }
-                    }
-                }
-            });
-        }
-        //전부를 보내준다.
-        else if(isAll){
-            matchListID.addAll(matchRepository.findAllId());
-            //설정한 팀에 따른 알람 제공.
-            Set<Long> matchListByTeam = new HashSet<>();
-            teamList.forEach(teamId -> {
-                matchListByTeam.addAll(teamRepository.findById(teamId).orElse(null).getTeamMatchList());
-            });
-            matchListID.forEach(matchId -> {
-                MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
-                if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
-                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
-                //설정한 값이 있다면 설정한 값으로 진행한다.
-                if(userSelected.containsKey(matchId)) {
-                    if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                    else {
-                        if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                            matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                        else {
-                            List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                            matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
-                        }
-                    }
-                }
-                //선택한 팀이라면 알람을 보내준다.
-                else if(matchListByTeam.contains(matchId)) {
-                    if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(true, teamRepository));
-                    else {
-                        if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                            matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(true, teamRepository));
-                        else {
-                            List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(true, teamRepository));
-                            matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
-                        }
-                    }
-                }
-                //아니라면 안보낸다.
-                else {
-                    if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(false, teamRepository));
-                    else {
-                        if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                            matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(false, teamRepository));
-                        else {
-                            List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(false, teamRepository));
-                            matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
-                        }
-                    }
-                }
-            });
-        }
-        //해당 팀 정보만 보내준다.
-        else{
+        else
             teamList.forEach(teamId -> {
                 matchListID.addAll(teamRepository.findById(teamId).orElse(null).getTeamMatchList());
             });
-            matchListID.forEach(matchId -> {
-                MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
-                if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
-                if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
-                //설정한 값이 있다면 설정한 값으로 진행한다.
-                if(userSelected.containsKey(matchId)) {
-                    if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                    else {
-                        if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                            matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                        else {
-                            List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                            matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
-                        }
-                    }
-                }
+
+        Set<Long> matchListByTeam = new HashSet<>();
+        teamList.forEach(teamId -> {
+            matchListByTeam.addAll(teamRepository.findById(teamId).orElse(null).getTeamMatchList());
+        });
+
+        matchListID.forEach(matchId -> {
+            MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
+            //오늘 날짜를 기준으로 정렬.(이전경기 or 이후경기)
+            if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
+            if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
+            //설정한 값이 있다면 설정한 값으로 진행한다.
+            if(userSelected.containsKey(matchId)) {
+                if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
                 else {
-                    if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(true, teamRepository));
+                    if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
+                        matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
                     else {
-                        if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                            matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(true, teamRepository));
-                        else {
-                            List<MatchDetails> matchDetailsList = new ArrayList<>();
-                            matchDetailsList.add(matchEntity.toMatchDetails(true, teamRepository));
-                            matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
-                        }
+                        List<MatchDetails> matchDetailsList = new ArrayList<>();
+                        matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
+                        matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
                     }
                 }
-            });
-        }
+            }
+            //선택한 팀이라면 알람을 보내준다.
+            else if(matchListByTeam.contains(matchId)) {
+                if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(true, teamRepository));
+                else {
+                    if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
+                        matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(true, teamRepository));
+                    else {
+                        List<MatchDetails> matchDetailsList = new ArrayList<>();
+                        matchDetailsList.add(matchEntity.toMatchDetails(true, teamRepository));
+                        matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
+                    }
+                }
+            }
+            //아니라면 안보낸다.
+            else {
+                if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(false, teamRepository));
+                else {
+                    if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
+                        matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(false, teamRepository));
+                    else {
+                        List<MatchDetails> matchDetailsList = new ArrayList<>();
+                        matchDetailsList.add(matchEntity.toMatchDetails(false, teamRepository));
+                        matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
+                    }
+                }
+            }
+        });
 
         List<Match> returnMatchList = new ArrayList<>();
         if(isAfter) {
@@ -198,6 +130,7 @@ public class LofService {
 
         return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList), returnMatchList), HttpStatus.OK);
     }
+
     //user가 선택한 team list 제공 함수.
     public ResponseEntity<?> getTeamList(Long userId){
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
@@ -219,7 +152,8 @@ public class LofService {
     public ResponseEntity<UserId> setUser(UserDto userDto){
         UserEntity userEntity = userRepository.findByDeviceId(userDto.getDeviceId());
         //없다면 저장한다.
-        if(userEntity == null) return new ResponseEntity<>(new UserId(userRepository.save(new UserEntity(userDto.getToken(), userDto.getDeviceId())).getUserId(),false), HttpStatus.OK);
+        if(userEntity == null)
+            return new ResponseEntity<>(new UserId(userRepository.save(new UserEntity(userDto.getToken(), userDto.getDeviceId())).getUserId(),false), HttpStatus.OK);
         //있다면 반환한다.
         return new ResponseEntity<>(new UserId(userEntity.getUserId(), true), HttpStatus.OK);
     }
@@ -228,11 +162,11 @@ public class LofService {
         UserEntity userEntity = userRepository.findById(userTeamListDto.getUserId()).orElse(null);
 
         if(userEntity == null){ // id 없음 예외처리.
-            log.info("getMatchList: "+"해당 id 없음 :" + userTeamListDto.getUserId());
+            log.info("getMatchList: "+"해당 id({}) 없음" , userTeamListDto.getUserId());
             return new ResponseEntity<>("해당 user id 없음", HttpStatus.BAD_REQUEST);
         }
         if(!teamRepository.findAllId().containsAll(userTeamListDto.getTeamIdList())){
-            log.info("getMatchList: "+"팀 id 리스트 잘못됨" + userTeamListDto.getTeamIdList().toString());
+            log.info("getMatchList: "+"팀 id({}) 리스트 잘못됨" , userTeamListDto.getTeamIdList().toString());
             return new ResponseEntity<>("해당 team id 없음", HttpStatus.BAD_REQUEST);
         }
         userEntity.setTeamList(userTeamListDto.getTeamIdList());
@@ -243,11 +177,11 @@ public class LofService {
         UserEntity userEntity = userRepository.findById(userAlarmDto.getUserId()).orElse(null);
 
         if(userEntity == null){ // id 없음 예외처리.
-            log.info("setAlarm: " + "해당 id 없음 :" + userAlarmDto.getUserId());
+            log.info("setAlarm: " + "해당 id({}) 없음" , userAlarmDto.getUserId());
             return new ResponseEntity<>("해당 id 없음", HttpStatus.BAD_REQUEST);
         }
         if(matchRepository.findById(userAlarmDto.getMatchId()).orElse(null) == null){
-            log.info("setAlarm: " + "해당 match id 없음 :" + userAlarmDto.getMatchId());
+            log.info("setAlarm: " + "해당 match id({}) 없음" + userAlarmDto.getMatchId());
             return new ResponseEntity<>("해당 match id 없음", HttpStatus.BAD_REQUEST);
         }
         userEntity.addUserSelected(userAlarmDto.getMatchId(),userAlarmDto.getAlarm());
