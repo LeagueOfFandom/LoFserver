@@ -8,8 +8,13 @@ import java.util.List;
 public class MatchList {
     private Match live;
     private List<Match> matchList;
-    public MatchList(Match live, List<Match> matchList) {
+    private Long totalPage;
+    private Long curPage;
+
+    public MatchList(Match live, List<Match> matchList, Long totalPage, Long curPage) {
         this.live = live;
         this.matchList = matchList;
+        this.totalPage = totalPage;
+        this.curPage = curPage;
     }
 }

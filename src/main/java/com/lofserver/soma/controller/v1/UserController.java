@@ -32,8 +32,8 @@ public class UserController {
     }
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
     @GetMapping("/matchList")
-    public ResponseEntity<?> getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "isAfter")Boolean isAfter){
-        return lofService.getMatchList(userId, isAll, isAfter);
+    public ResponseEntity<?> getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "isAfter")Boolean isAfter, @RequestParam(value = "page", required = false, defaultValue = "0")int page){
+        return lofService.getMatchList(userId, isAll, isAfter, page);
     }
 
     @ApiOperation(value = "유저가 선택한 팀 Api", notes = "client에서 User id를 주면 해당 User가 선택한 팀들의 List를 server에서 반환한다.", response = UserTeamInfoList.class)

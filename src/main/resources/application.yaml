@@ -29,7 +29,7 @@ spring:
     import: localkey.yaml
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   datasource:
     url: jdbc:mariadb://localhost:3306/lof
     username: root

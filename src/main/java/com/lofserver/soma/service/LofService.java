@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Service
@@ -38,7 +39,8 @@ public class LofService {
     private final MatchRepository matchRepository;
 
     //user의 matchList반환 함수.
-    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, Boolean isAfter){
+    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, Boolean isAfter, int page){
+        final int PAGE_PER_LOCALDATE = 5;
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
         if(userEntity == null){ // id 없음 예외처리.
             log.info("getMatchList" + "해당 id 없음 :" + userId);
@@ -111,24 +113,33 @@ public class LofService {
             }
         });
 
+        Long totalPage = null;
         List<Match> returnMatchList = new ArrayList<>();
         if(isAfter) {
             TreeSet<LocalDate> dateList = new TreeSet<>();
             dateList.addAll(matchList.keySet());
+            AtomicInteger pagecheck = new AtomicInteger(0);
+            totalPage = (long) Math.ceil((double) dateList.size()/PAGE_PER_LOCALDATE) - 1;
             dateList.forEach(localDate -> {
-                returnMatchList.add(new Match(localDate, matchList.get(localDate)));
+                if(pagecheck.get() >= page * PAGE_PER_LOCALDATE && pagecheck.get() < (page + 1)* PAGE_PER_LOCALDATE)
+                    returnMatchList.add(new Match(localDate, matchList.get(localDate)));
+                pagecheck.getAndIncrement();
             });
         }
         else{
             NavigableSet<LocalDate> dateList = new TreeSet<>();
             dateList.addAll(matchList.keySet());
             dateList = dateList.descendingSet();
+            AtomicInteger pagecheck = new AtomicInteger(0);
+            totalPage = (long) Math.ceil((double) dateList.size()/PAGE_PER_LOCALDATE) - 1;
             dateList.forEach(localDate -> {
-                returnMatchList.add(new Match(localDate, matchList.get(localDate)));
+                if(pagecheck.get() >= page * PAGE_PER_LOCALDATE && pagecheck.get() < (page + 1)* PAGE_PER_LOCALDATE)
+                    returnMatchList.add(new Match(localDate, matchList.get(localDate)));
+                pagecheck.getAndIncrement();
             });
         }
 
-        return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList), returnMatchList), HttpStatus.OK);
+        return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList) ,returnMatchList,totalPage,new Long(page)), HttpStatus.OK);
     }
 
     //user가 선택한 team list 제공 함수.
