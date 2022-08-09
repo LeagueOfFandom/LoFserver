@@ -51,6 +51,7 @@ public class LofService {
         List<MatchDetails> liveList = new ArrayList<>();
 
         List<Long> teamList = userEntity.getTeamList();
+        log.info(teamList.toString());
         TreeSet<Long> matchListID = new TreeSet<>();
         Map<Long, Boolean> userSelected = userEntity.getUserSelected();
 
