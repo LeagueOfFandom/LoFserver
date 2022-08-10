@@ -21,8 +21,8 @@ import java.util.List;
 @Slf4j
 public class DataSetController {
 
-    private MatchDetailsRepository matchDetailsRepository;
-    private MatchRepository matchRepository;
+    private final MatchDetailsRepository matchDetailsRepository;
+    private final MatchRepository matchRepository;
     @PostMapping("/dataset")
     public String dataset(@RequestParam(value = "homeTeamid")Long homeTeamId, @RequestParam(value = "awayTeamid")Long awayTeamId, @RequestParam(value = "date") String localDate1, @RequestBody List<MatchDetailSet> matchDetailSetList) {
         LocalDate localDate = LocalDate.parse(localDate1);

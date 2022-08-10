@@ -17,6 +17,7 @@ import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.entity.TeamEntity;
 import com.lofserver.soma.entity.TeamRankingEntity;
 import com.lofserver.soma.entity.UserEntity;
+import com.lofserver.soma.entity.match.MatchDetailsEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
 import com.lofserver.soma.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -300,4 +301,5 @@ public class LofService {
         return new ResponseEntity<>(new TeamRankingList(teamRankingList), HttpStatus.OK);
 
     }
+
 }
