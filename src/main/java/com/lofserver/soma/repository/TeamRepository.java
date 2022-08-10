@@ -14,4 +14,7 @@ public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
 
     @Query(value = "select id from team where json_value(name_list,'$.en_US') = ?1",nativeQuery = true)
     Long findIdByTeamName(String teamName);
+
+    @Query(value = "select * from team where json_value(name_list,'$.en_US') = ?1",nativeQuery = true)
+    TeamEntity findNameByTeamName(String teamName);
 }

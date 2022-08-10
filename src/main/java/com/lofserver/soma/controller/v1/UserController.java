@@ -4,6 +4,7 @@ import com.lofserver.soma.controller.v1.response.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
+import com.lofserver.soma.dto.TeamRankDto;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
@@ -55,5 +56,11 @@ public class UserController {
     @PostMapping("/alarm")
     public ResponseEntity<String> setAlarm(@RequestBody UserAlarmDto userAlarmDto){
         return lofService.setAlarm(userAlarmDto);
+    }
+
+    @ApiOperation(value = "리그 순위 Api", notes = "client에서 년도, 시즌, 리그를 보내주면 ")
+    @PostMapping("/teamRankList")
+    public ResponseEntity<?> setTeamRankLsit(@RequestBody TeamRankDto teamRankDto){
+        return lofService.getTeamRankList(teamRankDto);
     }
 }

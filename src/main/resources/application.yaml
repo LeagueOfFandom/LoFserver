@@ -31,7 +31,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mariadb://localhost:3306/lof
+    url: jdbc:mariadb://localhost:3306/lofDev
     username: root
     password: 1234
 

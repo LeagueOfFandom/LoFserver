@@ -8,15 +8,17 @@ import com.lofserver.soma.controller.v1.response.match.MatchDetails;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
+import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
+import com.lofserver.soma.controller.v1.response.teamRank.TeamRankingList;
+import com.lofserver.soma.dto.TeamRankDto;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.entity.TeamEntity;
+import com.lofserver.soma.entity.TeamRankingEntity;
 import com.lofserver.soma.entity.UserEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
-import com.lofserver.soma.repository.MatchRepository;
-import com.lofserver.soma.repository.TeamRepository;
-import com.lofserver.soma.repository.UserRepository;
+import com.lofserver.soma.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,7 @@ public class LofService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
+    private final TeamRankingRepository teamRankingRepository;
 
     //user의 matchList반환 함수.
     public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, Boolean isAfter, int page){
@@ -246,5 +249,55 @@ public class LofService {
         });
 
         return new ResponseEntity<>(new TeamVsTeam(homeTeamEntity.getTeamName(),homeTeamWinGame,homeTeamWinSet,homeTeamEntity.getTeamImg(),awayTeamEntity.getTeamName(),awayTeamWinGame,awayTeamWinSet,awayTeamEntity.getTeamImg(), rosterList), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getTeamRankList(TeamRankDto teamRankDto){
+        List<TeamRanking> teamRankingList = new ArrayList<>();
+
+        List<TeamRankingEntity> teamRankingEntityList = teamRankingRepository.findByYearSeasonLeague(teamRankDto.getYear(), teamRankDto.getSeason(), teamRankDto.getLeague());
+
+        if(teamRankingEntityList == null){
+            log.info("getTeamRankList" + "해당 경기 없음");
+            return new ResponseEntity<>("해당 경기 없음",HttpStatus.BAD_REQUEST);
+        }
+
+        for(TeamRankingEntity teamRankingEntity : teamRankingEntityList){
+            //팀 name으로 찾기
+            TeamEntity teamEntity = teamRepository.findNameByTeamName(teamRankingEntity.getTeamName());
+            if(teamEntity == null){
+                log.info("getTeamRankList" + "팀 이름 찾지 못함");
+                return new ResponseEntity<>("팀 이름 찾지 못함",HttpStatus.BAD_REQUEST);
+            }
+            List<String> recentMatches = new ArrayList<>();
+            List<MatchEntity> matchEntityList = matchRepository.findByTeamId(teamEntity.getTeamId());
+            if(matchEntityList == null){
+                log.info("getTeamRankList" + "최근 5경기 결과 불러오지 못함");
+                return new ResponseEntity<>("최근 5경기 결과 불러오지 못함",HttpStatus.BAD_REQUEST);
+            }
+            for(MatchEntity matchEntity : matchEntityList){
+                if(teamEntity.getTeamId() == matchEntity.getMatchInfo().getHomeTeamId()){
+                    if(matchEntity.getHomeScore() == 2){ // 승리한 경우
+                        recentMatches.add(0,"W");
+                    }
+                    else{
+                        recentMatches.add(0,"L");
+                    }
+                }
+                else if(teamEntity.getTeamId() == matchEntity.getMatchInfo().getAwayTeamId()){
+                    if(matchEntity.getAwayScore() == 2){ // 승리한 경우
+                        recentMatches.add(0,"W");
+                    }
+                    else{
+                        recentMatches.add(0,"L");
+                    }
+                }
+            }
+
+            //팀 id와 사진 저장
+            teamRankingList.add(new TeamRanking(teamRankingEntity, teamEntity.getTeamName(), teamEntity.getTeamImg(), recentMatches));
+        }
+
+        return new ResponseEntity<>(new TeamRankingList(teamRankingList), HttpStatus.OK);
+
     }
 }
