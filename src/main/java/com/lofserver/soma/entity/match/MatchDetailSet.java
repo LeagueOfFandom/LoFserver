@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class MatchDetailSet {
+    private Boolean isHomeWin;
     private Long homeTeamId;
     private Long awayTeamId;
     private String homeTop;
@@ -31,7 +32,8 @@ public class MatchDetailSet {
     private String homeInhibitor;
     private String awayInhibitor;
 
-    public MatchDetailSet(Long homeTeamId, Long awayTeamId, String homeTop, String homeMid, String homeJungle, String homeADC, String homeSupport, String awayTop, String awayMid, String awayJungle, String awayADC, String awaySupport, String homeKill, String awayKill, String homeGold, String awayGold, String homeHerald, String awayHerald, String homeDragon, String awayDragon, String homeBaron, String awayBaron, String homeTower, String awayTower, String homeInhibitor, String awayInhibitor) {
+    public MatchDetailSet(Boolean isHomeWin, Long homeTeamId, Long awayTeamId, String homeTop, String homeMid, String homeJungle, String homeADC, String homeSupport, String awayTop, String awayMid, String awayJungle, String awayADC, String awaySupport, String homeKill, String awayKill, String homeGold, String awayGold, String homeHerald, String awayHerald, String homeDragon, String awayDragon, String homeBaron, String awayBaron, String homeTower, String awayTower, String homeInhibitor, String awayInhibitor) {
+        this.isHomeWin = isHomeWin;
         this.homeTeamId = homeTeamId;
         this.awayTeamId = awayTeamId;
         this.homeTop = homeTop;
