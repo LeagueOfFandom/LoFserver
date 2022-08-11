@@ -255,7 +255,7 @@ public class LofService {
         return new ResponseEntity<>(new TeamVsTeam(homeTeamEntity.getTeamName(),homeTeamWinGame,homeTeamWinSet,homeTeamEntity.getTeamImg(),awayTeamEntity.getTeamName(),awayTeamWinGame,awayTeamWinSet,awayTeamEntity.getTeamImg(), rosterList), HttpStatus.OK);
     }*/
     public ResponseEntity<?> getTeamVsTeam(Long matchId){
-        MatchDetailsEntity matchDetailsEntity = matchDetailsRepository.findById(matchId).orElse(null);
+        MatchDetailsEntity matchDetailsEntity = matchDetailsRepository.findByMatchId(matchId);
         if(matchDetailsEntity == null)
             return new ResponseEntity<>("해당 match 없음",HttpStatus.BAD_REQUEST);
         List<TeamVsTeamSetInfo> teamVsTeamSetInfoList = new ArrayList<>();
@@ -278,7 +278,7 @@ public class LofService {
 
             TeamEntity homeTeamEntity = teamRepository.findById(matchDetailsSet.getHomeTeamId()).orElse(null);
             TeamEntity awayTeamEntity = teamRepository.findById(matchDetailsSet.getAwayTeamId()).orElse(null);
-            if(teamWinSet.containsKey(homeTeamEntity.getTeamName())) {
+            if(!teamWinSet.containsKey(homeTeamEntity.getTeamName())) {
                 teamWinSet.put(homeTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? 1L : 0L);
                 teamWinSet.put(awayTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? 0L : 1L);
             }
