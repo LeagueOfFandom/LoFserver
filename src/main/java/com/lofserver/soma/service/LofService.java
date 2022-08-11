@@ -2,6 +2,7 @@ package com.lofserver.soma.service;
 
 import com.lofserver.soma.controller.v1.response.Roster;
 import com.lofserver.soma.controller.v1.response.TeamVsTeam;
+import com.lofserver.soma.controller.v1.response.TeamVsTeamSetInfo;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchDetails;
@@ -17,6 +18,7 @@ import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.entity.TeamEntity;
 import com.lofserver.soma.entity.TeamRankingEntity;
 import com.lofserver.soma.entity.UserEntity;
+import com.lofserver.soma.entity.match.MatchDetailSet;
 import com.lofserver.soma.entity.match.MatchDetailsEntity;
 import com.lofserver.soma.entity.match.MatchEntity;
 import com.lofserver.soma.repository.*;
@@ -41,6 +43,7 @@ public class LofService {
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
     private final TeamRankingRepository teamRankingRepository;
+    private final MatchDetailsRepository matchDetailsRepository;
 
     //user의 matchList반환 함수.
     public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, Boolean isAfter, int page){
@@ -204,7 +207,7 @@ public class LofService {
         userRepository.save(userEntity);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
-
+/*
     public ResponseEntity<?> getTeamVsTeam(Long matchId){
         MatchEntity nowMatch = matchRepository.findById(matchId).orElse(null);
         if(nowMatch == null)
@@ -250,7 +253,65 @@ public class LofService {
         });
 
         return new ResponseEntity<>(new TeamVsTeam(homeTeamEntity.getTeamName(),homeTeamWinGame,homeTeamWinSet,homeTeamEntity.getTeamImg(),awayTeamEntity.getTeamName(),awayTeamWinGame,awayTeamWinSet,awayTeamEntity.getTeamImg(), rosterList), HttpStatus.OK);
+    }*/
+    public ResponseEntity<?> getTeamVsTeam(Long matchId){
+        MatchDetailsEntity matchDetailsEntity = matchDetailsRepository.findById(matchId).orElse(null);
+        if(matchDetailsEntity == null)
+            return new ResponseEntity<>("해당 match 없음",HttpStatus.BAD_REQUEST);
+        List<TeamVsTeamSetInfo> teamVsTeamSetInfoList = new ArrayList<>();
+        Map<String, Long> teamWinSet = new HashMap<>();
+        for(MatchDetailSet matchDetailsSet : matchDetailsEntity.getMatchDetailSetList()){
+            List<Roster> homeRosterList = new ArrayList<>();
+            List<Roster> awayRosterList = new ArrayList<>();
+
+            homeRosterList.add(new Roster("TOP",matchDetailsSet.getHomeTop(),"https://d654rq93y7j8z.cloudfront.net/line/TOP.png"));
+            homeRosterList.add(new Roster("JUNGLE",matchDetailsSet.getHomeJungle(),"https://d654rq93y7j8z.cloudfront.net/line/JUNGLE.png"));
+            homeRosterList.add(new Roster("MID",matchDetailsSet.getHomeMid(),"https://d654rq93y7j8z.cloudfront.net/line/MID.png"));
+            homeRosterList.add(new Roster("BOTTOM",matchDetailsSet.getAwayADC(),"https://d654rq93y7j8z.cloudfront.net/line/BOTTOM.png"));
+            homeRosterList.add(new Roster("SUPPORT",matchDetailsSet.getHomeSupport(),"https://d654rq93y7j8z.cloudfront.net/line/SUPPORT.png"));
+            awayRosterList.add(new Roster("TOP",matchDetailsSet.getAwayTop(),"https://d654rq93y7j8z.cloudfront.net/line/TOP.png"));
+
+            awayRosterList.add(new Roster("JUNGLE",matchDetailsSet.getAwayJungle(),"https://d654rq93y7j8z.cloudfront.net/line/JUNGLE.png"));
+            awayRosterList.add(new Roster("MID",matchDetailsSet.getAwayMid(),"https://d654rq93y7j8z.cloudfront.net/line/MID.png"));
+            awayRosterList.add(new Roster("BOTTOM",matchDetailsSet.getAwayADC(),"https://d654rq93y7j8z.cloudfront.net/line/BOTTOM.png"));
+            awayRosterList.add(new Roster("SUPPORT",matchDetailsSet.getAwaySupport(),"https://d654rq93y7j8z.cloudfront.net/line/SUPPORT.png"));
+
+            TeamEntity homeTeamEntity = teamRepository.findById(matchDetailsSet.getHomeTeamId()).orElse(null);
+            TeamEntity awayTeamEntity = teamRepository.findById(matchDetailsSet.getAwayTeamId()).orElse(null);
+            if(teamWinSet.containsKey(homeTeamEntity.getTeamName())) {
+                teamWinSet.put(homeTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? 1L : 0L);
+                teamWinSet.put(awayTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? 0L : 1L);
+            }
+            else{
+                teamWinSet.put(homeTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? teamWinSet.get(homeTeamEntity.getTeamName()) + 1 : teamWinSet.get(homeTeamEntity.getTeamName()));
+                teamWinSet.put(awayTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? teamWinSet.get(awayTeamEntity.getTeamName()) : teamWinSet.get(awayTeamEntity.getTeamName()) + 1);
+            }
+            teamVsTeamSetInfoList.add(new TeamVsTeamSetInfo(
+                    homeTeamEntity.getTeamName(),
+                    homeTeamEntity.getTeamImg(),
+                    teamWinSet.get(homeTeamEntity.getTeamName()).toString(),
+                    homeRosterList,awayTeamEntity.getTeamName(),
+                    awayTeamEntity.getTeamImg(),
+                    teamWinSet.get(awayTeamEntity.getTeamName()).toString(),
+                    awayRosterList,matchDetailsSet.getHomeKill(),
+                    matchDetailsSet.getHomeGold(),
+                    matchDetailsSet.getHomeHerald(),
+                    matchDetailsSet.getHomeDragon(),
+                    matchDetailsSet.getHomeBaron(),
+                    matchDetailsSet.getHomeTower(),
+                    matchDetailsSet.getHomeInhibitor(),
+                    matchDetailsSet.getAwayKill(),
+                    matchDetailsSet.getAwayGold(),
+                    matchDetailsSet.getAwayHerald(),
+                    matchDetailsSet.getAwayDragon()
+                    ,matchDetailsSet.getAwayBaron(),
+                    matchDetailsSet.getAwayTower(),
+                    matchDetailsSet.getAwayInhibitor()
+                    ));
+        }
+        return new ResponseEntity<>(new TeamVsTeam(teamVsTeamSetInfoList),HttpStatus.OK);
     }
+
 
     public ResponseEntity<?> getTeamRankList(TeamRankDto teamRankDto){
         List<TeamRanking> teamRankingList = new ArrayList<>();
