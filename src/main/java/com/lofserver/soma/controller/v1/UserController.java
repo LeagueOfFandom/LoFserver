@@ -59,8 +59,8 @@ public class UserController {
     }
 
     @ApiOperation(value = "리그 순위 Api", notes = "client에서 년도, 시즌, 리그를 보내주면 ")
-    @PostMapping("/teamRankList")
-    public ResponseEntity<?> setTeamRankLsit(@RequestBody TeamRankDto teamRankDto){
-        return lofService.getTeamRankList(teamRankDto);
+    @GetMapping("/teamRankList")
+    public ResponseEntity<?> setTeamRankLsit(@RequestParam(value="year")String year, @RequestParam(value="season")String season, @RequestParam(value="league")String league){
+        return lofService.getTeamRankList(year, season, league);
     }
 }

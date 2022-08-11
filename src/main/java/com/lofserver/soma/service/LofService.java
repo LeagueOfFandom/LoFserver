@@ -313,7 +313,8 @@ public class LofService {
     }
 
 
-    public ResponseEntity<?> getTeamRankList(TeamRankDto teamRankDto){
+    public ResponseEntity<?> getTeamRankList(String year, String season, String league){
+        TeamRankDto teamRankDto = new TeamRankDto(year, season, league);
         List<TeamRanking> teamRankingList = new ArrayList<>();
 
         List<TeamRankingEntity> teamRankingEntityList = teamRankingRepository.findByYearSeasonLeague(teamRankDto.getYear(), teamRankDto.getSeason(), teamRankDto.getLeague());
