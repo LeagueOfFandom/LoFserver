@@ -20,15 +20,12 @@ public class TeamRanking {
     private String name; //규격화된 팀 이름
 
     private String teamImg;
-    private String seriesWin;
 
-    private String seriesLose;
+    private String seriesWinLose;
 
     private String seriesWinRate;
 
-    private String gamesWin;
-
-    private String gamesLose;
+    private String gamesWinLose;
 
     private String gamesWinRate;
 
@@ -45,11 +42,11 @@ public class TeamRanking {
         this.season = teamRankingEntity.getSeason();
         this.league = teamRankingEntity.getLeague();
         this.rank = teamRankingEntity.getRank();
-        this.seriesWin = teamRankingEntity.getSeriesWin();
-        this.seriesLose = teamRankingEntity.getSeriesLose();
+
+        this.seriesWinLose = teamRankingEntity.getSeriesWin() + "W " + teamRankingEntity.getSeriesLose() + "L";
         this.seriesWinRate = teamRankingEntity.getSeriesWinRate();
-        this.gamesWin = teamRankingEntity.getGamesWin();
-        this.gamesLose = teamRankingEntity.getGamesLose();
+
+        this.gamesWinLose = teamRankingEntity.getGamesWin() + "W " + teamRankingEntity.getGamesLose() + "L";
         this.gamesWinRate = teamRankingEntity.getGamesWinRate();
         this.points = teamRankingEntity.getPoints();
     }
