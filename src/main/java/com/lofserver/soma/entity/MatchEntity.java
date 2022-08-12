@@ -90,7 +90,7 @@ public class MatchEntity {
         String awayUrl = "미정";
         Long homeScore = 0L;
         Long awayScore = 0L;
-        if(opponents.size() != 0) {
+        if(opponents != null && opponents.size() != 0) {
             homeTeam = opponents.get(0).getOpponent().getName();
             awayTeam = opponents.get(1).getOpponent().getName();
             homeUrl = opponents.get(0).getOpponent().getImage_url();

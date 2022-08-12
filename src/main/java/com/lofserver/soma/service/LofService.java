@@ -90,7 +90,7 @@ public class LofService {
         matchListID.forEach(matchId -> {
             MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
             //오늘 날짜를 기준으로 정렬.(이전경기 or 이후경기)
-            log.info(matchEntity.getOriginal_scheduled_at().toString());
+            if(matchEntity.getOriginal_scheduled_at() == null) return;
             if(isAfter && matchEntity.getOriginal_scheduled_at().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) return;
             if(!isAfter && matchEntity.getOriginal_scheduled_at().isAfter(LocalDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
             //설정한 값이 있다면 설정한 값으로 진행한다.
