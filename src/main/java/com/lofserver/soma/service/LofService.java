@@ -1,7 +1,5 @@
 package com.lofserver.soma.service;
 
-import com.lofserver.soma.controller.v1.response.Roster;
-import com.lofserver.soma.controller.v1.response.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.TeamVsTeamSetInfo;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
@@ -9,19 +7,19 @@ import com.lofserver.soma.controller.v1.response.match.MatchDetails;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
-import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
-import com.lofserver.soma.controller.v1.response.teamRank.TeamRankingList;
-import com.lofserver.soma.dto.TeamRankDto;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
-import com.lofserver.soma.entity.TeamEntity;
-import com.lofserver.soma.entity.TeamRankingEntity;
+import com.lofserver.soma.dto.crawlDto.gameDto.sub.teams.Team;
+import com.lofserver.soma.dto.crawlDto.matchDto.sub.Game;
+import com.lofserver.soma.dto.crawlDto.matchDto.sub.Result;
+import com.lofserver.soma.entity.MatchDetailEntity;
+import com.lofserver.soma.entity.MatchEntity;
 import com.lofserver.soma.entity.UserEntity;
-import com.lofserver.soma.entity.match.MatchDetailSet;
-import com.lofserver.soma.entity.match.MatchDetailsEntity;
-import com.lofserver.soma.entity.match.MatchEntity;
-import com.lofserver.soma.repository.*;
+import com.lofserver.soma.repository.MatchDetailRepository;
+import com.lofserver.soma.repository.MatchRepository;
+import com.lofserver.soma.repository.TeamRepository;
+import com.lofserver.soma.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,8 +41,21 @@ public class LofService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
-    private final TeamRankingRepository teamRankingRepository;
-    private final MatchDetailsRepository matchDetailsRepository;
+
+    private final MatchDetailRepository matchDetailRepository;
+
+    public ResponseEntity<?> getTeamVsTeam(Long matchId){
+        MatchEntity matchEntity = matchRepository.findById(matchId).orElse(null);
+        if(matchEntity == null)
+            return new ResponseEntity<>("해당 id 없음",HttpStatus.NOT_FOUND);
+
+        List<MatchDetailEntity> matchDetailEntityList = new ArrayList<>();
+        for(Game game : matchEntity.getGames()){
+            MatchDetailEntity matchDetailEntity = matchDetailRepository.findById(game.getId()).orElse(null);
+            matchDetailEntityList.add(matchDetailEntity);
+        }
+        return new ResponseEntity<>(matchDetailEntityList, HttpStatus.OK);
+    }
 
     //user의 matchList반환 함수.
     public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, Boolean isAfter, int page){
@@ -67,55 +79,56 @@ public class LofService {
             matchListID.addAll(matchRepository.findAllId());
         else
             teamList.forEach(teamId -> {
-                matchListID.addAll(teamRepository.findById(teamId).orElse(null).getTeamMatchList());
+                matchListID.addAll(matchRepository.findAllByTeamId(teamId));
             });
 
         Set<Long> matchListByTeam = new HashSet<>();
         teamList.forEach(teamId -> {
-            matchListByTeam.addAll(teamRepository.findById(teamId).orElse(null).getTeamMatchList());
+            matchListByTeam.addAll(matchRepository.findAllByTeamId(teamId));
         });
 
         matchListID.forEach(matchId -> {
             MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
             //오늘 날짜를 기준으로 정렬.(이전경기 or 이후경기)
-            if(isAfter && matchEntity.getMatchInfo().getMatchDate().isBefore(LocalDate.now(ZoneId.of("Asia/Seoul")))) return;
-            if(!isAfter && matchEntity.getMatchInfo().getMatchDate().isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
+            log.info(matchEntity.getOriginal_scheduled_at().toString());
+            if(isAfter && matchEntity.getOriginal_scheduled_at().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) return;
+            if(!isAfter && matchEntity.getOriginal_scheduled_at().isAfter(LocalDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
             //설정한 값이 있다면 설정한 값으로 진행한다.
             if(userSelected.containsKey(matchId)) {
-                if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
+                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId)));
                 else {
-                    if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                        matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
+                    if (matchList.containsKey(matchEntity.getOriginal_scheduled_at().toLocalDate()))
+                        matchList.get(matchEntity.getOriginal_scheduled_at().toLocalDate()).add(matchEntity.toMatchDetails(userSelected.get(matchId)));
                     else {
                         List<MatchDetails> matchDetailsList = new ArrayList<>();
-                        matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId), teamRepository));
-                        matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
+                        matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId)));
+                        matchList.put(matchEntity.getOriginal_scheduled_at().toLocalDate(), matchDetailsList);
                     }
                 }
             }
             //선택한 팀이라면 알람을 보내준다.
             else if(matchListByTeam.contains(matchId)) {
-                if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(true, teamRepository));
+                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(true));
                 else {
-                    if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                        matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(true, teamRepository));
+                    if (matchList.containsKey(matchEntity.getOriginal_scheduled_at().toLocalDate()))
+                        matchList.get(matchEntity.getOriginal_scheduled_at().toLocalDate()).add(matchEntity.toMatchDetails(true));
                     else {
                         List<MatchDetails> matchDetailsList = new ArrayList<>();
-                        matchDetailsList.add(matchEntity.toMatchDetails(true, teamRepository));
-                        matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
+                        matchDetailsList.add(matchEntity.toMatchDetails(true));
+                        matchList.put(matchEntity.getOriginal_scheduled_at().toLocalDate(), matchDetailsList);
                     }
                 }
             }
             //아니라면 안보낸다.
             else {
-                if(matchEntity.getLive() == true) liveList.add(matchEntity.toMatchDetails(false, teamRepository));
+                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(false));
                 else {
-                    if (matchList.containsKey(matchEntity.getMatchInfo().getMatchDate()))
-                        matchList.get(matchEntity.getMatchInfo().getMatchDate()).add(matchEntity.toMatchDetails(false, teamRepository));
+                    if (matchList.containsKey(matchEntity.getOriginal_scheduled_at().toLocalDate()))
+                        matchList.get(matchEntity.getOriginal_scheduled_at().toLocalDate()).add(matchEntity.toMatchDetails(false));
                     else {
                         List<MatchDetails> matchDetailsList = new ArrayList<>();
-                        matchDetailsList.add(matchEntity.toMatchDetails(false, teamRepository));
-                        matchList.put(matchEntity.getMatchInfo().getMatchDate(), matchDetailsList);
+                        matchDetailsList.add(matchEntity.toMatchDetails(false));
+                        matchList.put(matchEntity.getOriginal_scheduled_at().toLocalDate(), matchDetailsList);
                     }
                 }
             }
@@ -162,7 +175,7 @@ public class LofService {
         List<UserTeamInfo> userTeamInfoList = new ArrayList<>();
         //모든 팀에 대해 user의 선택 값 적용하여 제공.
         teamRepository.findAll().forEach(teamEntity -> {
-            if(userEntity.getTeamList().contains(teamEntity.getTeamId())) userTeamInfoList.add(new UserTeamInfo(teamEntity,true));
+            if(userEntity.getTeamList().contains(teamEntity.getId())) userTeamInfoList.add(new UserTeamInfo(teamEntity,true));
             else userTeamInfoList.add(new UserTeamInfo(teamEntity, false));
         });
         return new ResponseEntity<>(new UserTeamInfoList(userTeamInfoList),HttpStatus.OK );
@@ -206,162 +219,6 @@ public class LofService {
         userEntity.addUserSelected(userAlarmDto.getMatchId(),userAlarmDto.getAlarm());
         userRepository.save(userEntity);
         return new ResponseEntity<>("success", HttpStatus.OK);
-    }
-/*
-    public ResponseEntity<?> getTeamVsTeam(Long matchId){
-        MatchEntity nowMatch = matchRepository.findById(matchId).orElse(null);
-        if(nowMatch == null)
-            return new ResponseEntity<>("해당 match 없음",HttpStatus.BAD_REQUEST);
-        Long homeTeamId = nowMatch.getMatchInfo().getHomeTeamId();
-        Long awayTeamId = nowMatch.getMatchInfo().getAwayTeamId();
-
-        Long homeTeamWinGame = 0L, awayTeamWinGame = 0L,homeTeamWinSet = 0L,awayTeamWinSet = 0L;
-        List<MatchEntity> matchEntityList = matchRepository.findByHomeTeamIdAndAwayTeamId(homeTeamId,awayTeamId);
-        for(MatchEntity matchEntity : matchEntityList){
-            homeTeamWinSet += matchEntity.getHomeScore();
-            awayTeamWinSet += matchEntity.getAwayScore();
-            if(matchEntity.getHomeScore() > matchEntity.getAwayScore())
-                homeTeamWinGame += 1;
-            else if(matchEntity.getHomeScore() < matchEntity.getAwayScore())
-                awayTeamWinGame += 1;
-        }
-        matchEntityList = matchRepository.findByHomeTeamIdAndAwayTeamId(awayTeamId,homeTeamId);
-        for(MatchEntity matchEntity : matchEntityList){
-            homeTeamWinSet += matchEntity.getAwayScore();
-            awayTeamWinSet += matchEntity.getHomeScore();
-            if(matchEntity.getAwayScore() > matchEntity.getHomeScore())
-                homeTeamWinGame += 1;
-            else if(matchEntity.getAwayScore() < matchEntity.getHomeScore())
-                awayTeamWinGame += 1;
-        }
-        TeamEntity homeTeamEntity = teamRepository.findById(homeTeamId).orElse(null);
-        TeamEntity awayTeamEntity = teamRepository.findById(awayTeamId).orElse(null);
-
-        List<Roster> rosterList = new ArrayList<>();
-        List<String> line = new ArrayList<>() {
-            {
-                add("TOP");
-                add("JUNGLE");
-                add("MID");
-                add("BOTTOM");
-                add("SUPPORT");
-            }
-        };
-        line.forEach(lineName -> {
-           rosterList.add(new Roster("Home"+lineName,homeTeamEntity.getRosterName().get(lineName),"https://d654rq93y7j8z.cloudfront.net/line/" + lineName +".png"));
-           rosterList.add(new Roster("Away"+lineName,awayTeamEntity.getRosterName().get(lineName),"https://d654rq93y7j8z.cloudfront.net/line/" + lineName +".png"));
-        });
-
-        return new ResponseEntity<>(new TeamVsTeam(homeTeamEntity.getTeamName(),homeTeamWinGame,homeTeamWinSet,homeTeamEntity.getTeamImg(),awayTeamEntity.getTeamName(),awayTeamWinGame,awayTeamWinSet,awayTeamEntity.getTeamImg(), rosterList), HttpStatus.OK);
-    }*/
-    public ResponseEntity<?> getTeamVsTeam(Long matchId){
-        MatchDetailsEntity matchDetailsEntity = matchDetailsRepository.findByMatchId(matchId);
-        if(matchDetailsEntity == null)
-            return new ResponseEntity<>("해당 match 없음",HttpStatus.BAD_REQUEST);
-        List<TeamVsTeamSetInfo> teamVsTeamSetInfoList = new ArrayList<>();
-        Map<String, Long> teamWinSet = new HashMap<>();
-        for(MatchDetailSet matchDetailsSet : matchDetailsEntity.getMatchDetailSetList()){
-            List<Roster> homeRosterList = new ArrayList<>();
-            List<Roster> awayRosterList = new ArrayList<>();
-
-            homeRosterList.add(new Roster("TOP",matchDetailsSet.getHomeTop(),"https://d654rq93y7j8z.cloudfront.net/line/TOP.png"));
-            homeRosterList.add(new Roster("JUNGLE",matchDetailsSet.getHomeJungle(),"https://d654rq93y7j8z.cloudfront.net/line/JUNGLE.png"));
-            homeRosterList.add(new Roster("MID",matchDetailsSet.getHomeMid(),"https://d654rq93y7j8z.cloudfront.net/line/MID.png"));
-            homeRosterList.add(new Roster("BOTTOM",matchDetailsSet.getAwayADC(),"https://d654rq93y7j8z.cloudfront.net/line/BOTTOM.png"));
-            homeRosterList.add(new Roster("SUPPORT",matchDetailsSet.getHomeSupport(),"https://d654rq93y7j8z.cloudfront.net/line/SUPPORT.png"));
-            awayRosterList.add(new Roster("TOP",matchDetailsSet.getAwayTop(),"https://d654rq93y7j8z.cloudfront.net/line/TOP.png"));
-
-            awayRosterList.add(new Roster("JUNGLE",matchDetailsSet.getAwayJungle(),"https://d654rq93y7j8z.cloudfront.net/line/JUNGLE.png"));
-            awayRosterList.add(new Roster("MID",matchDetailsSet.getAwayMid(),"https://d654rq93y7j8z.cloudfront.net/line/MID.png"));
-            awayRosterList.add(new Roster("BOTTOM",matchDetailsSet.getAwayADC(),"https://d654rq93y7j8z.cloudfront.net/line/BOTTOM.png"));
-            awayRosterList.add(new Roster("SUPPORT",matchDetailsSet.getAwaySupport(),"https://d654rq93y7j8z.cloudfront.net/line/SUPPORT.png"));
-
-            TeamEntity homeTeamEntity = teamRepository.findById(matchDetailsSet.getHomeTeamId()).orElse(null);
-            TeamEntity awayTeamEntity = teamRepository.findById(matchDetailsSet.getAwayTeamId()).orElse(null);
-            if(!teamWinSet.containsKey(homeTeamEntity.getTeamName())) {
-                teamWinSet.put(homeTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? 1L : 0L);
-                teamWinSet.put(awayTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? 0L : 1L);
-            }
-            else{
-                teamWinSet.put(homeTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? teamWinSet.get(homeTeamEntity.getTeamName()) + 1 : teamWinSet.get(homeTeamEntity.getTeamName()));
-                teamWinSet.put(awayTeamEntity.getTeamName(), matchDetailsSet.getIsHomeWin() ? teamWinSet.get(awayTeamEntity.getTeamName()) : teamWinSet.get(awayTeamEntity.getTeamName()) + 1);
-            }
-            teamVsTeamSetInfoList.add(new TeamVsTeamSetInfo(
-                    homeTeamEntity.getTeamName(),
-                    homeTeamEntity.getTeamImg(),
-                    teamWinSet.get(homeTeamEntity.getTeamName()).toString(),
-                    homeRosterList,awayTeamEntity.getTeamName(),
-                    awayTeamEntity.getTeamImg(),
-                    teamWinSet.get(awayTeamEntity.getTeamName()).toString(),
-                    awayRosterList,matchDetailsSet.getHomeKill(),
-                    matchDetailsSet.getHomeGold(),
-                    matchDetailsSet.getHomeHerald(),
-                    matchDetailsSet.getHomeDragon(),
-                    matchDetailsSet.getHomeBaron(),
-                    matchDetailsSet.getHomeTower(),
-                    matchDetailsSet.getHomeInhibitor(),
-                    matchDetailsSet.getAwayKill(),
-                    matchDetailsSet.getAwayGold(),
-                    matchDetailsSet.getAwayHerald(),
-                    matchDetailsSet.getAwayDragon()
-                    ,matchDetailsSet.getAwayBaron(),
-                    matchDetailsSet.getAwayTower(),
-                    matchDetailsSet.getAwayInhibitor()
-                    ));
-        }
-        return new ResponseEntity<>(new TeamVsTeam(teamVsTeamSetInfoList),HttpStatus.OK);
-    }
-
-
-    public ResponseEntity<?> getTeamRankList(String year, String season, String league){
-        TeamRankDto teamRankDto = new TeamRankDto(year, season, league);
-        List<TeamRanking> teamRankingList = new ArrayList<>();
-
-        List<TeamRankingEntity> teamRankingEntityList = teamRankingRepository.findByYearSeasonLeague(teamRankDto.getYear(), teamRankDto.getSeason(), teamRankDto.getLeague());
-
-        if(teamRankingEntityList == null){
-            log.info("getTeamRankList" + "해당 경기 없음");
-            return new ResponseEntity<>("해당 경기 없음",HttpStatus.BAD_REQUEST);
-        }
-
-        for(TeamRankingEntity teamRankingEntity : teamRankingEntityList){
-            //팀 name으로 찾기
-            TeamEntity teamEntity = teamRepository.findNameByTeamName(teamRankingEntity.getTeamName());
-            if(teamEntity == null){
-                log.info("getTeamRankList" + "팀 이름 찾지 못함");
-                return new ResponseEntity<>("팀 이름 찾지 못함",HttpStatus.BAD_REQUEST);
-            }
-            List<String> recentMatches = new ArrayList<>();
-            List<MatchEntity> matchEntityList = matchRepository.findByTeamId(teamEntity.getTeamId());
-            if(matchEntityList == null){
-                log.info("getTeamRankList" + "최근 5경기 결과 불러오지 못함");
-                return new ResponseEntity<>("최근 5경기 결과 불러오지 못함",HttpStatus.BAD_REQUEST);
-            }
-            for(MatchEntity matchEntity : matchEntityList){
-                if(teamEntity.getTeamId() == matchEntity.getMatchInfo().getHomeTeamId()){
-                    if(matchEntity.getHomeScore() == 2){ // 승리한 경우
-                        recentMatches.add(0,"W");
-                    }
-                    else{
-                        recentMatches.add(0,"L");
-                    }
-                }
-                else if(teamEntity.getTeamId() == matchEntity.getMatchInfo().getAwayTeamId()){
-                    if(matchEntity.getAwayScore() == 2){ // 승리한 경우
-                        recentMatches.add(0,"W");
-                    }
-                    else{
-                        recentMatches.add(0,"L");
-                    }
-                }
-            }
-
-            //팀 id와 사진 저장
-            teamRankingList.add(new TeamRanking(teamRankingEntity, teamEntity.getTeamName(), teamEntity.getTeamImg(), recentMatches));
-        }
-
-        return new ResponseEntity<>(new TeamRankingList(teamRankingList), HttpStatus.OK);
-
     }
 
 }

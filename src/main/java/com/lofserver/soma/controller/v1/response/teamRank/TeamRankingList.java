@@ -1,6 +1,6 @@
 package com.lofserver.soma.controller.v1.response.teamRank;
 
-import com.lofserver.soma.entity.TeamRankingEntity;
+
 import lombok.Getter;
 
 import java.util.List;
