@@ -90,6 +90,7 @@ public class MatchEntity {
         String awayUrl = "미정";
         Long homeScore = 0L;
         Long awayScore = 0L;
+        String url = "미정";
         if(opponents.size() != 0) {
             homeTeam = opponents.get(0).getOpponent().getName();
             awayTeam = opponents.get(1).getOpponent().getName();
@@ -97,6 +98,7 @@ public class MatchEntity {
             awayUrl = opponents.get(1).getOpponent().getImage_url();
             homeScore = results.get(0).getScore();
             awayScore = results.get(1).getScore();
+            url = streams_list.get(0).getRaw_url();
         }
         return new MatchDetails(
                 id,
@@ -108,7 +110,7 @@ public class MatchEntity {
                 awayUrl,
                 homeScore,
                 awayScore,
-                streams_list.get(1).getRaw_url(),
+                url,
                 alarm);
     }
 }
