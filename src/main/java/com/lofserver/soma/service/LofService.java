@@ -216,15 +216,12 @@ public class LofService {
 
             List<String> recentMatches = new ArrayList<>();
             List<MatchEntity> matchEntityList = matchRepository.findRecentGamesByTeamId(teamEntity.getId());
-            System.out.println("matchEntityList : " + matchEntityList.size());
             for(MatchEntity matchEntity : matchEntityList){
 
                 if(matchEntity.getWinner_id().toString().equals(teamEntity.getId().toString()) ) {
-                    System.out.println("같다" + matchEntity.getWinner_id().toString() + " " + teamEntity.getId().toString());
                     recentMatches.add("W");
                 }
                 else {
-                    System.out.println("다르다" + matchEntity.getWinner_id().toString() + " " + teamEntity.getId().toString());
                     recentMatches.add("L");
                 }
             }
