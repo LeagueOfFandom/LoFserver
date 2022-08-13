@@ -58,4 +58,9 @@ public class UserController {
     public ResponseEntity<String> setAlarm(@RequestBody UserAlarmDto userAlarmDto){
         return lofService.setAlarm(userAlarmDto);
     }
+    @ApiOperation(value = "리그 순위 Api", notes = "client에서 년도, 시즌, 리그를 보내주면 ")
+    @GetMapping("/teamRankList")
+    public ResponseEntity<?> setTeamRankLsit(@RequestParam(value="year")String year, @RequestParam(value="season")String season, @RequestParam(value="league")String league){
+        return lofService.getTeamRankList(year, season, league);
+    }
 }
