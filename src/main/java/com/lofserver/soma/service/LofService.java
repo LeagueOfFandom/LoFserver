@@ -8,19 +8,17 @@ import com.lofserver.soma.controller.v1.response.match.MatchDetails;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
+import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
+import com.lofserver.soma.controller.v1.response.teamRank.TeamRankingList;
+import com.lofserver.soma.dto.TeamRankDto;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.dto.crawlDto.gameDto.sub.teams.Team;
 import com.lofserver.soma.dto.crawlDto.matchDto.sub.Game;
 import com.lofserver.soma.dto.crawlDto.matchDto.sub.Result;
-import com.lofserver.soma.entity.MatchDetailEntity;
-import com.lofserver.soma.entity.MatchEntity;
-import com.lofserver.soma.entity.UserEntity;
-import com.lofserver.soma.repository.MatchDetailRepository;
-import com.lofserver.soma.repository.MatchRepository;
-import com.lofserver.soma.repository.TeamRepository;
-import com.lofserver.soma.repository.UserRepository;
+import com.lofserver.soma.entity.*;
+import com.lofserver.soma.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,6 +42,7 @@ public class LofService {
     private final MatchRepository matchRepository;
 
     private final MatchDetailRepository matchDetailRepository;
+    private final TeamRankingRepository teamRankingRepository;
 
     public ResponseEntity<?> getTeamVsTeam(Long matchId){
         MatchEntity matchEntity = matchRepository.findById(matchId).orElse(null);
@@ -188,6 +187,58 @@ public class LofService {
         userEntity.addUserSelected(userAlarmDto.getMatchId(),userAlarmDto.getAlarm());
         userRepository.save(userEntity);
         return new ResponseEntity<>("success", HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getTeamRankList(String year, String season, String league){
+        log.info("getTeamRankList 실행");
+        TeamRankDto teamRankDto = new TeamRankDto(year, season, league);
+        List<TeamRanking> teamRankingList = new ArrayList<>();
+
+        // 모든 팀 순위
+        List<TeamRankingEntity> teamRankingEntityList = teamRankingRepository.findByYearSeasonLeague(teamRankDto.getYear(), teamRankDto.getSeason(), teamRankDto.getLeague());
+        if(teamRankingEntityList == null){
+            log.info("getTeamRankList" + "해당 경기 없음");
+            return new ResponseEntity<>("해당 경기 없음",HttpStatus.BAD_REQUEST);
+        }
+
+        for(TeamRankingEntity teamRankingEntity : teamRankingEntityList){
+            TeamEntity teamEntity = new TeamEntity();
+            if(teamRankingEntity.getTeamName().equals("Nongshim RedForce")) {
+                teamEntity = teamRepository.findByTeamName("Nongshim Red Force");
+            }
+            else {
+                teamEntity = teamRepository.findByTeamName(teamRankingEntity.getTeamName()); // 팀 찾기
+            }
+            if(teamEntity == null){
+                log.info("getTeamRankList" + "팀 찾지 못함");
+                return new ResponseEntity<>("팀 찾지 못함",HttpStatus.BAD_REQUEST);
+            }
+
+            List<String> recentMatches = new ArrayList<>();
+            List<MatchEntity> matchEntityList = matchRepository.findRecentGamesByTeamId(teamEntity.getId());
+            System.out.println("matchEntityList : " + matchEntityList.size());
+            for(MatchEntity matchEntity : matchEntityList){
+
+                if(matchEntity.getWinner_id().toString().equals(teamEntity.getId().toString()) ) {
+                    System.out.println("같다" + matchEntity.getWinner_id().toString() + " " + teamEntity.getId().toString());
+                    recentMatches.add("W");
+                }
+                else {
+                    System.out.println("다르다" + matchEntity.getWinner_id().toString() + " " + teamEntity.getId().toString());
+                    recentMatches.add("L");
+                }
+            }
+            if(matchEntityList == null){
+                log.info("getTeamRankList" + "최근 5경기 결과 불러오지 못함");
+                return new ResponseEntity<>("최근 5경기 결과 불러오지 못함",HttpStatus.BAD_REQUEST);
+            }
+
+            //팀 id와 사진 저장
+            teamRankingList.add(new TeamRanking(teamRankingEntity, teamEntity.getAcronym(), teamEntity.getImage_url(), recentMatches));
+        }
+
+        return new ResponseEntity<>(new TeamRankingList(teamRankingList), HttpStatus.OK);
+
     }
 
 }
