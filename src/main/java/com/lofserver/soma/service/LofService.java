@@ -1,5 +1,6 @@
 package com.lofserver.soma.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lofserver.soma.controller.v1.response.TeamVsTeamSetInfo;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
@@ -65,101 +66,69 @@ public class LofService {
             return new ResponseEntity<>("해당 id 없음",HttpStatus.BAD_REQUEST);
         }
 
-        Map<LocalDate, List<MatchDetails>> matchList = new HashMap<>();
-        List<MatchDetails> liveList = new ArrayList<>();
 
-        List<Long> teamList = userEntity.getTeamList();
-        log.info(teamList.toString());
+        List<Long> teamList = new ArrayList<>();
+        if(isAll)
+            teamList = teamRepository.findAllId();
+        else
+            teamList = userEntity.getTeamList();
+        if(teamList.isEmpty())
+            teamList = teamRepository.findAllId();
+
         TreeSet<Long> matchListID = new TreeSet<>();
         Map<Long, Boolean> userSelected = userEntity.getUserSelected();
 
-        //선택한 팀이 없거나 전부 보여달라고 하면 모든 경기 추가.
-        if(teamList.isEmpty() || isAll)
-            matchListID.addAll(matchRepository.findAllId());
-        else
-            teamList.forEach(teamId -> {
-                matchListID.addAll(matchRepository.findAllByTeamId(teamId));
-            });
 
-        Set<Long> matchListByTeam = new HashSet<>();
-        teamList.forEach(teamId -> {
-            matchListByTeam.addAll(matchRepository.findAllByTeamId(teamId));
-        });
+        List<MatchEntity> matchEntityList = null;
 
-        matchListID.forEach(matchId -> {
-            MatchEntity matchEntity =  matchRepository.findById(matchId).orElse(null);
+            if (isAfter)
+                matchEntityList = matchRepository.findAllAfterMatchByTeamIds(LocalDateTime.now(), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 293L, teamList);
+            else
+                matchEntityList = matchRepository.findAllBeforeMatchByTeamIds(LocalDateTime.now(), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 293L, teamList);
+
+
+
+        log.info(matchEntityList.size() + " match !!");
+        List<MatchDetails> liveList = new ArrayList<>();
+        List<MatchDetails> matchList = new ArrayList<>();
+        matchEntityList.forEach(matchEntity -> {
+
             //오늘 날짜를 기준으로 정렬.(이전경기 or 이후경기)
             if(matchEntity.getOriginal_scheduled_at() == null) return;
-            if(isAfter && matchEntity.getOriginal_scheduled_at().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) return;
-            if(!isAfter && matchEntity.getOriginal_scheduled_at().isAfter(LocalDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1))) return;
+
             //설정한 값이 있다면 설정한 값으로 진행한다.
-            if(userSelected.containsKey(matchId)) {
-                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchId)));
-                else {
-                    if (matchList.containsKey(matchEntity.getOriginal_scheduled_at().toLocalDate()))
-                        matchList.get(matchEntity.getOriginal_scheduled_at().toLocalDate()).add(matchEntity.toMatchDetails(userSelected.get(matchId)));
-                    else {
-                        List<MatchDetails> matchDetailsList = new ArrayList<>();
-                        matchDetailsList.add(matchEntity.toMatchDetails(userSelected.get(matchId)));
-                        matchList.put(matchEntity.getOriginal_scheduled_at().toLocalDate(), matchDetailsList);
-                    }
-                }
+            if(userSelected.containsKey(matchEntity.getId())) {
+                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchEntity.getId())));
+                else matchList.add(matchEntity.toMatchDetails(userSelected.get(matchEntity.getId())));
             }
             //선택한 팀이라면 알람을 보내준다.
-            else if(matchListByTeam.contains(matchId)) {
+            else if(userEntity.getTeamList().contains(matchEntity.getOpponents().get(0).getOpponent().getId()) || userEntity.getTeamList().contains(matchEntity.getOpponents().get(1).getOpponent().getId())){
                 if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(true));
-                else {
-                    if (matchList.containsKey(matchEntity.getOriginal_scheduled_at().toLocalDate()))
-                        matchList.get(matchEntity.getOriginal_scheduled_at().toLocalDate()).add(matchEntity.toMatchDetails(true));
-                    else {
-                        List<MatchDetails> matchDetailsList = new ArrayList<>();
-                        matchDetailsList.add(matchEntity.toMatchDetails(true));
-                        matchList.put(matchEntity.getOriginal_scheduled_at().toLocalDate(), matchDetailsList);
-                    }
-                }
+                else matchList.add(matchEntity.toMatchDetails(true));
             }
             //아니라면 안보낸다.
             else {
                 if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(false));
-                else {
-                    if (matchList.containsKey(matchEntity.getOriginal_scheduled_at().toLocalDate()))
-                        matchList.get(matchEntity.getOriginal_scheduled_at().toLocalDate()).add(matchEntity.toMatchDetails(false));
-                    else {
-                        List<MatchDetails> matchDetailsList = new ArrayList<>();
-                        matchDetailsList.add(matchEntity.toMatchDetails(false));
-                        matchList.put(matchEntity.getOriginal_scheduled_at().toLocalDate(), matchDetailsList);
-                    }
-                }
+                else matchList.add(matchEntity.toMatchDetails(false));
             }
         });
 
-        Long totalPage = null;
         List<Match> returnMatchList = new ArrayList<>();
-        if(isAfter) {
-            TreeSet<LocalDate> dateList = new TreeSet<>();
-            dateList.addAll(matchList.keySet());
-            AtomicInteger pagecheck = new AtomicInteger(0);
-            totalPage = (long) Math.ceil((double) dateList.size()/PAGE_PER_LOCALDATE) - 1;
-            dateList.forEach(localDate -> {
-                if(pagecheck.get() >= page * PAGE_PER_LOCALDATE && pagecheck.get() < (page + 1)* PAGE_PER_LOCALDATE)
-                    returnMatchList.add(new Match(localDate, matchList.get(localDate)));
-                pagecheck.getAndIncrement();
-            });
+        for(int i = 0; i < matchList.size() - 1; i++){
+            if(matchList.get(i).getMatchDate().equals(matchList.get(i+1).getMatchDate())){
+                List<MatchDetails> matchDetailsList = new ArrayList<>();
+                matchDetailsList.add(matchList.get(i));
+                matchDetailsList.add(matchList.get(i+1));
+                returnMatchList.add(new Match(matchList.get(i).getMatchDate(), matchDetailsList));
+                i++;
+            }
+            else{
+                List<MatchDetails> matchDetailsList = new ArrayList<>();
+                matchDetailsList.add(matchList.get(i));
+                returnMatchList.add(new Match(matchList.get(i).getMatchDate(), matchDetailsList));
+            }
         }
-        else{
-            NavigableSet<LocalDate> dateList = new TreeSet<>();
-            dateList.addAll(matchList.keySet());
-            dateList = dateList.descendingSet();
-            AtomicInteger pagecheck = new AtomicInteger(0);
-            totalPage = (long) Math.ceil((double) dateList.size()/PAGE_PER_LOCALDATE) - 1;
-            dateList.forEach(localDate -> {
-                if(pagecheck.get() >= page * PAGE_PER_LOCALDATE && pagecheck.get() < (page + 1)* PAGE_PER_LOCALDATE)
-                    returnMatchList.add(new Match(localDate, matchList.get(localDate)));
-                pagecheck.getAndIncrement();
-            });
-        }
-
-        return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList) ,returnMatchList,totalPage,new Long(page)), HttpStatus.OK);
+        return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList) ,returnMatchList,10,page), HttpStatus.OK);
     }
 
     //user가 선택한 team list 제공 함수.
