@@ -521,10 +521,10 @@ public class LofService {
 
         List<MatchEntity> matchEntityList = null;
 
-            if (isAfter)
-                matchEntityList = matchRepository.findAllAfterMatchByTeamIds(LocalDateTime.now(), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 293L, teamList);
-            else
-                matchEntityList = matchRepository.findAllBeforeMatchByTeamIds(LocalDateTime.now(), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 293L, teamList);
+        if (isAfter)
+            matchEntityList = matchRepository.findAllAfterMatchByTeamIds(LocalDateTime.now(), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 8281L, teamList);
+        else
+            matchEntityList = matchRepository.findAllBeforeMatchByTeamIds(LocalDateTime.now(), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 8281L, teamList);
 
 
         List<MatchDetails> liveList = new ArrayList<>();

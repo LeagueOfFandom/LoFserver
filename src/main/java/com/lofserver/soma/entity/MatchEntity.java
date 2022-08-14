@@ -91,8 +91,8 @@ public class MatchEntity {
         Long homeScore = 0L;
         Long awayScore = 0L;
         if(opponents != null && opponents.size() != 0) {
-            homeTeam = opponents.get(0).getOpponent().getName();
-            awayTeam = opponents.get(1).getOpponent().getName();
+            homeTeam = opponents.get(0).getOpponent().getAcronym();
+            awayTeam = opponents.get(1).getOpponent().getAcronym();
             homeUrl = opponents.get(0).getOpponent().getImage_url();
             awayUrl = opponents.get(1).getOpponent().getImage_url();
             homeScore = results.get(0).getScore();
