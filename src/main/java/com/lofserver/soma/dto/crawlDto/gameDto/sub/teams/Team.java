@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 public class Team {
     private List<Long> bans;
+    private Long herald_kills;
     private Long gold_earned;
     private Long baron_kills;
     private Long chemtech_drake_kills;

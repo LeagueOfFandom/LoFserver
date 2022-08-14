@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class Winner {
-    private Long team_id;
+    private Long id;
 }

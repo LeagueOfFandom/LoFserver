@@ -1,5 +1,6 @@
 package com.lofserver.soma.dto.crawlDto.gameDto.sub.player;
 
+import com.lofserver.soma.controller.v1.response.Roster;
 import com.lofserver.soma.dto.crawlDto.matchDto.sub.Opponent;
 import lombok.Getter;
 
