@@ -429,7 +429,12 @@ public class LofService {
             }
             Long blueScore = score.get(blueTeam.getTeam().getId());
             Long redScore = score.get(redTeam.getTeam().getId());
+            LocalDateTime localDateTime = matchDetailEntity.getBegin_at();
+            String date = localDateTime.getYear() + "년 " + localDateTime.getMonthValue() + "월 " + localDateTime.getDayOfMonth() + "일";
+            String time = localDateTime.getHour() + "시 " + localDateTime.getMinute() + "분";
             return new TeamVsTeamMainInfo(
+                    date,
+                    time,
                     blueTeam.getTeam().getAcronym(),
                     redTeam.getTeam().getAcronym(),
                     blueTeam.getTeam().getId(),

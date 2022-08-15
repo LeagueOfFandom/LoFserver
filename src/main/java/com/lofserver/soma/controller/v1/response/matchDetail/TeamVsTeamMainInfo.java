@@ -4,23 +4,27 @@ import lombok.Getter;
 
 @Getter
 public class TeamVsTeamMainInfo {
+    private String date;
+    private String time;
     private String blueTeamAcronym;
     private String redTeamAcronym;
     private Long blueTeamId;
     private Long redTeamId;
     private String blueTeamImageUrl;
     private String redTeamImageUrl;
-    private Long blueTeamScrore;
-    private Long redTeamScrore;
+    private Long blueTeamScore;
+    private Long redTeamScore;
 
-    public TeamVsTeamMainInfo(String blueTeamAcronym, String redTeamAcronym, Long blueTeamId, Long redTeamId, String blueTeamImageUrl, String redTeamImageUrl, Long blueTeamScrore, Long redTeamScrore) {
+    public TeamVsTeamMainInfo(String date, String time, String blueTeamAcronym, String redTeamAcronym, Long blueTeamId, Long redTeamId, String blueTeamImageUrl, String redTeamImageUrl, Long blueTeamScore, Long redTeamScore) {
+        this.date = date;
+        this.time = time;
         this.blueTeamAcronym = blueTeamAcronym;
         this.redTeamAcronym = redTeamAcronym;
         this.blueTeamId = blueTeamId;
         this.redTeamId = redTeamId;
         this.blueTeamImageUrl = blueTeamImageUrl;
         this.redTeamImageUrl = redTeamImageUrl;
-        this.blueTeamScrore = blueTeamScrore;
-        this.redTeamScrore = redTeamScrore;
+        this.blueTeamScore = blueTeamScore;
+        this.redTeamScore = redTeamScore;
     }
 }
