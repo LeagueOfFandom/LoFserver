@@ -2,6 +2,7 @@ package com.lofserver.soma.controller.v1;
 
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
+import com.lofserver.soma.controller.v1.response.matchDetail.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
     private final LofService lofService;
-    @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = MatchDetailEntity[].class)
+    @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = TeamVsTeam.class)
     @GetMapping("/teamVSteam")
     public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "matchId")Long matchId){
         return lofService.getTeamVsTeam(matchId);

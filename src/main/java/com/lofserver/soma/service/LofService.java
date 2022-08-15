@@ -496,7 +496,7 @@ public class LofService {
             TeamVsTeamPrediction teamVsTeamPrediction = setPre(matchDetailEntity);
             teamVsTeamDetails.add(new TeamVsTeamDetails(teamVsTeamSetInfoList, teamVsTeamRosterInfo, teamVsTeamMainInfo, teamVsTeamPrediction));
         }
-        return new ResponseEntity<>(teamVsTeamDetails, HttpStatus.OK);
+        return new ResponseEntity<>(new TeamVsTeam(teamVsTeamDetails), HttpStatus.OK);
     }
 
 
