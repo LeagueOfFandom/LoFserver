@@ -14,8 +14,10 @@ public class TeamVsTeamMainInfo {
     private String redTeamImageUrl;
     private Long blueTeamScore;
     private Long redTeamScore;
+    private Boolean blueWin;
+    private Boolean redWin;
 
-    public TeamVsTeamMainInfo(String date, String time, String blueTeamAcronym, String redTeamAcronym, Long blueTeamId, Long redTeamId, String blueTeamImageUrl, String redTeamImageUrl, Long blueTeamScore, Long redTeamScore) {
+    public TeamVsTeamMainInfo(String date, String time, String blueTeamAcronym, String redTeamAcronym, Long blueTeamId, Long redTeamId, String blueTeamImageUrl, String redTeamImageUrl, Long blueTeamScore, Long redTeamScore, Boolean blueWin, Boolean redWin) {
         this.date = date;
         this.time = time;
         this.blueTeamAcronym = blueTeamAcronym;
@@ -26,5 +28,7 @@ public class TeamVsTeamMainInfo {
         this.redTeamImageUrl = redTeamImageUrl;
         this.blueTeamScore = blueTeamScore;
         this.redTeamScore = redTeamScore;
+        this.blueWin = blueWin;
+        this.redWin = redWin;
     }
 }

@@ -432,6 +432,15 @@ public class LofService {
             LocalDateTime localDateTime = matchDetailEntity.getBegin_at();
             String date = localDateTime.getYear() + "년 " + localDateTime.getMonthValue() + "월 " + localDateTime.getDayOfMonth() + "일";
             String time = localDateTime.getHour() + "시 " + localDateTime.getMinute() + "분";
+            Boolean blueWin, redWin;
+            if(matchDetailEntity.getWinner().getId().equals(blueTeam.getTeam().getId())){
+                blueWin = true;
+                redWin = false;
+            }else {
+                blueWin = false;
+                redWin = true;
+            }
+
             return new TeamVsTeamMainInfo(
                     date,
                     time,
@@ -442,7 +451,7 @@ public class LofService {
                     blueTeam.getTeam().getImage_url(),
                     redTeam.getTeam().getImage_url(),
                     blueScore,
-                    redScore);
+                    redScore,blueWin,redWin);
 
         }
         return null;

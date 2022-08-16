@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @ApiResponses({
         @ApiResponse(code = 200, message = "success"),
         @ApiResponse(code = 500, message = "Internal Server Error")
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
     private final LofService lofService;
+
     @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = TeamVsTeam.class)
     @GetMapping("/teamVSteam")
     public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "matchId")Long matchId){
