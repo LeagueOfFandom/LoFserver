@@ -1,7 +1,6 @@
 package com.lofserver.soma.repository;
 
 import com.lofserver.soma.entity.UserEntity;
-import com.lofserver.soma.entity.match.MatchEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

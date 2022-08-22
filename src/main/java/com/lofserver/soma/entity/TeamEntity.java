@@ -1,50 +1,56 @@
 package com.lofserver.soma.entity;
 
-
+import com.lofserver.soma.dto.crawlDto.gameDto.sub.player.PlayerDetails;
+import com.lofserver.soma.dto.teamsDetailDto.sub.Status;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "team")
 @NoArgsConstructor
+@Table(name = "team_list")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class TeamEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long teamId; //임의로 생성된 team id.
+    private Long id;
+
+    @Column(name = "acronym")
+    private String acronym;
+
+    @Column(name = "image_url")
+    private String image_url;
+
+    @Column(name = "location")
+    private String location;
 
     @Column(name = "name")
-    private String teamName;
+    private String name;
 
     @Type(type = "json")
-    @Column(name = "name_list", columnDefinition = "json")
-    private Map<String, String> teamNameList = new HashMap<>(); //team 이름(여러 언어).
-
-    @Column(name = "img")
-    private String teamImg; //team의 img link.
-    @Type(type = "json")
-    @Column(name = "match_list", columnDefinition = "json")
-    private Set<Long> teamMatchList = new HashSet<>(); //team의 경기 lisk.
+    @Column(name = "players", columnDefinition = "json")
+    private List<PlayerDetails> players;
 
     @Type(type = "json")
-    @Column(name = "roster", columnDefinition = "json")
-    private Map<String, String> rosterName = new HashMap<>();
-    public void delMatch(Long matchId){
-        teamMatchList.remove(matchId);
+    @Column(name = "status", columnDefinition = "json")
+    private Status status;
+
+    public TeamEntity(Long id, String acronym, String image_url, String location, String name, List<PlayerDetails> players, Status status) {
+        this.id = id;
+        this.acronym = acronym;
+        this.image_url = image_url;
+        this.location = location;
+        this.name = name;
+        this.players = players;
+        this.status = status;
     }
-    public void addMatch(Long matchId){
-        teamMatchList.add(matchId);
-    }
-
 }

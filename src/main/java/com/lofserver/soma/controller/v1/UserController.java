@@ -1,12 +1,13 @@
 package com.lofserver.soma.controller.v1;
 
-import com.lofserver.soma.controller.v1.response.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
+import com.lofserver.soma.controller.v1.response.matchDetail.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
+import com.lofserver.soma.entity.MatchDetailEntity;
 import com.lofserver.soma.service.LofService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @ApiResponses({
         @ApiResponse(code = 200, message = "success"),
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
     private final LofService lofService;
+
     @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = TeamVsTeam.class)
     @GetMapping("/teamVSteam")
     public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "matchId")Long matchId){
@@ -32,8 +36,8 @@ public class UserController {
     }
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
     @GetMapping("/matchList")
-    public ResponseEntity<?> getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "isAfter")Boolean isAfter){
-        return lofService.getAfterMatchList(userId, isAll, isAfter);
+    public ResponseEntity<?> getMatchList(@RequestParam(value = "id")Long userId, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "isAfter")Boolean isAfter, @RequestParam(value = "page", required = false, defaultValue = "0")int page){
+        return lofService.getMatchList(userId, isAll, isAfter, page);
     }
 
     @ApiOperation(value = "유저가 선택한 팀 Api", notes = "client에서 User id를 주면 해당 User가 선택한 팀들의 List를 server에서 반환한다.", response = UserTeamInfoList.class)
@@ -55,5 +59,10 @@ public class UserController {
     @PostMapping("/alarm")
     public ResponseEntity<String> setAlarm(@RequestBody UserAlarmDto userAlarmDto){
         return lofService.setAlarm(userAlarmDto);
+    }
+    @ApiOperation(value = "리그 순위 Api", notes = "client에서 년도, 시즌, 리그를 보내주면 ")
+    @GetMapping("/teamRankList")
+    public ResponseEntity<?> setTeamRankLsit(@RequestParam(value="year")String year, @RequestParam(value="season")String season, @RequestParam(value="league")String league){
+        return lofService.getTeamRankList(year, season, league);
     }
 }
