@@ -1,3 +1,4 @@
+ALTER table video convert to charset utf8;
 INSERT INTO video (video_url, video_title, video_channel, video_published_at) values ('https://www.youtube.com/watch?v=-qiXm42omCY', '젠지 vs. T1 | 매치 하이라이트 | 2022 LCK 서머 스플릿 결승', 'youtube', '2022-08-20');
 INSERT INTO video (video_url, video_title, video_channel, video_published_at) values ('https://www.youtube.com/watch?v=ClygIGzJajs', 'T1 vs. 담원 기아 | 매치 하이라이트 | 08.21 | 2022 LCK 서머 플레이오프 R2', 'youtube', '2022-08-21');
 INSERT INTO video (video_url, video_title, video_channel, video_published_at) values ('https://www.youtube.com/watch?v=FratGChwPp0', '담원 기아 vs. KT | 매치 하이라이트 | 08.18 | 2022 LCK 서머 플레이오프 R1', 'youtube', '2022-08-19');
