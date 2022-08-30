@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Entity
@@ -32,20 +33,20 @@ public class VideoEntity {
     private String videoDuration;
 
     @Column(name="video_view_count")
-    private String videoViewCount;
+    private Long videoViewCount;
 
     @Column(name="video_like_count")
-    private String videoLikeCount;
+    private Long videoLikeCount;
 
     @Column(name="video_dislike_count")
-    private String videoDislikeCount;
+    private Long videoDislikeCount;
 
     @Column(name="video_published_at")
-    private String videoPublishedAt;
+    private LocalDateTime videoPublishedAt;
 
     @Column(name="video_channel")
     private String videoChannel;
-  
+
     //- 링크
     //- 종류 ex. 경기 하이라이트/ 선수 개인/ 팀 영상
     //- 업로드 된 날짜
