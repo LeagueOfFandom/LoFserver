@@ -42,7 +42,7 @@ public class VideoEntity {
     private Long videoDislikeCount;
 
     @Column(name="video_published_at")
-    private LocalDateTime videoPublishedAt;
+    private String videoPublishedAt;
 
     @Column(name="video_channel")
     private String videoChannel;

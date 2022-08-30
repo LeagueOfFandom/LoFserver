@@ -28,13 +28,16 @@ spring:
       on-profile: localdb
     import: localkey.yaml
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: update
   datasource:
     url: jdbc:mariadb://localhost:3306/lof
     username: root
     password: 1234
-
+  sql:
+    data: classpath:data.sql #더미데이터 생성
+    initialization-mode: always #서버 재기동마다 schema, data 새로생성
 slack:
   token: ${localkey.slack-api.token}
 
@@ -51,6 +54,9 @@ spring:
     url: ${lof.mariadb.url}/lofDev
     username: root
     password: ${lof.mariadb.password}
+  sql: #video 더미데이터
+    data: classpath:data.sql
+    initialization-mode: always
 slack:
   token: ${lof.slack.token}
 
