@@ -60,9 +60,9 @@ public class UserController {
     public ResponseEntity<String> setAlarm(@RequestBody UserAlarmDto userAlarmDto){
         return lofService.setAlarm(userAlarmDto);
     }
-    @ApiOperation(value = "리그 순위 Api", notes = "client에서 년도, 시즌, 리그를 보내주면 ")
+    @ApiOperation(value = "리그 순위 Api", notes = "client에서 년도, 시즌, 리그를 보내주면 server에서 리그순위를 보내준다.")
     @GetMapping("/teamRankList")
-    public ResponseEntity<?> setTeamRankLsit(@RequestParam(value="year")String year, @RequestParam(value="season")String season, @RequestParam(value="league")String league){
+    public ResponseEntity<?> setTeamRankList(@RequestParam(value="year")String year, @RequestParam(value="season")String season, @RequestParam(value="league")String league){
         return lofService.getTeamRankList(year, season, league);
     }
 }
