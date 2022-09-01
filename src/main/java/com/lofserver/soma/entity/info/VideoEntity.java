@@ -12,13 +12,14 @@ import java.time.LocalDateTime;
 @Table(name="video")
 public class VideoEntity {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long videoId;
 
-    @Column(name="video_url")
-    private String videoUrl;
+    @Column(name="video_resource_id")
+    private String videoResourceId;
 
     @Column(name="video_title")
     private String videoTitle;
@@ -29,8 +30,14 @@ public class VideoEntity {
     @Column(name="video_thumbnail")
     private String videoThumbnail;
 
-    @Column(name="video_duration")
-    private String videoDuration;
+    @Column(name="video_published_at")
+    private String videoPublishedAt;
+
+    @Column(name="video_channel_id")
+    private String videoChannelId;
+
+    @Column(name="video_channel_title")
+    private String videoChannelTitle;
 
     @Column(name="video_view_count")
     private Long videoViewCount;
@@ -41,11 +48,6 @@ public class VideoEntity {
     @Column(name="video_dislike_count")
     private Long videoDislikeCount;
 
-    @Column(name="video_published_at")
-    private String videoPublishedAt;
-
-    @Column(name="video_channel")
-    private String videoChannel;
 
     //- 링크
     //- 종류 ex. 경기 하이라이트/ 선수 개인/ 팀 영상
