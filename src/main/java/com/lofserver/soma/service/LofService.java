@@ -19,13 +19,14 @@ import com.lofserver.soma.dto.crawlDto.gameDto.sub.player.Player;
 import com.lofserver.soma.dto.crawlDto.gameDto.sub.teams.Team;
 import com.lofserver.soma.dto.crawlDto.matchDto.sub.Game;
 import com.lofserver.soma.dto.crawlDto.matchDto.sub.Opponent;
+import com.lofserver.soma.dto.google.GoogleUserInfoDto;
 import com.lofserver.soma.entity.*;
 import com.lofserver.soma.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -601,11 +602,28 @@ public class LofService {
         return new ResponseEntity<>(new UserTeamInfoList(userTeamInfoList),HttpStatus.OK );
     }
     //초기 user set 함수.
-    public ResponseEntity<UserId> setUser(UserDto userDto){
-        UserEntity userEntity = userRepository.findByDeviceId(userDto.getDeviceId());
+    public ResponseEntity<?> setUser(UserDto userDto){
+
+        String url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + userDto.getAccessToken();
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        GoogleUserInfoDto googleUserInfo;
+
+        try {
+            ResponseEntity<GoogleUserInfoDto> googleUserInfoDto = restTemplate.exchange(url, HttpMethod.GET, requestEntity, GoogleUserInfoDto.class);
+            googleUserInfo = googleUserInfoDto.getBody();
+        }catch (Exception e){
+            log.info("googleLogin : {}",e);
+            return new ResponseEntity<>("googleAccessToken 오류",HttpStatus.BAD_REQUEST);
+        }
+
+        UserEntity userEntity = userRepository.findByDeviceId(googleUserInfo.getEmail());
         //없다면 저장한다.
         if(userEntity == null)
-            return new ResponseEntity<>(new UserId(userRepository.save(new UserEntity(userDto.getToken(), userDto.getDeviceId())).getUserId(),false), HttpStatus.OK);
+            return new ResponseEntity<>(new UserId(userRepository.save(new UserEntity(userDto.getToken(), googleUserInfo.getEmail())).getUserId(),false), HttpStatus.OK);
         //있다면 반환한다.
         return new ResponseEntity<>(new UserId(userEntity.getUserId(), true), HttpStatus.OK);
     }
