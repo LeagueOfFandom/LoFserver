@@ -1,5 +1,6 @@
 package com.lofserver.soma.service;
 
+import com.lofserver.soma.config.JsonWebToken;
 import com.lofserver.soma.controller.v1.response.Roster;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
@@ -38,7 +39,6 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class LofService {
-
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
