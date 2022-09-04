@@ -1,5 +1,6 @@
 package com.lofserver.soma.config;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,7 +18,14 @@ public class JsonWebToken {
                 .setIssuedAt(now) // (iat setting)
                 .setExpiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis())) // (exp setting)
                 .claim("id", id) // (secret claim setting)
-                .signWith(SignatureAlgorithm.HS256, "secret") // (6)
+                .signWith(SignatureAlgorithm.HS256, "secret") // (signature setting)
                 .compact();
+    }
+
+    public Claims parseJwtToken(String token){
+        return Jwts.parser()
+                .setSigningKey("secret")
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
