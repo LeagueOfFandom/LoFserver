@@ -43,4 +43,14 @@ public class CommunityService {
         return new ResponseEntity<>(boardEntityList, HttpStatus.OK);
     }
 
+    public ResponseEntity<?> getBoardDetail(Long boardId) {
+        BoardEntity boardEntity = boardRepository.findById(boardId).orElse(null);
+
+        if(boardEntity == null){
+            log.info("boardEntity is null");
+            return new ResponseEntity<>("해당 게시글 없음", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(boardEntity, HttpStatus.OK);
+    }
+
 }

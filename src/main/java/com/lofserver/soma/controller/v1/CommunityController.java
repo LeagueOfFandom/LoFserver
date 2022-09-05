@@ -36,11 +36,11 @@ public class CommunityController{
         return communityService.writeBoard(boardDto);
     }
 
-//    @ApiOperation(value = "게시글 상세화면 조회 Api", notes = "client에서 게시글 id를 GET하면 해당 게시글을 반환한다.")
-//    @GetMapping(value="/board")
-//    public BoardDto openBoardDetail(@RequestParam(value="boardId")Long boardId) throws Exception {
-//        return communityService.getBoardDetail(boardId);
-//    }
+    @ApiOperation(value = "게시글 상세화면 조회 Api", notes = "client에서 게시글 id를 GET하면 해당 게시글을 반환한다.")
+    @GetMapping(value="/board")
+    public ResponseEntity<?> getBoardDetail(@RequestParam(value="boardId")Long boardId) throws Exception {
+        return communityService.getBoardDetail(boardId);
+    }
 
     //PUT, DELETE
 }
