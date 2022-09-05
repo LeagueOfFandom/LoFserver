@@ -45,9 +45,9 @@ public class UserController {
     public ResponseEntity<?> getTeamList(@RequestParam(value = "id")Long userId) {
         return lofService.getTeamList(userId);
     }
-    @ApiOperation(value = "유저 등록 Api", notes = "client에서 device id를 주면 server에서 User id와 함께 새로운 User는 false, 기존 User는 true를 반환한다.")
+    @ApiOperation(value = "유저 등록 Api", notes = "client에서 device id를 주면 server에서 User id와 함께 새로운 User는 false, 기존 User는 true를 반환한다.",response = UserId.class)
     @PostMapping("/user")
-    public ResponseEntity<UserId> setUser(@RequestBody UserDto userDto){
+    public ResponseEntity<?> setUser(@RequestBody UserDto userDto){
         return lofService.setUser(userDto);
     }
     @ApiOperation(value = "유저의 Fandom list 설정 Api", notes = "client에서 User id와 함께 Fandom으로 설정한 팀들을 post하면 server에서 업데이트를 진행한다.")
