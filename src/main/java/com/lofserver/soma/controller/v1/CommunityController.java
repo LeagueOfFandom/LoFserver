@@ -37,7 +37,7 @@ public class CommunityController{
     }
 
     @ApiOperation(value = "게시글 상세화면 조회 Api", notes = "client에서 게시글 id를 GET하면 해당 게시글을 반환한다.")
-    @GetMapping(value="/board")
+    @GetMapping(value="/board/detail")
     public ResponseEntity<?> getBoardDetail(@RequestParam(value="boardId")Long boardId) throws Exception {
         return communityService.getBoardDetail(boardId);
     }
