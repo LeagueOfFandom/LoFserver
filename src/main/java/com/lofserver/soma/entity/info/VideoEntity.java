@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Table(name="video")
 public class VideoEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
