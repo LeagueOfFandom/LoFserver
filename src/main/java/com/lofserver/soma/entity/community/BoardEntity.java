@@ -1,5 +1,6 @@
 package com.lofserver.soma.entity.community;
 
+import com.lofserver.soma.dto.communityDto.BoardDto;
 import com.lofserver.soma.dto.communityDto.CommentDto;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class BoardEntity {
     private String contents;
 
     @Column(name="view_count")
-    private int viewCount;
+    private Long viewCount;
 
     @Column(name="creator_id")
     private String creatorId;
@@ -38,13 +39,17 @@ public class BoardEntity {
     @Column(name="created_datetime")
     private LocalDateTime createdDatetime;
 
-    @Column(name="updater_id")
-    private String updaterId;
-
     @Column(name="updated_datetime")
     private LocalDateTime updatedDatetime;
 
     @Type(type = "json")
     @Column(name = "comments", columnDefinition = "json")
     private List<CommentDto> comments;
+
+    public BoardEntity(BoardDto boardDto, LocalDateTime createdDatetime) {
+        this.title = boardDto.getTitle();
+        this.contents = boardDto.getContents();
+        this.creatorId = boardDto.getCreatorId();
+        this.createdDatetime = createdDatetime;
+    }
 }
