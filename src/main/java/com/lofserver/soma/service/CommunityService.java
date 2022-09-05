@@ -2,6 +2,7 @@ package com.lofserver.soma.service;
 
 import com.lofserver.soma.dto.communityDto.BoardDto;
 import com.lofserver.soma.entity.community.BoardEntity;
+import com.lofserver.soma.entity.info.VideoEntity;
 import com.lofserver.soma.repository.BoardRepository;
 import com.lofserver.soma.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,6 @@ import java.util.List;
 public class CommunityService {
 
     private final BoardRepository boardRepository;
-    public List<BoardDto> getBoardList() {
-        return null;
-    }
 
     public ResponseEntity<String> writeBoard(BoardDto boardDto) {
         //boardDto 내용의 유효성 검사(하나라도 null값이 있으면 안된다)
@@ -32,7 +30,17 @@ public class CommunityService {
 
         //boardDto 내용 boardEntity 저장
         boardRepository.save(new BoardEntity(boardDto, LocalDateTime.now()));
-
         return new ResponseEntity<>("게시글 작성 성공", HttpStatus.OK);
     }
+
+    public ResponseEntity<?> getBoardList() {
+        List<BoardEntity> boardEntityList = boardRepository.findAll();
+
+        if(boardEntityList == null){
+            log.info("boardEntityList is null");
+            return new ResponseEntity<>("게시판 리스트 없음", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(boardEntityList, HttpStatus.OK);
+    }
+
 }

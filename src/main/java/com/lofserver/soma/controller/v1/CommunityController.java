@@ -1,6 +1,7 @@
 package com.lofserver.soma.controller.v1;
 
 import com.lofserver.soma.dto.communityDto.BoardDto;
+import com.lofserver.soma.entity.community.BoardEntity;
 import com.lofserver.soma.service.CommunityService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -25,7 +26,7 @@ public class CommunityController{
     //페이징 추가해서 나눠서 주기
     @ApiOperation(value = "게시판 목록 조회 Api", notes = "client에서 GET하면 모든 게시글을 반환한다.")
     @GetMapping("/board")
-    public List<BoardDto> getBoardList() throws Exception {
+    public ResponseEntity<?> getBoardList() throws Exception {
         return communityService.getBoardList();
     }
 
@@ -34,7 +35,7 @@ public class CommunityController{
     public ResponseEntity<String> insertBoard(@RequestBody BoardDto boardDto) throws Exception {
         return communityService.writeBoard(boardDto);
     }
-xx
+
 //    @ApiOperation(value = "게시글 상세화면 조회 Api", notes = "client에서 게시글 id를 GET하면 해당 게시글을 반환한다.")
 //    @GetMapping(value="/board")
 //    public BoardDto openBoardDetail(@RequestParam(value="boardId")Long boardId) throws Exception {
