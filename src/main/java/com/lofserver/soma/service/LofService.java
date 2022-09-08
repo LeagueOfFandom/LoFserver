@@ -47,6 +47,17 @@ public class LofService {
     private final TeamRankingRepository teamRankingRepository;
     private final ChampionRepository championRepository;
     private final JsonWebToken jsonWebToken;
+
+    public ResponseEntity<?> setFcm(String fcmToken, Long id){
+        UserEntity userEntity = userRepository.findById(id).orElse(null);
+        if(userEntity == null){
+            return new ResponseEntity<>("User Not Found", HttpStatus.BAD_REQUEST);
+        }
+        userEntity.setToken(fcmToken);
+        userRepository.save(userEntity);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
     private TeamVsTeamSetInfo setKDA(MatchDetailEntity matchDetailEntity) {
         if(matchDetailEntity.getStatus().equals("finished")) {
             String viewType = "MATCH_INFO_STRING_VIEW";
