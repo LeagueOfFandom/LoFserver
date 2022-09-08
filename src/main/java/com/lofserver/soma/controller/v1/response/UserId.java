@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class UserId {
-    private Long userId;
-    private boolean check;
+    private String JwtToken;
+    private boolean isNewUser;
 
-    public UserId(Long userId, boolean check) {
-        this.userId = userId;
-        this.check = check;
+    public UserId(String jwtToken, boolean isNewUser) {
+        JwtToken = jwtToken;
+        this.isNewUser = isNewUser;
     }
 }

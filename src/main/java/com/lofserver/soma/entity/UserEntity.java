@@ -21,8 +21,8 @@ public class UserEntity {
     private Long userId; //임의로 생성된 user id. 추후 int가 아닌 타 값으로 변경 필요.(보안)
     @Column(name = "token")
     private String token; //fcm token 값. 변경 가능으로 setter 설정.
-    @Column(name = "device_id")
-    private String deviceId; //현재 user 구분을 위한 deviceId. 추후 로그인을 통해 사라질 값.
+    @Column(name = "email")
+    private String email; //현재 user 구분을 위한 deviceId. 추후 로그인을 통해 사라질 값.
     @Type(type = "json")
     @Column(name = "team_list" ,columnDefinition = "json")
     private List<Long> teamList = new ArrayList<>(); //user가 등록한 팀 리스트. 변경 가능으로 setter 설정.
@@ -39,8 +39,8 @@ public class UserEntity {
     public void addUserSelected(Long matchId, Boolean alarm) {
         this.userSelected.put(matchId,alarm);
     }
-    public UserEntity(String token, String deviceId) {
+    public UserEntity(String token, String email) {
         this.token = token;
-        this.deviceId = deviceId;
+        this.email = email;
     }
 }
