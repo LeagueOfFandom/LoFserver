@@ -18,12 +18,10 @@ class JsonWebTokenTest {
         assertEquals(jsonWebToken.makeJwtTokenById(1L),jsonWebToken.makeJwtTokenById(1L));
     }
 
-    @Value("${JWT.signature}")
-    String test;
     @Test
     void parseJwtToken() {
-        System.out.println(test);
         String token = jsonWebToken.makeJwtTokenById(1L);
+        assertTrue(jsonWebToken.checkJwtToken(token));
         assertEquals(jsonWebToken.parseJwtToken(token).get("id"), 1);
     }
 }

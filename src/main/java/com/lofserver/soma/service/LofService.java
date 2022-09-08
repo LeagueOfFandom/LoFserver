@@ -46,6 +46,7 @@ public class LofService {
     private final MatchDetailRepository matchDetailRepository;
     private final TeamRankingRepository teamRankingRepository;
     private final ChampionRepository championRepository;
+    private final JsonWebToken jsonWebToken;
     private TeamVsTeamSetInfo setKDA(MatchDetailEntity matchDetailEntity) {
         if(matchDetailEntity.getStatus().equals("finished")) {
             String viewType = "MATCH_INFO_STRING_VIEW";
@@ -604,7 +605,7 @@ public class LofService {
     //초기 user set 함수.
     public ResponseEntity<?> setUser(UserDto userDto){
 
-        String url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + userDto.getAccessToken();
+        String url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + userDto.getGoogleAccessToken();
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -620,12 +621,17 @@ public class LofService {
             return new ResponseEntity<>("googleAccessToken 오류",HttpStatus.BAD_REQUEST);
         }
 
-        UserEntity userEntity = userRepository.findByDeviceId(googleUserInfo.getEmail());
+        UserEntity userEntity = userRepository.findByEmail(googleUserInfo.getEmail());
+
         //없다면 저장한다.
-        if(userEntity == null)
-            return new ResponseEntity<>(new UserId(userRepository.save(new UserEntity(userDto.getToken(), googleUserInfo.getEmail())).getUserId(),false), HttpStatus.OK);
+        if(userEntity == null) {
+            userEntity = new UserEntity(userDto.getFcmToken(),googleUserInfo.getEmail());
+            String jwtToken = jsonWebToken.makeJwtTokenById(userRepository.save(userEntity).getUserId());
+            return new ResponseEntity<>(new UserId(jwtToken , false), HttpStatus.OK);
+        }
         //있다면 반환한다.
-        return new ResponseEntity<>(new UserId(userEntity.getUserId(), true), HttpStatus.OK);
+        String jwtToken = jsonWebToken.makeJwtTokenById(userEntity.getUserId());
+        return new ResponseEntity<>(new UserId(jwtToken, true), HttpStatus.OK);
     }
     //user의 팀 정보 수정.
     public ResponseEntity<String> setTeamList(UserTeamListDto userTeamListDto){

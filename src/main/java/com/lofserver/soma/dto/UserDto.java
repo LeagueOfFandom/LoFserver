@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserDto {
-    private String accessToken;
-    private String token;
+    private String googleAccessToken;
+    private String fcmToken;
 }
