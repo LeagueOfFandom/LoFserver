@@ -18,10 +18,10 @@ public class TeamList {
     @ApiModelProperty(example = "lck")
     private String league;
 
-    public TeamList(Long teamId, String teamName, String teamImg, boolean teamCheck, String league) {
-        this.teamId = teamId;
-        this.teamName = teamName;
-        this.teamImg = teamImg;
+    public TeamList(TeamEntity teamEntity, Boolean teamCheck ,String league) {
+        this.teamId = teamEntity.getId();
+        this.teamName = teamEntity.getAcronym();
+        this.teamImg = teamEntity.getImage_url();
         this.teamCheck = teamCheck;
         this.league = league;
     }

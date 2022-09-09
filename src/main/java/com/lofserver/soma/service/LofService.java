@@ -7,6 +7,8 @@ import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchDetails;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.matchDetail.*;
+import com.lofserver.soma.controller.v1.response.team.LeagueList;
+import com.lofserver.soma.controller.v1.response.team.TeamList;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRankingList;
 import com.lofserver.soma.data.DragonImgs;
@@ -44,6 +46,7 @@ public class LofService {
     private final MatchDetailRepository matchDetailRepository;
     private final TeamRankingRepository teamRankingRepository;
     private final ChampionRepository championRepository;
+    private final LeagueRepository leagueRepository;
     private final JsonWebToken jsonWebToken;
 
     public ResponseEntity<?> setFcm(String fcmToken, Long id){
@@ -596,7 +599,36 @@ public class LofService {
 
     //user가 선택한 team list 제공 함수.
     public ResponseEntity<?> getTeamList(Long userId){
-        return null;
+        UserEntity userEntity = userRepository.findById(userId).orElse(null);
+        if(userEntity == null){ // id 없음 예외처리.
+            log.info("getTeamList" + "해당 id 없음 :" + userId);
+            return new ResponseEntity<>("해당 id 없음",HttpStatus.BAD_REQUEST);
+        }
+        List<String> leagues = new ArrayList<>();
+        leagues.add("LCK");
+        leagues.add("LPL");
+        leagues.add("LEC");
+        leagues.add("LCS");
+        leagues.add("Worlds");
+        leagues.add("Mid-Season Invitational");
+
+        List<LeagueList> leagueLists = new ArrayList<>();
+        leagues.forEach(league -> {
+            Long seriesId = leagueRepository.findByName(league).getLatest_series_id();
+            List<TeamEntity> teamEntityList = teamRepository.findAllBySeries_id(seriesId);
+            LeagueList leagueList = new LeagueList(league);
+            List<TeamList> teamLists = new ArrayList<>();
+
+            teamEntityList.forEach(teamEntity -> {
+                if(userEntity.getTeamList().contains(teamEntity.getId()))
+                    teamLists.add(new TeamList(teamEntity, true, league));
+                else
+                    teamLists.add(new TeamList(teamEntity, false, league));
+            });
+            leagueList.setTeamList(teamLists);
+            leagueLists.add(leagueList);
+        });
+        return new ResponseEntity<>(leagueLists, HttpStatus.OK);
     }
     //초기 user set 함수.
     public ResponseEntity<?> setUser(UserDto userDto){
