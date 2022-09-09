@@ -7,8 +7,6 @@ import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchDetails;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.matchDetail.*;
-import com.lofserver.soma.controller.v1.response.team.UserTeamInfo;
-import com.lofserver.soma.controller.v1.response.team.UserTeamInfoList;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRankingList;
 import com.lofserver.soma.data.DragonImgs;
@@ -598,20 +596,7 @@ public class LofService {
 
     //user가 선택한 team list 제공 함수.
     public ResponseEntity<?> getTeamList(Long userId){
-        UserEntity userEntity = userRepository.findById(userId).orElse(null);
-
-        if(userEntity == null){ // id 없음 예외처리.
-            log.info("getTeamList: "+"해당 id 없음 :" + userId);
-            return new ResponseEntity<>("해당 id 없음",HttpStatus.BAD_REQUEST);
-        }
-
-        List<UserTeamInfo> userTeamInfoList = new ArrayList<>();
-        //모든 팀에 대해 user의 선택 값 적용하여 제공.
-        teamRepository.findAll().forEach(teamEntity -> {
-            if(userEntity.getTeamList().contains(teamEntity.getId())) userTeamInfoList.add(new UserTeamInfo(teamEntity,true));
-            else userTeamInfoList.add(new UserTeamInfo(teamEntity, false));
-        });
-        return new ResponseEntity<>(new UserTeamInfoList(userTeamInfoList),HttpStatus.OK );
+        return null;
     }
     //초기 user set 함수.
     public ResponseEntity<?> setUser(UserDto userDto){

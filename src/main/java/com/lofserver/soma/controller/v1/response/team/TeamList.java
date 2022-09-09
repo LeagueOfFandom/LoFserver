@@ -5,20 +5,24 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 @Getter
-public class UserTeamInfo {
+public class TeamList {
     @ApiModelProperty(example = "1")
     private Long teamId;
-    @ApiModelProperty(example = "담원 기아")
+    @ApiModelProperty(example = "T1")
     private String teamName;
     @ApiModelProperty(example = "https://")
     private String teamImg;
     @ApiModelProperty(example = "true")
     private boolean teamCheck;
 
-    public UserTeamInfo(TeamEntity teamEntity, boolean teamCheck) {
-        this.teamId = teamEntity.getId();
-        this.teamName = teamEntity.getAcronym();
-        this.teamImg = teamEntity.getImage_url();
+    @ApiModelProperty(example = "lck")
+    private String league;
+
+    public TeamList(Long teamId, String teamName, String teamImg, boolean teamCheck, String league) {
+        this.teamId = teamId;
+        this.teamName = teamName;
+        this.teamImg = teamImg;
         this.teamCheck = teamCheck;
+        this.league = league;
     }
 }
