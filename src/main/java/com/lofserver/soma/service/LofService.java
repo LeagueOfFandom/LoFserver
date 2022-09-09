@@ -615,7 +615,7 @@ public class LofService {
         List<LeagueList> leagueLists = new ArrayList<>();
         leagues.forEach(league -> {
             Long seriesId = leagueRepository.findByName(league).getLatest_series_id();
-            List<TeamEntity> teamEntityList = teamRepository.findAllBySeries_id(seriesId);
+            List<TeamEntity> teamEntityList = teamRepository.findAllBySeries_Id(seriesId);
             LeagueList leagueList = new LeagueList(league);
             List<TeamList> teamLists = new ArrayList<>();
 
