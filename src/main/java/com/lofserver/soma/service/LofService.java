@@ -9,7 +9,7 @@ import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.matchDetail.*;
 import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
-import com.lofserver.soma.controller.v1.response.team.TeamList;
+import com.lofserver.soma.controller.v1.response.team.TeamInfo;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRankingList;
 import com.lofserver.soma.data.DragonImgs;
@@ -598,6 +598,22 @@ public class LofService {
         return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList) ,returnMatchList,10,page), HttpStatus.OK);
     }
 
+    public ResponseEntity<?> getTeamListByUser(Long userId){
+        UserEntity userEntity = userRepository.findById(userId).orElse(null);
+        if(userEntity == null){ // id 없음 예외처리.
+            log.info("getTeamListByUser" + "해당 id 없음 :" + userId);
+            return new ResponseEntity<>("해당 id 없음",HttpStatus.BAD_REQUEST);
+        }
+        List<Long> selectedTeamList = userEntity.getTeamList();
+        List<TeamEntity> teamEntityList = teamRepository.findAllById(selectedTeamList);
+        List<TeamInfo> teamInfoList = new ArrayList<>();
+        teamEntityList.forEach(teamEntity -> {
+            TeamInfo teamInfo = new TeamInfo(teamEntity,true, leagueRepository.findBySeriesId(teamEntity.getSeries_id()).getName());
+            teamInfoList.add(teamInfo);
+        });
+
+        return new ResponseEntity<>(teamInfoList, HttpStatus.OK);
+    }
     //user가 선택한 team list 제공 함수.
     public ResponseEntity<?> getTeamList(Long userId){
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
@@ -619,15 +635,15 @@ public class LofService {
             Long seriesId = leagueRepository.findByName(league).getLatest_series_id();
             List<TeamEntity> teamEntityList = teamRepository.findAllBySeries_Id(seriesId);
             LeagueInfo leagueInfo = new LeagueInfo(league);
-            List<TeamList> teamLists = new ArrayList<>();
+            List<TeamInfo> teamInfos = new ArrayList<>();
 
             teamEntityList.forEach(teamEntity -> {
                 if(userEntity.getTeamList().contains(teamEntity.getId()))
-                    teamLists.add(new TeamList(teamEntity, true, league));
+                    teamInfos.add(new TeamInfo(teamEntity, true, league));
                 else
-                    teamLists.add(new TeamList(teamEntity, false, league));
+                    teamInfos.add(new TeamInfo(teamEntity, false, league));
             });
-            leagueInfo.setTeamList(teamLists);
+            leagueInfo.setTeamInfo(teamInfos);
             leagueInfos.add(leagueInfo);
         });
         return new ResponseEntity<>(new LeagueList(leagueInfos,leagues), HttpStatus.OK);

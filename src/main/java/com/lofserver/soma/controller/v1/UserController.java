@@ -6,6 +6,7 @@ import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.matchDetail.TeamVsTeam;
 import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
+import com.lofserver.soma.controller.v1.response.team.TeamInfo;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
@@ -40,6 +41,17 @@ public class UserController {
         if(jsonWebToken.checkJwtToken(token)){
             Long id = jsonWebToken.parseJwtToken(token).get("id",Long.class);
             return lofService.getMatchList(id, isAll, isAfter, page);
+        }
+        else
+            return ResponseEntity.badRequest().body("Invalid Token");
+    }
+
+    @ApiOperation(value = "유저가 선택한 팀 Api", notes = "client에서 User id를 주면 해당 User가 선택한 팀들의 List를 server에서 반환한다.", response = TeamInfo[].class)
+    @GetMapping("/teamList/user")
+    public ResponseEntity<?> getTeamListByUser(@RequestHeader("Authorization") String token) {
+        if(jsonWebToken.checkJwtToken(token)) {
+            Long id = jsonWebToken.parseJwtToken(token).get("id", Long.class);
+            return lofService.getTeamListByUser(id);
         }
         else
             return ResponseEntity.badRequest().body("Invalid Token");
