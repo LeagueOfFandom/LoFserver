@@ -7,6 +7,7 @@ import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.match.MatchDetails;
 import com.lofserver.soma.controller.v1.response.match.MatchList;
 import com.lofserver.soma.controller.v1.response.matchDetail.*;
+import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
 import com.lofserver.soma.controller.v1.response.team.TeamList;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
@@ -612,11 +613,12 @@ public class LofService {
         leagues.add("Worlds");
         leagues.add("Mid-Season Invitational");
 
-        List<LeagueList> leagueLists = new ArrayList<>();
+        List<LeagueInfo> leagueInfos = new ArrayList<>();
         leagues.forEach(league -> {
+            log.info(league);
             Long seriesId = leagueRepository.findByName(league).getLatest_series_id();
             List<TeamEntity> teamEntityList = teamRepository.findAllBySeries_Id(seriesId);
-            LeagueList leagueList = new LeagueList(league);
+            LeagueInfo leagueInfo = new LeagueInfo(league);
             List<TeamList> teamLists = new ArrayList<>();
 
             teamEntityList.forEach(teamEntity -> {
@@ -625,10 +627,10 @@ public class LofService {
                 else
                     teamLists.add(new TeamList(teamEntity, false, league));
             });
-            leagueList.setTeamList(teamLists);
-            leagueLists.add(leagueList);
+            leagueInfo.setTeamList(teamLists);
+            leagueInfos.add(leagueInfo);
         });
-        return new ResponseEntity<>(leagueLists, HttpStatus.OK);
+        return new ResponseEntity<>(new LeagueList(leagueInfos,leagues), HttpStatus.OK);
     }
     //초기 user set 함수.
     public ResponseEntity<?> setUser(UserDto userDto){

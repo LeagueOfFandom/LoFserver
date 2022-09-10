@@ -6,14 +6,11 @@ import java.util.List;
 
 @Getter
 public class LeagueList {
-    private String league;
-    private List<TeamList> teamList;
+    private List<LeagueInfo> leagueInfo;
+    private List<String> leagueList;
 
-    public LeagueList(String league) {
-        this.league = league;
-    }
-
-    public void setTeamList(List<TeamList> teamList) {
-        this.teamList = teamList;
+    public LeagueList(List<LeagueInfo> leagueInfo, List<String> leagueList) {
+        this.leagueInfo = leagueInfo;
+        this.leagueList = leagueList;
     }
 }
