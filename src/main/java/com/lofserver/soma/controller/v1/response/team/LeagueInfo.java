@@ -6,11 +6,11 @@ import java.util.List;
 
 @Getter
 public class LeagueInfo {
-    private String league;
+    private String note;
     private List<TeamInfo> teamInfo;
 
-    public LeagueInfo(String league) {
-        this.league = league;
+    public LeagueInfo(String note) {
+        this.note = note;
     }
 
     public void setTeamInfo(List<TeamInfo> teamInfo) {

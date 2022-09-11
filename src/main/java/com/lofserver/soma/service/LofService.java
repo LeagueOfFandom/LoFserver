@@ -634,7 +634,7 @@ public class LofService {
             log.info(league);
             Long seriesId = leagueRepository.findByName(league).getLatest_series_id();
             List<TeamEntity> teamEntityList = teamRepository.findAllBySeries_Id(seriesId);
-            LeagueInfo leagueInfo = new LeagueInfo(league);
+            LeagueInfo leagueInfo = new LeagueInfo("(have to fix)this is " + league);
             List<TeamInfo> teamInfos = new ArrayList<>();
 
             teamEntityList.forEach(teamEntity -> {
@@ -646,6 +646,8 @@ public class LofService {
             leagueInfo.setTeamInfo(teamInfos);
             leagueInfos.add(leagueInfo);
         });
+        leagues.remove("Mid-Season Invitational");
+        leagues.add("MSI");
         return new ResponseEntity<>(new LeagueList(leagueInfos,leagues), HttpStatus.OK);
     }
     //초기 user set 함수.
