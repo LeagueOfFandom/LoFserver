@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3306/lof
+    url: jdbc:mariadb://localhost:3306/lofTest
     username: root
     password: 1234
 

@@ -32,21 +32,16 @@ class CommunityServiceTest {
         boardDto2.setCreatorId("작성자2");
         boardDto2.setSubject("all");
 
-        BoardDto boardDto3 = new BoardDto(); //작성자가 없는 경우-blank
-        boardDto3.setTitle("제목3");
-        boardDto3.setContents("내용3");
-        boardDto3.setSubject("all");
-
-        BoardDto boardDto4 = new BoardDto(); //subject가 없는 경우-blank
-        boardDto4.setTitle("제목4");
-        boardDto4.setContents("내용4");
-        boardDto4.setCreatorId("작성자4");
 
         //when
         ResponseEntity<String> responseEntity = communityService.writeBoard(boardDto);
+        ResponseEntity<String> responseEntity1 = communityService.writeBoard(boardDto1);
+        ResponseEntity<String> responseEntity2 = communityService.writeBoard(boardDto2);
 
         //then
         assertEquals("게시글 작성 성공", responseEntity.getBody());
+        assertEquals("입력내용이 없음", responseEntity1.getBody());
+        assertEquals("입력내용이 없음", responseEntity2.getBody());
     }
 
 
