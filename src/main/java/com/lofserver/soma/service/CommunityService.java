@@ -21,12 +21,13 @@ public class CommunityService {
 
     public ResponseEntity<String> writeBoard(BoardDto boardDto) {
         //boardDto 내용의 유효성 검사(하나라도 null값이 있으면 안된다)
-        if (boardDto.getTitle().isEmpty() || boardDto.getContents().isEmpty() || boardDto.getCreatorId().isEmpty()) {
+        if (boardDto.getTitle().isEmpty() || boardDto.getContents().isEmpty() || boardDto.getCreatorId().isBlank() || boardDto.getSubject().isBlank()) {
             log.info("writeBoard: " + "post 내용이 비어있음");
             return new ResponseEntity<>("입력내용이 없음", HttpStatus.BAD_REQUEST);
         }
 
         //boardDto 내용 boardEntity 저장
+        log.info(boardDto.getSubject().toString());
         boardRepository.save(new BoardEntity(boardDto, LocalDateTime.now()));
         return new ResponseEntity<>("게시글 작성 성공", HttpStatus.OK);
     }

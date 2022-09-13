@@ -7,12 +7,9 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class BoardDto {
-    //private Long boardId;
+    //게시글 작성 시
     private String title;
     private String contents;
-    //private Long viewCount;
     private String creatorId;
-    //private LocalDateTime createdDatetime;
-    //private String updaterId;
-    //private LocalDateTime updatedDatetime;
+    private String subject;
 }
