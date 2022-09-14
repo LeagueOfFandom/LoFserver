@@ -30,6 +30,9 @@ public class BoardEntity {
     @Column(name="contents")
     private String contents;
 
+    @Column(name="subject") //게시판 종류
+    private String subject;
+
     @Column(name="view_count")
     private Long viewCount;
 
@@ -42,6 +45,9 @@ public class BoardEntity {
     @Column(name="updated_datetime")
     private LocalDateTime updatedDatetime;
 
+    @Column(name="deleted_datetime")
+    private LocalDateTime deletedDatetime;
+
     @Type(type = "json")
     @Column(name = "comments", columnDefinition = "json")
     private List<CommentDto> comments;
@@ -50,6 +56,7 @@ public class BoardEntity {
         this.title = boardDto.getTitle();
         this.contents = boardDto.getContents();
         this.creatorId = boardDto.getCreatorId();
+        this.subject= boardDto.getSubject();
         this.createdDatetime = createdDatetime;
     }
 }

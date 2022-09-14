@@ -1,18 +1,18 @@
 package com.lofserver.soma.dto.communityDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
+@Getter @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class BoardDto {
-    //private Long boardId;
+    //게시글 작성 시
     private String title;
     private String contents;
-    //private Long viewCount;
     private String creatorId;
-    //private LocalDateTime createdDatetime;
-    //private String updaterId;
-    //private LocalDateTime updatedDatetime;
+    private String subject;
 }
