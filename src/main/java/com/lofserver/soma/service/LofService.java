@@ -608,7 +608,7 @@ public class LofService {
         List<TeamEntity> teamEntityList = teamRepository.findAllById(selectedTeamList);
         List<TeamInfo> teamInfoList = new ArrayList<>();
         teamEntityList.forEach(teamEntity -> {
-            TeamInfo teamInfo = new TeamInfo(teamEntity,true, leagueRepository.findBySeriesId(teamEntity.getSeries_id()).getName());
+            TeamInfo teamInfo = new TeamInfo(teamEntity,true, leagueRepository.findBySeriesId(teamEntity.getSeriesId()).getName());
             teamInfoList.add(teamInfo);
         });
 
@@ -633,7 +633,7 @@ public class LofService {
         leagues.forEach(league -> {
             log.info(league);
             Long seriesId = leagueRepository.findByName(league).getLatest_series_id();
-            List<TeamEntity> teamEntityList = teamRepository.findAllBySeries_Id(seriesId);
+            List<TeamEntity> teamEntityList = teamRepository.findAllBySeriesId(seriesId);
             LeagueInfo leagueInfo = new LeagueInfo("(have to fix)this is " + league);
             List<TeamInfo> teamInfos = new ArrayList<>();
 
@@ -755,7 +755,7 @@ public class LofService {
             }
 
             //팀 id와 사진 저장
-            teamRankingList.add(new TeamRanking(teamRankingEntity, teamEntity.getAcronym(), teamEntity.getImage_url(), recentMatches));
+            teamRankingList.add(new TeamRanking(teamRankingEntity, teamEntity.getAcronym(), teamEntity.getImageUrl(), recentMatches));
         }
 
         return new ResponseEntity<>(new TeamRankingList(teamRankingList), HttpStatus.OK);

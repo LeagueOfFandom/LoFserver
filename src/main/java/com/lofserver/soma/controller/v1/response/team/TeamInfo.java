@@ -21,7 +21,7 @@ public class TeamInfo {
     public TeamInfo(TeamEntity teamEntity, Boolean teamCheck , String league) {
         this.teamId = teamEntity.getId();
         this.teamName = teamEntity.getAcronym();
-        this.teamImg = teamEntity.getImage_url();
+        this.teamImg = teamEntity.getImageUrl();
         this.teamCheck = teamCheck;
         this.league = league;
     }
