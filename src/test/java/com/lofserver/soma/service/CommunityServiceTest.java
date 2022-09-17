@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+//@ExtendWith(SpringExtension.class)
+//@SpringBootTest
 class CommunityServiceTest {
 
     @Autowired CommunityService communityService;
-
+/*
     @Test
     public void 게시글작성() throws Exception {
         //given
@@ -44,5 +44,5 @@ class CommunityServiceTest {
         assertEquals("입력내용이 없음", responseEntity2.getBody());
     }
 
-
+*/
 }
