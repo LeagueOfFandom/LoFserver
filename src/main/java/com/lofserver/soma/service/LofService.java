@@ -626,8 +626,6 @@ public class LofService {
         leagues.add("LPL");
         leagues.add("LEC");
         leagues.add("LCS");
-        leagues.add("Worlds");
-        leagues.add("Mid-Season Invitational");
 
         List<LeagueInfo> leagueInfos = new ArrayList<>();
         leagues.forEach(league -> {
@@ -646,8 +644,7 @@ public class LofService {
             leagueInfo.setTeamInfo(teamInfos);
             leagueInfos.add(leagueInfo);
         });
-        leagues.remove("Mid-Season Invitational");
-        leagues.add("MSI");
+
         return new ResponseEntity<>(new LeagueList(leagueInfos,leagues), HttpStatus.OK);
     }
     //초기 user set 함수.
