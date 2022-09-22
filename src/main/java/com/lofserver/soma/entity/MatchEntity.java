@@ -66,38 +66,4 @@ public class MatchEntity {
     @Type(type = "json")
     @Column(name = "opponents", columnDefinition = "json")
     private List<Opponents> opponents;
-
-    public MatchViewObject toMatchViewObject(Boolean isAlarm) {
-
-        Opponent homeTeam = new Opponent();
-        Opponent awayTeam = new Opponent();
-        Long homeScore = 0L;
-        Long awayScore = 0L;
-
-        if(opponents != null && opponents.size() != 0) {
-            homeTeam = opponents.get(0).getOpponent();
-            awayTeam = opponents.get(1).getOpponent();
-
-            homeScore = results.get(0).getScore();
-            awayScore = results.get(1).getScore();
-            if (results.get(1).getTeam_id() == homeTeam.getId()) {
-                homeScore = results.get(1).getScore();
-                awayScore = results.get(0).getScore();
-            }
-        }
-
-        return MatchViewObject.builder()
-                .matchId(id)
-                .homeName(homeTeam.getAcronym())
-                .homeImg(homeTeam.getImage_url())
-                .awayName(awayTeam.getAcronym())
-                .awayImg(awayTeam.getImage_url())
-                .time(beginAt.toString())
-                .league(tournament.getName())
-                .isAlarm(isAlarm)
-                .homeScore(homeScore)
-                .awayScore(awayScore)
-                .build();
-
-    }
 }

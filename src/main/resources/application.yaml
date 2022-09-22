@@ -28,7 +28,8 @@ spring:
       on-profile: localdb
     import: localkey.yaml
   jpa:
-    show-sql: true
+    show-sql: false
+    defer-datasource-initialization: false
     hibernate:
       ddl-auto: update
   datasource:

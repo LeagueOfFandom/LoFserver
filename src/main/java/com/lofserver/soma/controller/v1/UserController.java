@@ -29,8 +29,6 @@ import java.time.LocalDate;
 public class UserController {
     private final LofService lofService;
     private final JsonWebToken jsonWebToken;
-
-
     /*
     @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = TeamVsTeam.class)
     @GetMapping("/teamVSteam")
@@ -39,7 +37,7 @@ public class UserController {
     }*/
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = Match.class)
     @GetMapping("/matchList")
-    public ResponseEntity<?> getMatchList(@RequestHeader("Authorization") String token, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "date")LocalDate date){
+    public ResponseEntity<?> getMatchList(@RequestHeader("Authorization") String token, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         if(jsonWebToken.checkJwtToken(token)){
             Long id = jsonWebToken.parseJwtToken(token).get("id",Long.class);
             return lofService.getMatchList(id, isAll, date);

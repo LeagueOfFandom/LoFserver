@@ -1,7 +1,10 @@
 package com.lofserver.soma.controller.v1.response.match;
 
+import lombok.Getter;
+
 import java.time.LocalDate;
 
+@Getter
 public class DateInfo {
     private String month;
     private String date;

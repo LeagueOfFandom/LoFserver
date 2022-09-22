@@ -5,6 +5,8 @@ import com.lofserver.soma.controller.v1.response.CommonItem;
 import com.lofserver.soma.controller.v1.response.Roster;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.DateInfo;
+import com.lofserver.soma.controller.v1.response.match.Match;
+import com.lofserver.soma.controller.v1.response.match.MatchViewObject;
 import com.lofserver.soma.controller.v1.response.matchDetail.*;
 import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
@@ -12,6 +14,7 @@ import com.lofserver.soma.controller.v1.response.team.TeamInfo;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRanking;
 import com.lofserver.soma.controller.v1.response.teamRank.TeamRankingList;
 import com.lofserver.soma.data.DragonImgs;
+import com.lofserver.soma.data.ViewType;
 import com.lofserver.soma.dto.TeamRankDto;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
@@ -47,6 +50,8 @@ public class LofService {
     private final ChampionRepository championRepository;
     private final LeagueRepository leagueRepository;
     private final JsonWebToken jsonWebToken;
+
+    private final ViewType viewType = new ViewType();
 
     public ResponseEntity<?> setFcm(String fcmToken, Long id){
         UserEntity userEntity = userRepository.findById(id).orElse(null);
@@ -544,19 +549,39 @@ public class LofService {
             LocalDateTime end = date.plusDays(i).atTime(23, 59, 59);
 
             //get matchList
-            List<MatchEntity> matchEntityList = matchRepository.findAllByLeagueIdInOrOriginalScheduledAtBetween(leagueList, start, end);
+            List<MatchEntity> matchEntityList = matchRepository.findAllByLeagueIdInAndOriginalScheduledAtBetween(leagueList, start, end);
 
             //commonItemList setting
             List<CommonItem> commonItemList = new ArrayList<>();
             for(MatchEntity matchEntity : matchEntityList){
-                //commonItemList.add(new CommonItem());
+
+                if(matchEntity.getOpponents() == null || matchEntity.getOpponents().size() == 0)
+                    continue;
+
+                Opponent homeTeam = matchEntity.getOpponents().get(0).getOpponent();
+                Opponent awayTeam = matchEntity.getOpponents().get(1).getOpponent();
+
+                if(!isAll && !userEntity.getTeamList().contains(homeTeam.getId()) && !userEntity.getTeamList().contains(awayTeam.getId()))
+                    continue;
+
+                Boolean isAlarm = false;
+                if(userEntity.getUserSelected().containsKey(matchEntity.getId()))
+                    isAlarm = userEntity.getUserSelected().get(matchEntity.getId());
+                else if (userEntity.getTeamList().contains(homeTeam.getId()) || userEntity.getTeamList().contains(awayTeam.getId()))
+                    isAlarm = true;
+
+
+                String nowViewType = viewType.getMatchScheduleView();
+                if(matchEntity.getStatus().equals("finished"))
+                    nowViewType = viewType.getMatchResultView();
+
+
+                CommonItem commonItem = new CommonItem(nowViewType, new MatchViewObject(matchEntity,isAlarm));
+                commonItemList.add(commonItem);
             }
-
+            commonItemListList.add(commonItemList);
         }
-
-
-
-        return null;
+        return new ResponseEntity<>(new Match(dateInfoList,commonItemListList), HttpStatus.OK);
     }
 
     public ResponseEntity<?> getTeamListByUser(Long userId){
@@ -719,5 +744,4 @@ public class LofService {
         return new ResponseEntity<>(new TeamRankingList(teamRankingList), HttpStatus.OK);
 
     }
-
 }
