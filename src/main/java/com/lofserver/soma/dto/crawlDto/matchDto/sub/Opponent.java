@@ -9,4 +9,9 @@ public class Opponent {
     private String image_url;
     private String location;
     private String name;
+
+    public Opponent() {
+        acronym = "미정";
+        image_url = "";
+    }
 }

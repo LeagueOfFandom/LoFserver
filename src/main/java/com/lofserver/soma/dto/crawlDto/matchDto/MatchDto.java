@@ -2,7 +2,6 @@ package com.lofserver.soma.dto.crawlDto.matchDto;
 
 
 import com.lofserver.soma.dto.crawlDto.matchDto.sub.*;
-import com.lofserver.soma.entity.MatchEntity;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -24,21 +23,5 @@ public class MatchDto {
     private String status;
     private List<Opponents> opponents;
 
-    public MatchEntity toEntity(){
-        return new MatchEntity(
-                id,
-                tournament,
-                league_id,
-                original_schedule_at,
-                begin_at,
-                winner_id,
-                status,
-                end_at,
-                live,
-                results,
-                games,
-                streams_list,
-                opponents);
-    }
 
 }

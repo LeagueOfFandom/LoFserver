@@ -1,11 +1,10 @@
 package com.lofserver.soma.service;
 
 import com.lofserver.soma.config.JsonWebToken;
+import com.lofserver.soma.controller.v1.response.CommonItem;
 import com.lofserver.soma.controller.v1.response.Roster;
 import com.lofserver.soma.controller.v1.response.UserId;
-import com.lofserver.soma.controller.v1.response.match.Match;
-import com.lofserver.soma.controller.v1.response.match.MatchDetails;
-import com.lofserver.soma.controller.v1.response.match.MatchList;
+import com.lofserver.soma.controller.v1.response.match.DateInfo;
 import com.lofserver.soma.controller.v1.response.matchDetail.*;
 import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
@@ -32,7 +31,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 
@@ -527,75 +525,38 @@ public class LofService {
 
 
     //user의 matchList반환 함수.
-    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, Boolean isAfter, int page){
-        final int PAGE_PER_LOCALDATE = 5;
+    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, LocalDate date){
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
-        if(userEntity == null){ // id 없음 예외처리.
-            log.info("getMatchList" + "해당 id 없음 :" + userId);
+        if(userEntity == null)
             return new ResponseEntity<>("해당 id 없음",HttpStatus.BAD_REQUEST);
+
+        List<Long> leagueList = new ArrayList<>();
+        leagueList.add(297L); //worlds
+        List<DateInfo> dateInfoList = new ArrayList<>();
+        List<List<CommonItem>> commonItemListList = new ArrayList<>();
+
+        for(int i = 0; i < 7; i++) {
+            //dateInfo setting
+            dateInfoList.add(new DateInfo(date.plusDays(i)));
+
+            //localDate -> LocalDateTime
+            LocalDateTime start = date.plusDays(i).atStartOfDay();
+            LocalDateTime end = date.plusDays(i).atTime(23, 59, 59);
+
+            //get matchList
+            List<MatchEntity> matchEntityList = matchRepository.findAllByLeagueIdInOrOriginalScheduledAtBetween(leagueList, start, end);
+
+            //commonItemList setting
+            List<CommonItem> commonItemList = new ArrayList<>();
+            for(MatchEntity matchEntity : matchEntityList){
+                //commonItemList.add(new CommonItem());
+            }
+
         }
 
 
-        List<Long> teamList = new ArrayList<>();
-        if(isAll)
-            teamList = teamRepository.findAllId();
-        else
-            teamList = userEntity.getTeamList();
-        if(teamList.isEmpty())
-            teamList = teamRepository.findAllId();
 
-        TreeSet<Long> matchListID = new TreeSet<>();
-        Map<Long, Boolean> userSelected = userEntity.getUserSelected();
-
-
-        List<MatchEntity> matchEntityList = null;
-
-        if (isAfter)
-            matchEntityList = matchRepository.findAllAfterMatchByTeamIds(LocalDateTime.now().minusMonths(1), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 8281L, teamList);
-        else
-            matchEntityList = matchRepository.findAllBeforeMatchByTeamIds(LocalDateTime.now().minusMonths(1), page * PAGE_PER_LOCALDATE, PAGE_PER_LOCALDATE, 8281L, teamList);
-
-
-        List<MatchDetails> liveList = new ArrayList<>();
-        List<MatchDetails> matchList = new ArrayList<>();
-        matchEntityList.forEach(matchEntity -> {
-
-            //오늘 날짜를 기준으로 정렬.(이전경기 or 이후경기)
-            if(matchEntity.getOriginal_scheduled_at() == null) return;
-
-            //설정한 값이 있다면 설정한 값으로 진행한다.
-            if(userSelected.containsKey(matchEntity.getId())) {
-                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(userSelected.get(matchEntity.getId())));
-                else matchList.add(matchEntity.toMatchDetails(userSelected.get(matchEntity.getId())));
-            }
-            //선택한 팀이라면 알람을 보내준다.
-            else if(userEntity.getTeamList().contains(matchEntity.getOpponents().get(0).getOpponent().getId()) || userEntity.getTeamList().contains(matchEntity.getOpponents().get(1).getOpponent().getId())){
-                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(true));
-                else matchList.add(matchEntity.toMatchDetails(true));
-            }
-            //아니라면 안보낸다.
-            else {
-                if(matchEntity.getStatus().equals("live")) liveList.add(matchEntity.toMatchDetails(false));
-                else matchList.add(matchEntity.toMatchDetails(false));
-            }
-        });
-
-        List<Match> returnMatchList = new ArrayList<>();
-        for(int i = 0; i < matchList.size() - 1; i++){
-            if(matchList.get(i).getMatchDate().equals(matchList.get(i+1).getMatchDate())){
-                List<MatchDetails> matchDetailsList = new ArrayList<>();
-                matchDetailsList.add(matchList.get(i));
-                matchDetailsList.add(matchList.get(i+1));
-                returnMatchList.add(new Match(matchList.get(i).getMatchDate(), matchDetailsList));
-                i++;
-            }
-            else{
-                List<MatchDetails> matchDetailsList = new ArrayList<>();
-                matchDetailsList.add(matchList.get(i));
-                returnMatchList.add(new Match(matchList.get(i).getMatchDate(), matchDetailsList));
-            }
-        }
-        return new ResponseEntity<>(new MatchList(new Match(LocalDate.now(ZoneId.of("Asia/Seoul")),liveList) ,returnMatchList,10,page), HttpStatus.OK);
+        return null;
     }
 
     public ResponseEntity<?> getTeamListByUser(Long userId){
@@ -739,7 +700,7 @@ public class LofService {
             List<MatchEntity> matchEntityList = matchRepository.findRecentGamesByTeamId(teamEntity.getId());
             for(MatchEntity matchEntity : matchEntityList){
 
-                if(matchEntity.getWinner_id().toString().equals(teamEntity.getId().toString()) ) {
+                if(matchEntity.getWinnerId().toString().equals(teamEntity.getId().toString()) ) {
                     recentMatches.add("W");
                 }
                 else {

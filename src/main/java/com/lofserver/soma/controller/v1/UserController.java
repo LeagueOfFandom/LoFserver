@@ -2,12 +2,9 @@ package com.lofserver.soma.controller.v1;
 
 import com.lofserver.soma.config.JsonWebToken;
 import com.lofserver.soma.controller.v1.response.UserId;
-import com.lofserver.soma.controller.v1.response.match.MatchList;
-import com.lofserver.soma.controller.v1.response.matchDetail.TeamVsTeam;
-import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
+import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
 import com.lofserver.soma.controller.v1.response.team.TeamInfo;
-import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.service.LofService;
@@ -16,8 +13,11 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @ApiResponses({
         @ApiResponse(code = 200, message = "success"),
@@ -30,17 +30,19 @@ public class UserController {
     private final LofService lofService;
     private final JsonWebToken jsonWebToken;
 
+
+    /*
     @ApiOperation(value = "Team vs Team 정보 반환 Api", notes = "client에서 team name들을 주면 server에서 해당 팀의 맞는 값들을 반환한다.",response = TeamVsTeam.class)
     @GetMapping("/teamVSteam")
     public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "matchId")Long matchId){
         return lofService.getTeamVsTeam(matchId);
-    }
-    @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = MatchList.class)
+    }*/
+    @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = Match.class)
     @GetMapping("/matchList")
-    public ResponseEntity<?> getMatchList(@RequestHeader("Authorization") String token, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "isAfter")Boolean isAfter, @RequestParam(value = "page", required = false, defaultValue = "0")int page){
+    public ResponseEntity<?> getMatchList(@RequestHeader("Authorization") String token, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "date")LocalDate date){
         if(jsonWebToken.checkJwtToken(token)){
             Long id = jsonWebToken.parseJwtToken(token).get("id",Long.class);
-            return lofService.getMatchList(id, isAll, isAfter, page);
+            return lofService.getMatchList(id, isAll, date);
         }
         else
             return ResponseEntity.badRequest().body("Invalid Token");
@@ -94,6 +96,7 @@ public class UserController {
         else
             return ResponseEntity.badRequest().body("Invalid Token");
     }
+    /*
     @ApiOperation(value = "User의 경기 알람 설정 Api", notes = "client에서 User가 선택한 경기의 알람여부를 보내주면 server에서 업데이트를 진행한다.")
     @PostMapping("/alarm")
     public ResponseEntity<String> setAlarm(@RequestHeader("Authorization") String token,@RequestBody UserAlarmDto userAlarmDto){
@@ -111,4 +114,5 @@ public class UserController {
     public ResponseEntity<?> setTeamRankList(@RequestParam(value="year")String year, @RequestParam(value="season")String season, @RequestParam(value="league")String league){
         return lofService.getTeamRankList(year, season, league);
     }
+    */
 }

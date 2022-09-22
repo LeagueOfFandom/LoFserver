@@ -1,6 +1,6 @@
 package com.lofserver.soma.entity;
 
-import com.lofserver.soma.controller.v1.response.match.MatchDetails;
+import com.lofserver.soma.controller.v1.response.match.MatchViewObject;
 import com.lofserver.soma.dto.crawlDto.matchDto.sub.*;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
@@ -30,22 +30,22 @@ public class MatchEntity {
     private Tournament tournament;
 
     @Column(name = "league_id")
-    private Long league_id;
+    private Long leagueId;
 
     @Column(name = "original_schedule_at")
-    private LocalDateTime original_scheduled_at;
+    private LocalDateTime originalScheduledAt;
 
     @Column(name = "begin_at")
-    private LocalDateTime begin_at;
+    private LocalDateTime beginAt;
 
     @Column(name = "winner_id")
-    private Long winner_id;
+    private Long winnerId;
 
     @Column(name = "status")
     private String status;
 
     @Column(name = "end_at")
-    private LocalDateTime end_at;
+    private LocalDateTime endAt;
 
     @Type(type = "json")
     @Column(name = "live", columnDefinition = "json")
@@ -61,54 +61,43 @@ public class MatchEntity {
 
     @Type(type = "json")
     @Column(name = "streams_list", columnDefinition = "json")
-    private List<Stream> streams_list;
+    private List<Stream> streamsList;
 
     @Type(type = "json")
     @Column(name = "opponents", columnDefinition = "json")
     private List<Opponents> opponents;
 
-    public MatchEntity(Long id, Tournament tournament, Long league_id, LocalDateTime original_scheduled_at, LocalDateTime begin_at, Long winner_id, String status, LocalDateTime end_at, Live live, List<Result> results, List<Game> games, List<Stream> streams_list, List<Opponents> opponents) {
-        this.id = id;
-        this.tournament = tournament;
-        this.league_id = league_id;
-        this.original_scheduled_at = original_scheduled_at;
-        this.begin_at = begin_at;
-        this.winner_id = winner_id;
-        this.status = status;
-        this.end_at = end_at;
-        this.live = live;
-        this.results = results;
-        this.games = games;
-        this.streams_list = streams_list;
-        this.opponents = opponents;
-    }
+    public MatchViewObject toMatchViewObject(Boolean isAlarm) {
 
-    public MatchDetails toMatchDetails(Boolean alarm) {
-        String homeTeam = "미정";
-        String awayTeam = "미정";
-        String homeUrl = "미정";
-        String awayUrl = "미정";
+        Opponent homeTeam = new Opponent();
+        Opponent awayTeam = new Opponent();
         Long homeScore = 0L;
         Long awayScore = 0L;
+
         if(opponents != null && opponents.size() != 0) {
-            homeTeam = opponents.get(0).getOpponent().getAcronym();
-            awayTeam = opponents.get(1).getOpponent().getAcronym();
-            homeUrl = opponents.get(0).getOpponent().getImage_url();
-            awayUrl = opponents.get(1).getOpponent().getImage_url();
+            homeTeam = opponents.get(0).getOpponent();
+            awayTeam = opponents.get(1).getOpponent();
+
             homeScore = results.get(0).getScore();
             awayScore = results.get(1).getScore();
+            if (results.get(1).getTeam_id() == homeTeam.getId()) {
+                homeScore = results.get(1).getScore();
+                awayScore = results.get(0).getScore();
+            }
         }
-        return new MatchDetails(
-                id,
-                original_scheduled_at.toLocalDate(),
-                original_scheduled_at.toLocalTime(),
-                homeTeam,
-                awayTeam,
-                homeUrl,
-                awayUrl,
-                homeScore,
-                awayScore,
-                "https://www.twitch.tv/lck?lang=ko",
-                alarm);
+
+        return MatchViewObject.builder()
+                .matchId(id)
+                .homeName(homeTeam.getAcronym())
+                .homeImg(homeTeam.getImage_url())
+                .awayName(awayTeam.getAcronym())
+                .awayImg(awayTeam.getImage_url())
+                .time(beginAt.toString())
+                .league(tournament.getName())
+                .isAlarm(isAlarm)
+                .homeScore(homeScore)
+                .awayScore(awayScore)
+                .build();
+
     }
 }
