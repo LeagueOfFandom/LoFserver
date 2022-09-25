@@ -1,8 +1,8 @@
 package com.lofserver.soma.entity;
 
-import com.lofserver.soma.dto.crawlDto.gameDto.sub.player.Player;
-import com.lofserver.soma.dto.crawlDto.gameDto.sub.teams.Team;
-import com.lofserver.soma.dto.crawlDto.matchDto.sub.Winner;
+import com.lofserver.soma.dto.pandaScoreDto.gameDto.sub.player.Player;
+import com.lofserver.soma.dto.pandaScoreDto.gameDto.sub.teams.Team;
+import com.lofserver.soma.dto.pandaScoreDto.matchDto.sub.Winner;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,10 +27,10 @@ public class MatchDetailEntity {
     private Long id;
 
     @Column(name = "begin_at")
-    private LocalDateTime begin_at;
+    private LocalDateTime beginAt;
 
     @Column(name = "end_at")
-    private LocalDateTime end_at;
+    private LocalDateTime endAt;
 
     @Column(name = "status")
     private String status;
@@ -50,14 +50,6 @@ public class MatchDetailEntity {
     @Column(name = "teams", columnDefinition = "json")
     private List<Team> teams;
 
-    public MatchDetailEntity(Long id, LocalDateTime begin_at, LocalDateTime end_at, String status, Long length, List<Player> players, Winner winner, List<Team> teams) {
-        this.id = id;
-        this.begin_at = begin_at;
-        this.end_at = end_at;
-        this.status = status;
-        this.length = length;
-        this.players = players;
-        this.winner = winner;
-        this.teams = teams;
-    }
+    @Column(name = "position")
+    private Long position;
 }

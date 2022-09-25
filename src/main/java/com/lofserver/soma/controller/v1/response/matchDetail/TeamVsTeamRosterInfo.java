@@ -1,7 +1,7 @@
 package com.lofserver.soma.controller.v1.response.matchDetail;
 
 import com.lofserver.soma.controller.v1.response.Roster;
-import com.lofserver.soma.dto.crawlDto.gameDto.sub.teams.Team;
+import com.lofserver.soma.dto.pandaScoreDto.gameDto.sub.teams.Team;
 import lombok.Getter;
 
 import java.util.List;

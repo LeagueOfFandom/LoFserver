@@ -18,12 +18,11 @@ import com.lofserver.soma.data.ViewType;
 import com.lofserver.soma.dto.TeamRankDto;
 import com.lofserver.soma.dto.UserAlarmDto;
 import com.lofserver.soma.dto.UserDto;
-import com.lofserver.soma.dto.UserTeamListDto;
-import com.lofserver.soma.dto.crawlDto.gameDto.sub.player.Player;
-import com.lofserver.soma.dto.crawlDto.gameDto.sub.teams.Team;
-import com.lofserver.soma.dto.crawlDto.matchDto.sub.Game;
-import com.lofserver.soma.dto.crawlDto.matchDto.sub.Opponent;
 import com.lofserver.soma.dto.google.GoogleUserInfoDto;
+import com.lofserver.soma.dto.pandaScoreDto.gameDto.sub.player.Player;
+import com.lofserver.soma.dto.pandaScoreDto.gameDto.sub.teams.Team;
+import com.lofserver.soma.dto.pandaScoreDto.matchDto.sub.Game;
+import com.lofserver.soma.dto.pandaScoreDto.matchDto.sub.Opponent;
 import com.lofserver.soma.entity.*;
 import com.lofserver.soma.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -447,7 +449,7 @@ public class LofService {
             }
             Long blueScore = score.get(blueTeam.getTeam().getId());
             Long redScore = score.get(redTeam.getTeam().getId());
-            LocalDateTime localDateTime = matchDetailEntity.getBegin_at();
+            LocalDateTime localDateTime = matchDetailEntity.getBeginAt();
             String date = localDateTime.getYear() + "년 " + localDateTime.getMonthValue() + "월 " + localDateTime.getDayOfMonth() + "일";
             String time = localDateTime.getHour() + "시 " + localDateTime.getMinute() + "분";
             Boolean blueWin, redWin;
@@ -665,18 +667,18 @@ public class LofService {
         return new ResponseEntity<>(new UserId(jwtToken, true), HttpStatus.OK);
     }
     //user의 팀 정보 수정.
-    public ResponseEntity<String> setTeamList(UserTeamListDto userTeamListDto){
-        UserEntity userEntity = userRepository.findById(userTeamListDto.getUserId()).orElse(null);
+    public ResponseEntity<String> setTeamList(List<Long> userTeamListDto, Long id){
+        UserEntity userEntity = userRepository.findById(id).orElse(null);
 
         if(userEntity == null){ // id 없음 예외처리.
-            log.info("getMatchList: "+"해당 id({}) 없음" , userTeamListDto.getUserId());
+            log.info("getMatchList: "+"해당 id({}) 없음" , id);
             return new ResponseEntity<>("해당 user id 없음", HttpStatus.BAD_REQUEST);
         }
-        if(!teamRepository.findAllId().containsAll(userTeamListDto.getTeamIdList())){
-            log.info("getMatchList: "+"팀 id({}) 리스트 잘못됨" , userTeamListDto.getTeamIdList().toString());
+        if(!teamRepository.findAllId().containsAll(userTeamListDto)){
+            log.info("getMatchList: "+"팀 id({}) 리스트 잘못됨" , userTeamListDto.toString());
             return new ResponseEntity<>("해당 team id 없음", HttpStatus.BAD_REQUEST);
         }
-        userEntity.setTeamList(userTeamListDto.getTeamIdList());
+        userEntity.setTeamList(userTeamListDto);
         userRepository.save(userEntity);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
@@ -694,6 +696,10 @@ public class LofService {
         userEntity.addUserSelected(userAlarmDto.getMatchId(),userAlarmDto.getAlarm());
         userRepository.save(userEntity);
         return new ResponseEntity<>("success", HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getMainPage(){
+        return null;
     }
 
     public ResponseEntity<?> getTeamRankList(String year, String season, String league){

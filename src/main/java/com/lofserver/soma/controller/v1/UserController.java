@@ -6,7 +6,6 @@ import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
 import com.lofserver.soma.controller.v1.response.team.TeamInfo;
 import com.lofserver.soma.dto.UserDto;
-import com.lofserver.soma.dto.UserTeamListDto;
 import com.lofserver.soma.service.LofService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -18,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @ApiResponses({
         @ApiResponse(code = 200, message = "success"),
@@ -84,12 +84,10 @@ public class UserController {
     }
     @ApiOperation(value = "유저의 Fandom list 설정 Api", notes = "client에서 User id와 함께 Fandom으로 설정한 팀들을 post하면 server에서 업데이트를 진행한다.")
     @PostMapping("/teamList")
-    public ResponseEntity<String> setTeamList(@RequestHeader("Authorization") String token, @RequestBody UserTeamListDto userTeamListDto){
+    public ResponseEntity<String> setTeamList(@RequestHeader("Authorization") String token, @RequestBody List<Long> userTeamListDto){
         if(jsonWebToken.checkJwtToken(token)) {
             Long id = jsonWebToken.parseJwtToken(token).get("id", Long.class);
-            if(id != userTeamListDto.getUserId())
-                return ResponseEntity.badRequest().body("wrong user id");
-            return lofService.setTeamList(userTeamListDto);
+            return lofService.setTeamList(userTeamListDto, id);
         }
         else
             return ResponseEntity.badRequest().body("Invalid Token");

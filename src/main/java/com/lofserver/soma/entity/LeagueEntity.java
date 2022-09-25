@@ -1,7 +1,7 @@
 package com.lofserver.soma.entity;
 
-import com.lofserver.soma.dto.leagueDto.Series;
-import com.lofserver.soma.dto.leagueDto.VideoGame;
+import com.lofserver.soma.dto.pandaScoreDto.leagueDto.sub.Series;
+import com.lofserver.soma.dto.pandaScoreDto.leagueDto.sub.VideoGame;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

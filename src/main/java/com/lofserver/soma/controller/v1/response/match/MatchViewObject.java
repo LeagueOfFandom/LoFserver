@@ -1,9 +1,7 @@
 package com.lofserver.soma.controller.v1.response.match;
 
-import com.lofserver.soma.dto.crawlDto.matchDto.sub.Opponent;
+import com.lofserver.soma.dto.pandaScoreDto.matchDto.sub.Opponent;
 import com.lofserver.soma.entity.MatchEntity;
-import jdk.jshell.Snippet;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
