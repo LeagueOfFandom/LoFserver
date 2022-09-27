@@ -1,6 +1,7 @@
 package com.lofserver.soma.controller.v1;
 
 import com.lofserver.soma.config.JsonWebToken;
+import com.lofserver.soma.controller.v1.response.CommonItem;
 import com.lofserver.soma.controller.v1.response.UserId;
 import com.lofserver.soma.controller.v1.response.match.Match;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
@@ -35,6 +36,18 @@ public class UserController {
     public ResponseEntity<?> getTeamVSTeam(@RequestParam(value = "matchId")Long matchId){
         return lofService.getTeamVsTeam(matchId);
     }*/
+
+    @ApiOperation(value = "main", notes = "main",response = CommonItem[].class)
+    @GetMapping("/mainPage")
+    public ResponseEntity<?> getMainPage(@RequestHeader("Authorization") String token){
+        if(jsonWebToken.checkJwtToken(token)){
+            Long id = jsonWebToken.parseJwtToken(token).get("id",Long.class);
+            return lofService.getMainPage(id);
+        }
+        else
+            return ResponseEntity.badRequest().body("Invalid Token");
+
+    }
     @ApiOperation(value = "User의 Fandom에 맞는 경기 내역 반환 Api", notes = "client에서 User id를 주면 server에서 해당 유저의 맞는 경기들을 반환한다.",response = Match.class)
     @GetMapping("/matchList")
     public ResponseEntity<?> getMatchList(@RequestHeader("Authorization") String token, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){

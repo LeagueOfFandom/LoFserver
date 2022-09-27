@@ -53,6 +53,61 @@ public class LofService {
 
     private final ViewType viewType = new ViewType();
 
+    public ResponseEntity<?> getMainPage(Long id){
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+
+        List<CommonItem> commonItemList = new ArrayList<>();
+
+        List<MatchEntity> matchEntityList = matchRepository.findAllByStatus("running");
+
+        for(MatchEntity matchEntity : matchEntityList){
+            Boolean isAlarm = false;
+            if(userEntity.getUserSelected().containsKey(matchEntity.getId()))
+                isAlarm = userEntity.getUserSelected().get(matchEntity.getId());
+            else if (userEntity.getTeamList().contains(matchEntity.getOpponents().get(0).getOpponent().getId()) || userEntity.getTeamList().contains(matchEntity.getOpponents().get(1).getOpponent().getId()))
+                isAlarm = true;
+
+            CommonItem commonItem = new CommonItem(viewType.getLiveViewType(), new MatchViewObject(matchEntity,isAlarm));
+            commonItemList.add(commonItem);
+        }
+
+        List<Long> leagueList = new ArrayList<>();
+        leagueList.add(297L); //worlds
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().atTime(23, 59, 59);
+
+        //get matchList
+        List<MatchEntity> matchEntityListByNow = matchRepository.findAllByLeagueIdInAndOriginalScheduledAtBetween(leagueList, start, end);
+
+        for(MatchEntity matchEntity : matchEntityList){
+
+            if(matchEntity.getOpponents() == null || matchEntity.getOpponents().size() == 0)
+                continue;
+
+            Opponent homeTeam = matchEntity.getOpponents().get(0).getOpponent();
+            Opponent awayTeam = matchEntity.getOpponents().get(1).getOpponent();
+
+            if(!userEntity.getTeamList().contains(homeTeam.getId()) && !userEntity.getTeamList().contains(awayTeam.getId()))
+                continue;
+
+            Boolean isAlarm = false;
+            if(userEntity.getUserSelected().containsKey(matchEntity.getId()))
+                isAlarm = userEntity.getUserSelected().get(matchEntity.getId());
+            else if (userEntity.getTeamList().contains(homeTeam.getId()) || userEntity.getTeamList().contains(awayTeam.getId()))
+                isAlarm = true;
+
+
+            String nowViewType = viewType.getMatchScheduleView();
+            if(matchEntity.getStatus().equals("finished"))
+                nowViewType = viewType.getMatchResultView();
+
+
+            CommonItem commonItem = new CommonItem(nowViewType, new MatchViewObject(matchEntity,isAlarm));
+            commonItemList.add(commonItem);
+        }
+        return new ResponseEntity<>(commonItemList, HttpStatus.OK);
+    }
+
     public ResponseEntity<?> setFcm(String fcmToken, Long id){
         UserEntity userEntity = userRepository.findById(id).orElse(null);
         if(userEntity == null){

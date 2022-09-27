@@ -18,6 +18,8 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Long> {
     @Query(value = "select * from match_list where status='finished' and ( (json_value(opponents,'$[0].opponent.id') = ?1 and json_value(opponents,'$[1].opponent.id') = ?2) or (json_value(opponents,'$[0].opponent.id') = ?2 and json_value(opponents,'$[1].opponent.id') = ?1))", nativeQuery = true)
     List<MatchEntity> findAllByTeamIds(Long homeId, Long awayId);
 
+    List<MatchEntity> findAllByStatus(String status);
+
 
     @Query(value = "select * from match_list where status='finished' and json_value(results, '$[0].team_id') = ?1 or status='finished' and json_value(results, '$[1].team_id') = ?1 ORDER BY id DESC limit 5",nativeQuery = true)
     List<MatchEntity> findRecentGamesByTeamId(Long TeamId);
