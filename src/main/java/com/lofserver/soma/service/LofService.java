@@ -19,6 +19,7 @@ import com.lofserver.soma.entity.UserEntity;
 import com.lofserver.soma.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -47,10 +48,14 @@ public class LofService {
         List<CommonItem> commonItems = new ArrayList<>();
         commonItems.addAll(matchViewService.getLiveMatch(1L));
         commonItems.addAll(matchViewService.getMatchListTest());
-        commonItems.add(new CommonItem("실시간 인기글"));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("text", "실시간 인기글");
+        commonItems.add(new CommonItem(jsonObject));
         commonItems.add(communityViewService.getCommunityListTest());
         commonItems.add(communityViewService.getCommunityListTest());
-        commonItems.add(new CommonItem("하이라이트"));
+        JSONObject jsonObject2 = new JSONObject();
+        jsonObject2.put("text", "하이라이트");
+        commonItems.add(new CommonItem(jsonObject2));
         commonItems.add(videoViewService.getVideoListTest());
         return commonItems;
     }

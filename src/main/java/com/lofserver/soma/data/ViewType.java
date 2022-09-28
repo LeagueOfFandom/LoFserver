@@ -3,6 +3,7 @@ package com.lofserver.soma.data;
 import com.lofserver.soma.controller.v1.response.community.CommunityViewObject;
 import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
 import lombok.Getter;
+import org.json.simple.JSONObject;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ViewType {
                 return matchResultView;
             else
                 return liveViewType;
-        } else if(object instanceof String){
+        } else if(object instanceof JSONObject){
             return textArrowView;
         } else if(object instanceof List<?>){
             return highlightView;
