@@ -27,8 +27,9 @@ public class MatchEntity {
     @Column(name = "rescheduled")
     private Boolean rescheduled;
 
+    @Type(type = "json")
     @Column(name = "winner")
-    private String winner;
+    private Winner winner;
 
     @Column(name = "winner_type")
     private String winnerType;
@@ -52,9 +53,6 @@ public class MatchEntity {
     @Type(type = "json")
     @Column(name = "oppontents", columnDefinition = "json")
     private List<Opponents> opponents;
-
-    @Column(name = "video_game_version")
-    private String videoGameVersion;
 
     @Column(name = "tournament_id")
     private Long tournamentId;
