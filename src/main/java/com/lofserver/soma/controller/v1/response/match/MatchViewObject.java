@@ -17,6 +17,8 @@ public class MatchViewObject {
     private Long homeScore;
     private Long awayScore;
 
+    private String status;
+
     public MatchViewObject(MatchEntity matchEntity, Boolean isAlarm){
         this.matchId = matchEntity.getId();
         this.homeName = matchEntity.getOpponents().get(0).getOpponent().getAcronym();
@@ -28,5 +30,6 @@ public class MatchViewObject {
         this.isAlarm = isAlarm;
         this.homeScore = matchEntity.getResults().get(0).getScore();
         this.awayScore = matchEntity.getResults().get(1).getScore();
+        this.status = matchEntity.getStatus();
     }
 }
