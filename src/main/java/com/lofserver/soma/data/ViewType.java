@@ -1,6 +1,7 @@
 package com.lofserver.soma.data;
 
 import com.lofserver.soma.controller.v1.response.community.CommunityViewObject;
+import com.lofserver.soma.controller.v1.response.community.HighLightViewObject;
 import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
 import lombok.Getter;
 import org.json.simple.JSONObject;
@@ -28,7 +29,7 @@ public class ViewType {
                 return liveViewType;
         } else if(object instanceof JSONObject){
             return textArrowView;
-        } else if(object instanceof List<?>){
+        } else if(object instanceof HighLightViewObject){
             return highlightView;
         } else if(object instanceof CommunityViewObject){
             return CommunityView;
