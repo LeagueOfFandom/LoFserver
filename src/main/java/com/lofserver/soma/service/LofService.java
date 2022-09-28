@@ -3,9 +3,9 @@ package com.lofserver.soma.service;
 import com.lofserver.soma.config.JsonWebToken;
 import com.lofserver.soma.controller.v1.response.CommonItem;
 import com.lofserver.soma.controller.v1.response.UserId;
-import com.lofserver.soma.controller.v1.response.match.DateInfo;
-import com.lofserver.soma.controller.v1.response.match.Match;
-import com.lofserver.soma.controller.v1.response.match.MatchViewObject;
+import com.lofserver.soma.controller.v1.response.match.sub.DateInfo;
+import com.lofserver.soma.controller.v1.response.match.MatchList;
+import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
 import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
 import com.lofserver.soma.controller.v1.response.team.TeamInfo;
@@ -38,13 +38,15 @@ public class LofService {
     private final MatchRepository matchRepository;
     private final LeagueRepository leagueRepository;
     private final JsonWebToken jsonWebToken;
-    private final MatchService matchService;
+    private final MatchViewService matchViewService;
 
     private final ViewType viewType = new ViewType();
 
+    /** main test page */
     private List<CommonItem> getMainPageTest(){
         List<CommonItem> commonItems = new ArrayList<>();
-        commonItems.addAll(matchService.getMatchListTest());
+        commonItems.addAll(matchViewService.getLiveMatch(1L));
+        commonItems.addAll(matchViewService.getMatchListTest());
         return commonItems;
     }
 
@@ -54,9 +56,9 @@ public class LofService {
 
         List<CommonItem> commonItemList = new ArrayList<>();
         //live 추가
-        commonItemList.addAll(matchService.getLiveMatch(id));
+        commonItemList.addAll(matchViewService.getLiveMatch(id));
         //오늘 경기 추가
-        commonItemList.addAll(matchService.getMatchListByDate(id, LocalDate.now(), false));
+        commonItemList.addAll(matchViewService.getMatchListByDate(id, LocalDate.now(), false));
 
         return new ResponseEntity<>(commonItemList, HttpStatus.OK);
     }
@@ -124,7 +126,7 @@ public class LofService {
             }
             commonItemListList.add(commonItemList);
         }
-        return new ResponseEntity<>(new Match(dateInfoList,commonItemListList), HttpStatus.OK);
+        return new ResponseEntity<>(new MatchList(dateInfoList,commonItemListList), HttpStatus.OK);
     }
 
     public ResponseEntity<?> getTeamListByUser(Long userId){
@@ -199,7 +201,7 @@ public class LofService {
 
         //없다면 저장한다.
         if(userEntity == null) {
-            userEntity = new UserEntity(userDto.getFcmToken(),googleUserInfo.getEmail());
+            userEntity = new UserEntity(userDto.getFcmToken(),googleUserInfo.getEmail(), googleUserInfo.getName(), googleUserInfo.getPicture());
             String jwtToken = jsonWebToken.makeJwtTokenById(userRepository.save(userEntity).getUserId());
             return new ResponseEntity<>(new UserId(jwtToken , false), HttpStatus.OK);
         }

@@ -1,7 +1,6 @@
 package com.lofserver.soma.data;
 
-import com.lofserver.soma.controller.v1.response.match.MatchViewObject;
-import com.lofserver.soma.entity.MatchEntity;
+import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
 import lombok.Getter;
 
 @Getter
@@ -23,7 +22,10 @@ public class ViewType {
                 return matchResultView;
             else
                 return liveViewType;
-        } else {
+        } else if(object instanceof String){
+            return textArrowView;
+        }
+        else {
             return errorView;
         }
     }

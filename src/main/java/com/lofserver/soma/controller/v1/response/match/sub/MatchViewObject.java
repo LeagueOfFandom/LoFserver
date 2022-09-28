@@ -1,4 +1,4 @@
-package com.lofserver.soma.controller.v1.response.match;
+package com.lofserver.soma.controller.v1.response.match.sub;
 
 import com.lofserver.soma.dto.pandaScoreDto.matchDto.sub.Opponent;
 import com.lofserver.soma.entity.MatchEntity;

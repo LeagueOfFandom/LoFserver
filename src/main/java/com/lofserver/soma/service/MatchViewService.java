@@ -1,7 +1,7 @@
 package com.lofserver.soma.service;
 
 import com.lofserver.soma.controller.v1.response.CommonItem;
-import com.lofserver.soma.controller.v1.response.match.MatchViewObject;
+import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
 import com.lofserver.soma.entity.MatchEntity;
 import com.lofserver.soma.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MatchService {
+public class MatchViewService {
 
     private final MatchRepository matchRepository;
     private final UserService userService;

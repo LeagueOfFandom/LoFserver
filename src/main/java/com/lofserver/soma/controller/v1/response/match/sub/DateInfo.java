@@ -1,4 +1,4 @@
-package com.lofserver.soma.controller.v1.response.match;
+package com.lofserver.soma.controller.v1.response.match.sub;
 
 import lombok.Getter;
 

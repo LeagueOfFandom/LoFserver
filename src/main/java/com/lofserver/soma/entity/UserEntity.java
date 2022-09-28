@@ -22,7 +22,13 @@ public class UserEntity {
     @Column(name = "token")
     private String token; //fcm token 값. 변경 가능으로 setter 설정.
     @Column(name = "email")
-    private String email; //현재 user 구분을 위한 deviceId. 추후 로그인을 통해 사라질 값.
+    private String email; //현재 user 구분을 위한 deviceId.
+
+    @Column(name = "nickname")
+    private String nickname;
+    @Column(name = "profile_img")
+    private String profileImg;
+
     @Type(type = "json")
     @Column(name = "team_list" ,columnDefinition = "json")
     private List<Long> teamList = new ArrayList<>(); //user가 등록한 팀 리스트. 변경 가능으로 setter 설정.
@@ -48,8 +54,10 @@ public class UserEntity {
     public void setLeagueList(List<Long> leagueList) {
         this.leagueList = leagueList;
     }
-    public UserEntity(String token, String email) {
+    public UserEntity(String token, String email, String nickname, String profileImg) {
         this.token = token;
         this.email = email;
+        this.nickname = nickname;
+        this.profileImg = profileImg;
     }
 }
