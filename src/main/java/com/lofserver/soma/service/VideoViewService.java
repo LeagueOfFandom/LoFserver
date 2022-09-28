@@ -1,6 +1,7 @@
 package com.lofserver.soma.service;
 
 import com.lofserver.soma.controller.v1.response.CommonItem;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ public class VideoViewService {
         videoList.add("z1ai61tvmMo");
         videoList.add("gyD8bzTgRmM");
         videoList.add("V0N4C2Ax68Q");
-        return new CommonItem(videoList);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("videoList",videoList);
+        return new CommonItem(jsonObject);
     }
 }
