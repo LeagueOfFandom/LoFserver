@@ -39,14 +39,19 @@ public class LofService {
     private final LeagueRepository leagueRepository;
     private final JsonWebToken jsonWebToken;
     private final MatchViewService matchViewService;
-
-    private final ViewType viewType = new ViewType();
+    private final VideoViewService videoViewService;
+    private final CommunityViewService communityViewService;
 
     /** main test page */
     private List<CommonItem> getMainPageTest(){
         List<CommonItem> commonItems = new ArrayList<>();
         commonItems.addAll(matchViewService.getLiveMatch(1L));
         commonItems.addAll(matchViewService.getMatchListTest());
+        commonItems.add(new CommonItem("실시간 인기글"));
+        commonItems.add(communityViewService.getCommunityListTest());
+        commonItems.add(communityViewService.getCommunityListTest());
+        commonItems.add(new CommonItem("하이라이트"));
+        commonItems.add(videoViewService.getVideoListTest());
         return commonItems;
     }
 
@@ -114,11 +119,6 @@ public class LofService {
                     isAlarm = userEntity.getUserSelected().get(matchEntity.getId());
                 else if (userEntity.getTeamList().contains(homeTeam.getId()) || userEntity.getTeamList().contains(awayTeam.getId()))
                     isAlarm = true;
-
-
-                String nowViewType = viewType.getMatchScheduleView();
-                if(matchEntity.getStatus().equals("finished"))
-                    nowViewType = viewType.getMatchResultView();
 
 
                 CommonItem commonItem = new CommonItem(new MatchViewObject(matchEntity,isAlarm));

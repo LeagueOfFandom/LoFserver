@@ -1,7 +1,10 @@
 package com.lofserver.soma.data;
 
+import com.lofserver.soma.controller.v1.response.community.CommunityViewObject;
 import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class ViewType {
@@ -24,8 +27,11 @@ public class ViewType {
                 return liveViewType;
         } else if(object instanceof String){
             return textArrowView;
-        }
-        else {
+        } else if(object instanceof List<?>){
+            return highlightView;
+        } else if(object instanceof CommunityViewObject){
+            return CommunityView;
+        } else {
             return errorView;
         }
     }

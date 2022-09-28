@@ -12,7 +12,7 @@ public class CommunityViewService {
     public CommonItem getCommunityListTest(){
         CommunityViewObject communityViewObject = CommunityViewObject.builder()
                 .nickname("testNickname")
-                .profileImg("")
+                .profileImg("https://lh3.googleusercontent.com/a/ALm5wu0owKbQ9im6-ViZ9WKUHt2RwqGVLlx1i59ex1CZ=s96-c")
                 .time(LocalDateTime.now())
                 .content("test 블라블라")
                 .build();
