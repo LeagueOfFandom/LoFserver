@@ -47,5 +47,8 @@ public class TeamEntity {
     @Column(name = "series_id")
     private Long seriesId;
 
+    @Column(name = "league_id")
+    private Long leagueId;
+
 }
 

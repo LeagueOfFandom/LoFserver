@@ -8,12 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
-    @Query("select t.id from TeamEntity t")
-    List<Long> findAllId();
 
+    @Query("select t.id from TeamEntity t where t.seriesId = ?1")
+    List<Long> findAllIdBySeriesId(Long id);
 
-    List<TeamEntity> findAllBySeriesId(Long series_id);
-
-    @Query(value = "select * from team_list where name = ?1",nativeQuery = true)
-    TeamEntity findByTeamName(String teamName);
+    @Query("select t.seriesId from TeamEntity t where t.id in ?1")
+    List<Long> findSerieIdListByTeamIdList(List<Long> teamIdList);
 }

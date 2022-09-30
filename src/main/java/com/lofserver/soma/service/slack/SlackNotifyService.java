@@ -1,4 +1,4 @@
-package com.lofserver.soma.service;
+package com.lofserver.soma.service.slack;
 
 import com.slack.api.Slack;
 import com.slack.api.methods.SlackApiException;

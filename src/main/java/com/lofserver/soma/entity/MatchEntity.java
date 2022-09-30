@@ -28,7 +28,7 @@ public class MatchEntity {
     private Boolean rescheduled;
 
     @Type(type = "json")
-    @Column(name = "winner")
+    @Column(name = "winner", columnDefinition = "json")
     private Winner winner;
 
     @Column(name = "winner_type")

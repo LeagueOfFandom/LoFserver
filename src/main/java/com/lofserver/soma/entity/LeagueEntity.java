@@ -26,10 +26,10 @@ public class LeagueEntity {
     private Long id;
 
     @Column(name = "image_url")
-    private String image_url;
+    private String imageUrl;
 
     @Column(name = "modified_at")
-    private LocalDateTime modified_at;
+    private LocalDateTime modifiedAt;
 
     @Column(name = "name")
     private String name;
@@ -39,7 +39,7 @@ public class LeagueEntity {
     private List<Series> series;
 
     @Column(name = "latest_series_id")
-    private Long latest_series_id;
+    private Long latestSeriesId;
     @Column(name = "slug")
     private String slug;
 

@@ -1,6 +1,7 @@
 package com.lofserver.soma.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
@@ -54,6 +55,7 @@ public class UserEntity {
     public void setLeagueList(List<Long> leagueList) {
         this.leagueList = leagueList;
     }
+    @Builder
     public UserEntity(String token, String email, String nickname, String profileImg) {
         this.token = token;
         this.email = email;

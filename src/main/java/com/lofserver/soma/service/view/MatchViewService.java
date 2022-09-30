@@ -1,9 +1,10 @@
-package com.lofserver.soma.service;
+package com.lofserver.soma.service.view;
 
 import com.lofserver.soma.controller.v1.response.CommonItem;
 import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
 import com.lofserver.soma.entity.MatchEntity;
 import com.lofserver.soma.repository.MatchRepository;
+import com.lofserver.soma.service.api.user.UserRepositoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ import java.util.List;
 public class MatchViewService {
 
     private final MatchRepository matchRepository;
-    private final UserService userService;
+    private final UserRepositoryService userRepositoryService;
 
     public List<CommonItem> getMatchListTest(){
         return getMatchListByDate(1L, LocalDate.parse("2022-09-29"), false);
@@ -33,7 +34,7 @@ public class MatchViewService {
         List<CommonItem> commonItemList = new ArrayList<>();
 
         List<MatchEntity> matchEntityList = matchRepository.findAllByLeagueIdInAndOriginalScheduledAtBetween(
-                userService.getUserLeagueList(userId),
+                userRepositoryService.getUserLeagueList(userId),
                 date.atStartOfDay(),
                 date.atTime(23, 59, 59));
 
@@ -42,10 +43,10 @@ public class MatchViewService {
             if (matchEntity.getOpponents() == null || matchEntity.getOpponents().size() == 0)
                 return;
             //유저가 선택한 경기만 조회
-            if (onlyUserTeam && !userService.checkUserTeamByMatchEntity(userId, matchEntity))
+            if (onlyUserTeam && !userRepositoryService.checkUserTeamByMatchEntity(userId, matchEntity))
                 return;
 
-            Boolean isAlarm = userService.checkUserMatchSetAlarmByMatchEntity(userId, matchEntity);
+            Boolean isAlarm = userRepositoryService.checkUserMatchSetAlarmByMatchEntity(userId, matchEntity);
 
             CommonItem commonItem = new CommonItem(new MatchViewObject(matchEntity, isAlarm));
             commonItemList.add(commonItem);
@@ -59,7 +60,7 @@ public class MatchViewService {
         List<MatchEntity> matchEntityList = matchRepository.findAllByStatus("running");
 
         matchEntityList.forEach(matchEntity -> {
-            Boolean isAlarm = userService.checkUserMatchSetAlarmByMatchEntity(userId, matchEntity);
+            Boolean isAlarm = userRepositoryService.checkUserMatchSetAlarmByMatchEntity(userId, matchEntity);
             CommonItem commonItem = new CommonItem(new MatchViewObject(matchEntity, isAlarm));
             commonItemList.add(commonItem);
         });

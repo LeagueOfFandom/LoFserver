@@ -1,5 +1,6 @@
 package com.lofserver.soma.controller.v1.response.team;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -9,11 +10,9 @@ public class LeagueInfo {
     private String note;
     private List<TeamInfo> teamInfo;
 
-    public LeagueInfo(String note) {
+    @Builder
+    public LeagueInfo(String note, List<TeamInfo> teamInfo) {
         this.note = note;
-    }
-
-    public void setTeamInfo(List<TeamInfo> teamInfo) {
         this.teamInfo = teamInfo;
     }
 }

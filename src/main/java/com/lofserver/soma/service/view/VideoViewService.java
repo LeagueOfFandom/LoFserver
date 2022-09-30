@@ -1,4 +1,4 @@
-package com.lofserver.soma.service;
+package com.lofserver.soma.service.view;
 
 import com.lofserver.soma.controller.v1.response.CommonItem;
 import com.lofserver.soma.controller.v1.response.community.HighLightViewObject;
