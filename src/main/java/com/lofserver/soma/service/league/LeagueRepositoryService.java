@@ -4,8 +4,9 @@ import com.lofserver.soma.controller.v1.response.team.LeagueInfo;
 import com.lofserver.soma.controller.v1.response.team.LeagueList;
 import com.lofserver.soma.controller.v1.response.team.TeamInfo;
 import com.lofserver.soma.entity.LeagueEntity;
+import com.lofserver.soma.entity.TeamEntity;
 import com.lofserver.soma.repository.LeagueRepository;
-import com.lofserver.soma.service.team.TeamRepositoryService;
+import com.lofserver.soma.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LeagueRepositoryService {
     private final LeagueRepository leagueRepository;
-    private final TeamRepositoryService teamRepositoryService;
+    private final TeamRepository teamRepository;
 
     public String getLeagueNameByLeagueId(Long leagueId) {
         LeagueEntity leagueEntity = leagueRepository.findById(leagueId).orElse(null);
@@ -34,8 +35,8 @@ public class LeagueRepositoryService {
         leagueEntityList.forEach(leagueEntity -> {
             leagueNameList.add(leagueEntity.getName());
 
-            List<Long> teamList = teamRepositoryService.getTeamListBySeriesId(leagueEntity.getLatestSeriesId());
-            List<TeamInfo> teamInfoList = teamRepositoryService.getTeamInfoListByTeamIdList(teamList);
+            List<Long> teamList = getTeamListBySeriesId(leagueEntity.getLatestSeriesId());
+            List<TeamInfo> teamInfoList = getTeamInfoListByTeamIdList(teamList);
 
             LeagueInfo leagueInfo = LeagueInfo.builder()
                     .note(leagueEntity.getSlug())
@@ -49,7 +50,26 @@ public class LeagueRepositoryService {
     }
 
     public List<Long> getLeagueIdListByTeamIdList(List<Long> teamIdList) {
-        List<Long> seriesIdList = teamRepositoryService.getSerieIdListByTeamIdList(teamIdList);
+        List<Long> seriesIdList = getSerieIdListByTeamIdList(teamIdList);
         return leagueRepository.findLeagueIdListBySerieIdList(seriesIdList);
+    }
+
+    public List<TeamInfo> getTeamInfoListByTeamIdList(List<Long> teamList) {
+        List<TeamEntity> teamEntityList = teamRepository.findAllById(teamList);
+
+        List<TeamInfo> teamInfoList = new ArrayList<>();
+        teamEntityList.forEach(teamEntity -> {
+            TeamInfo teamInfo = new TeamInfo(teamEntity,true, getLeagueNameByLeagueId(teamEntity.getLeagueId()));
+            teamInfoList.add(teamInfo);
+        });
+
+        return teamInfoList;
+    }
+
+    public List<Long> getTeamListBySeriesId(Long seriesId) {
+        return teamRepository.findAllIdBySeriesId(seriesId);
+    }
+    public List<Long> getSerieIdListByTeamIdList(List<Long> teamIdList) {
+        return teamRepository.findSerieIdListByTeamIdList(teamIdList);
     }
 }

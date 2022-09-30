@@ -7,7 +7,6 @@ import com.lofserver.soma.controller.v1.response.team.TeamInfo;
 import com.lofserver.soma.dto.UserDto;
 import com.lofserver.soma.dto.google.GoogleUserInfoDto;
 import com.lofserver.soma.service.league.LeagueRepositoryService;
-import com.lofserver.soma.service.team.TeamRepositoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ public class UserApiService {
 
     private final GoogleAccessService googleAccessService;
     private final UserRepositoryService userRepositoryService;
-    private final TeamRepositoryService teamRepositoryService;
     private final LeagueRepositoryService leagueRepositoryService;
     private final JsonWebToken jsonWebToken;
 
@@ -45,7 +43,7 @@ public class UserApiService {
     public ResponseEntity<?> getTeamListByUser(Long userId){
 
         List<Long> selectedTeamList = userRepositoryService.getUserTeamList(userId);
-        List<TeamInfo> teamInfoList = teamRepositoryService.getTeamInfoListByTeamIdList(selectedTeamList);
+        List<TeamInfo> teamInfoList = leagueRepositoryService.getTeamInfoListByTeamIdList(selectedTeamList);
 
         return new ResponseEntity<>(teamInfoList, HttpStatus.OK);
     }
