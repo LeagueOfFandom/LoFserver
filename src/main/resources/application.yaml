@@ -28,15 +28,21 @@ spring:
       on-profile: localdb
     import: localkey.yaml
   jpa:
+    show-sql: false
+    defer-datasource-initialization: false
     hibernate:
       ddl-auto: update
   datasource:
     url: jdbc:mariadb://localhost:3306/lof
     username: root
     password: 1234
-
+  sql:
+    data: classpath:data.sql
+    initialization-mode: always
 slack:
   token: ${localkey.slack-api.token}
+JWT:
+  signature: ${localkey.JWT.signature}
 
 ---
 
@@ -48,11 +54,16 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: ${lof.mariadb.url}/lofDev
+    url: ${lof.mariadb.url}/lof
     username: root
     password: ${lof.mariadb.password}
+  sql: #video 더미데이터
+    data: classpath:data.sql
+    initialization-mode: always
 slack:
   token: ${lof.slack.token}
+JWT:
+  signature: ${lof.JWT.signature}
 
 ---
 
@@ -69,3 +80,5 @@ spring:
     password: ${lof.mariadb.password}
 slack:
   token: ${lof.slack.token}
+JWT:
+  signature: ${lof.JWT.signature}

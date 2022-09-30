@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/lofTest
+    username: root
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        #show_sql: true #system.out 출력
+        format_sql: true
+
+  mvc:
+    path match:
+      matching-strategy: ant_path_matcher
+
+logging:
+  level:
+    org.hibernate.SQL: debug #log 출력
+    org.hibernate.type: trace #파라미터 로그남기기
+
+slack:
+  token: 1234
+JWT:
+  signature: 1234

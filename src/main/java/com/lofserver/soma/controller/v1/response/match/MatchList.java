@@ -1,20 +1,20 @@
 package com.lofserver.soma.controller.v1.response.match;
 
+import com.lofserver.soma.controller.v1.response.CommonItem;
+import com.lofserver.soma.controller.v1.response.match.sub.DateInfo;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 public class MatchList {
-    private Match live;
-    private List<Match> matchList;
-    private int totalPage;
-    private int curPage;
+    private List<DateInfo> dateList;
+    private List<List<CommonItem>> matchDataList;
 
-    public MatchList(Match live, List<Match> matchList, int totalPage, int curPage) {
-        this.live = live;
-        this.matchList = matchList;
-        this.totalPage = totalPage;
-        this.curPage = curPage;
+    @Builder
+    public MatchList(List<DateInfo> dateList, List<List<CommonItem>> matchDataList) {
+        this.dateList = dateList;
+        this.matchDataList = matchDataList;
     }
 }

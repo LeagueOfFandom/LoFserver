@@ -1,7 +1,6 @@
 package com.lofserver.soma.entity;
 
-import com.lofserver.soma.controller.v1.response.match.MatchDetails;
-import com.lofserver.soma.dto.crawlDto.matchDto.sub.*;
+import com.lofserver.soma.dto.pandaScoreDto.matchDto.sub.*;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,90 +24,102 @@ public class MatchEntity {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "rescheduled")
+    private Boolean rescheduled;
+
+    @Type(type = "json")
+    @Column(name = "winner", columnDefinition = "json")
+    private Winner winner;
+
+    @Column(name = "winner_type")
+    private String winnerType;
+
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
+
+    @Type(type = "json")
+    @Column(name = "streams_list", columnDefinition = "json")
+    private List<Stream> streamsList;
+
+    @Column(name = "forfeit")
+    private Boolean forfeit;
+
+    @Column(name = "official_stream_url")
+    private String officialStreamUrl;
+
+    @Column(name = "number_of_games")
+    private Long numberOfGames;
+
+    @Type(type = "json")
+    @Column(name = "oppontents", columnDefinition = "json")
+    private List<Opponents> opponents;
+
+    @Column(name = "tournament_id")
+    private Long tournamentId;
+
+    @Column(name = "name")
+    private String name;
+
+    @Type(type = "json")
+    @Column(name = "league", columnDefinition = "json")
+    private League league;
+
     @Type(type = "json")
     @Column(name = "tournament", columnDefinition = "json")
     private Tournament tournament;
 
-    @Column(name = "league_id")
-    private Long league_id;
-
-    @Column(name = "original_schedule_at")
-    private LocalDateTime original_scheduled_at;
-
     @Column(name = "begin_at")
-    private LocalDateTime begin_at;
+    private LocalDateTime beginAt;
 
-    @Column(name = "winner_id")
-    private Long winner_id;
+    @Column(name = "slug")
+    private String slug;
 
     @Column(name = "status")
     private String status;
 
-    @Column(name = "end_at")
-    private LocalDateTime end_at;
+    @Column(name = "match_type")
+    private String match_type;
+
+    @Column(name = "live_embed_url")
+    private String liveEmbedUrl;
+
+    @Column(name = "winner_id")
+    private Long winnerId;
 
     @Type(type = "json")
-    @Column(name = "live", columnDefinition = "json")
-    private Live live;
+    @Column(name = "serie", columnDefinition = "json")
+    private Serie serie;
+
+    @Column(name = "detailed_stats")
+    private Boolean detailed_stats;
 
     @Type(type = "json")
     @Column(name = "results", columnDefinition = "json")
     private List<Result> results;
 
+    @Column(name = "draw")
+    private Boolean draw;
+
+    @Type(type = "json")
+    @Column(name = "live", columnDefinition = "json")
+    private Live live;
+
+    @Column(name = "end_at")
+    private LocalDateTime endAt;
+
+    @Column(name = "modified_at")
+    private LocalDateTime modifiedAt;
+
+    @Column(name = "serie_id")
+    private Long serieId;
+
+    @Column(name = "original_scheduled_at")
+    private LocalDateTime originalScheduledAt;
+
     @Type(type = "json")
     @Column(name = "games", columnDefinition = "json")
     private List<Game> games;
 
-    @Type(type = "json")
-    @Column(name = "streams_list", columnDefinition = "json")
-    private List<Stream> streams_list;
-
-    @Type(type = "json")
-    @Column(name = "opponents", columnDefinition = "json")
-    private List<Opponents> opponents;
-
-    public MatchEntity(Long id, Tournament tournament, Long league_id, LocalDateTime original_scheduled_at, LocalDateTime begin_at, Long winner_id, String status, LocalDateTime end_at, Live live, List<Result> results, List<Game> games, List<Stream> streams_list, List<Opponents> opponents) {
-        this.id = id;
-        this.tournament = tournament;
-        this.league_id = league_id;
-        this.original_scheduled_at = original_scheduled_at;
-        this.begin_at = begin_at;
-        this.winner_id = winner_id;
-        this.status = status;
-        this.end_at = end_at;
-        this.live = live;
-        this.results = results;
-        this.games = games;
-        this.streams_list = streams_list;
-        this.opponents = opponents;
-    }
-
-    public MatchDetails toMatchDetails(Boolean alarm) {
-        String homeTeam = "미정";
-        String awayTeam = "미정";
-        String homeUrl = "미정";
-        String awayUrl = "미정";
-        Long homeScore = 0L;
-        Long awayScore = 0L;
-        if(opponents != null && opponents.size() != 0) {
-            homeTeam = opponents.get(0).getOpponent().getAcronym();
-            awayTeam = opponents.get(1).getOpponent().getAcronym();
-            homeUrl = opponents.get(0).getOpponent().getImage_url();
-            awayUrl = opponents.get(1).getOpponent().getImage_url();
-            homeScore = results.get(0).getScore();
-            awayScore = results.get(1).getScore();
-        }
-        return new MatchDetails(
-                id,
-                original_scheduled_at.toLocalDate(),
-                original_scheduled_at.toLocalTime(),
-                homeTeam,
-                awayTeam,
-                homeUrl,
-                awayUrl,
-                homeScore,
-                awayScore,
-                "https://www.twitch.tv/lck?lang=ko",
-                alarm);
-    }
+    @Column(name = "league_id")
+    private Long leagueId;
 }
