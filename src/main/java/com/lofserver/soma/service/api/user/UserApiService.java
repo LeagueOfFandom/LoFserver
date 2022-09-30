@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserApiService {
 
@@ -25,6 +24,12 @@ public class UserApiService {
     private final LeagueRepositoryService leagueRepositoryService;
     private final JsonWebToken jsonWebToken;
 
+    public UserApiService(GoogleAccessService googleAccessService, UserRepositoryService userRepositoryService, LeagueRepositoryService leagueRepositoryService, JsonWebToken jsonWebToken) {
+        this.googleAccessService = googleAccessService;
+        this.userRepositoryService = userRepositoryService;
+        this.leagueRepositoryService = leagueRepositoryService;
+        this.jsonWebToken = jsonWebToken;
+    }
     public ResponseEntity<?> setUser(UserDto userDto){
         GoogleUserInfoDto googleUserInfoDto = googleAccessService.getUserInfo(userDto.getGoogleAccessToken());
         if(googleUserInfoDto == null)

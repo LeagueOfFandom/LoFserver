@@ -35,8 +35,8 @@ public class MatchViewService {
 
         List<MatchEntity> matchEntityList = matchRepository.findAllByLeagueIdInAndOriginalScheduledAtBetween(
                 userRepositoryService.getUserLeagueList(userId),
-                date.atStartOfDay(),
-                date.atTime(23, 59, 59));
+                date.atStartOfDay().plusHours(9),
+                date.atTime(23, 59, 59).plusHours(9));
 
         matchEntityList.forEach(matchEntity -> {
             //비어있는 경기 제외
