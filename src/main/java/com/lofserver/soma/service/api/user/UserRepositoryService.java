@@ -81,6 +81,8 @@ public class UserRepositoryService {
     public void setTeamList(Long userId, List<Long> teamList){
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
         userEntity.setTeamList(teamList);
+        List<Long> leagueIdList = leagueRepositoryService.getLeagueIdListByTeamIdList(teamList);
+        leagueIdList.add(297L);
         userEntity.setLeagueList(leagueRepositoryService.getLeagueIdListByTeamIdList(teamList));
         userRepository.save(userEntity);
     }
