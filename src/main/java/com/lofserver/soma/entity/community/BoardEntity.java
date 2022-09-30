@@ -2,6 +2,7 @@ package com.lofserver.soma.entity.community;
 
 import com.lofserver.soma.dto.communityDto.BoardDto;
 import com.lofserver.soma.dto.communityDto.CommentDto;
+import com.lofserver.soma.entity.BaseTimeEntity;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 @Getter
 @Table(name="board")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class BoardEntity {
+public class BoardEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,12 +40,6 @@ public class BoardEntity {
     @Column(name="creator_id")
     private String creatorId;
 
-    @Column(name="created_datetime")
-    private LocalDateTime createdDatetime;
-
-    @Column(name="updated_datetime")
-    private LocalDateTime updatedDatetime;
-
     @Column(name="deleted_datetime")
     private LocalDateTime deletedDatetime;
 
@@ -57,6 +52,5 @@ public class BoardEntity {
         this.contents = boardDto.getContents();
         this.creatorId = boardDto.getCreatorId();
         this.subject= boardDto.getSubject();
-        this.createdDatetime = createdDatetime;
     }
 }
