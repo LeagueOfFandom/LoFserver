@@ -1,7 +1,7 @@
 package com.lofserver.soma.service.view;
 
 import com.lofserver.soma.controller.v1.response.CommonItem;
-import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
+import com.lofserver.soma.controller.v1.response.match.MatchViewObject;
 import com.lofserver.soma.entity.MatchEntity;
 import com.lofserver.soma.repository.MatchRepository;
 import com.lofserver.soma.service.api.user.UserRepositoryService;
@@ -40,7 +40,7 @@ public class MatchViewService {
 
         matchEntityList.forEach(matchEntity -> {
             //비어있는 경기 제외
-            if (matchEntity.getOpponents() == null || matchEntity.getOpponents().size() == 0)
+            if (matchEntity.getOpponents() == null || matchEntity.getOpponents().size() < 2)
                 return;
             //유저가 선택한 경기만 조회
             if (onlyUserTeam && !userRepositoryService.checkUserTeamByMatchEntity(userId, matchEntity))

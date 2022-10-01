@@ -47,7 +47,7 @@ public class MatchController {
     public ResponseEntity<?> getMatchList(@RequestHeader("Authorization") String token, @RequestParam(value = "all", required = false,defaultValue = "false")Boolean isAll, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         if(jsonWebToken.checkJwtToken(token)){
             Long id = jsonWebToken.parseJwtToken(token).get("id",Long.class);
-            return matchApiService.getMatchList(id, isAll, date);
+            return matchApiService.getMatchListByMonth(id, isAll, date);
         }
         else
             return ResponseEntity.badRequest().body("Invalid Token");
