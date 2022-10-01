@@ -9,6 +9,7 @@ import com.lofserver.soma.service.league.LeagueRepositoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,11 +28,14 @@ public class UserRepositoryService {
     }
 
     public Long createUserByUserDtoAndGoogleDto(UserDto userDto, GoogleUserInfoDto googleDto){
+        List<Long> defaultLeagueList = new ArrayList<>();
+        defaultLeagueList.add(297L); //worlds
         UserEntity userEntity = UserEntity.builder()
                 .token(userDto.getFcmToken())
                 .email(googleDto.getEmail())
                 .nickname(googleDto.getName())
                 .profileImg(googleDto.getPicture())
+                .leagueList(defaultLeagueList)
                 .build();
         return userRepository.save(userEntity).getUserId();
     }

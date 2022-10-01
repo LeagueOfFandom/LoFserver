@@ -56,10 +56,11 @@ public class UserEntity {
         this.leagueList = leagueList;
     }
     @Builder
-    public UserEntity(String token, String email, String nickname, String profileImg) {
+    public UserEntity(String token, String email, String nickname, String profileImg, List<Long> leagueList) {
         this.token = token;
         this.email = email;
         this.nickname = nickname;
         this.profileImg = profileImg;
+        this.leagueList = leagueList;
     }
 }
