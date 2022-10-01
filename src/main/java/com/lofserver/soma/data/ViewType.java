@@ -2,7 +2,7 @@ package com.lofserver.soma.data;
 
 import com.lofserver.soma.controller.v1.response.community.CommunityViewObject;
 import com.lofserver.soma.controller.v1.response.community.HighLightViewObject;
-import com.lofserver.soma.controller.v1.response.match.sub.MatchViewObject;
+import com.lofserver.soma.controller.v1.response.match.MatchViewObject;
 import lombok.Getter;
 import org.json.simple.JSONObject;
 

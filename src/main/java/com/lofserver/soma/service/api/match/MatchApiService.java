@@ -2,9 +2,7 @@ package com.lofserver.soma.service.api.match;
 
 import com.lofserver.soma.config.JsonWebToken;
 import com.lofserver.soma.controller.v1.response.CommonItem;
-import com.lofserver.soma.controller.v1.response.match.sub.DateInfo;
-import com.lofserver.soma.controller.v1.response.match.MatchList;
-import com.lofserver.soma.repository.*;
+import com.lofserver.soma.repository.LeagueRepository;
 import com.lofserver.soma.service.api.user.UserRepositoryService;
 import com.lofserver.soma.service.view.CommunityViewService;
 import com.lofserver.soma.service.view.MatchViewService;
@@ -12,7 +10,8 @@ import com.lofserver.soma.service.view.VideoViewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -62,16 +61,21 @@ public class MatchApiService {
         return new ResponseEntity<>(commonItemList, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getMatchList(Long userId, Boolean isAll, LocalDate date){
+    public ResponseEntity<?> getMatchListByMonth(Long userId, Boolean isAll, LocalDate date){
 
-        List<DateInfo> dateInfoList = new ArrayList<>();
-        List<List<CommonItem>> commonItemListList = new ArrayList<>();
-
-        for(int i = 0; i < 7; i++) {
-            dateInfoList.add(new DateInfo(date.plusDays(i)));
-            commonItemListList.add(matchViewService.getMatchListByDate(userId, date.plusDays(i), isAll));
+        List<CommonItem> commonItemList = new ArrayList<>();
+        LocalDate dateInfo = LocalDate.of(date.getYear(), date.getMonthValue(), 1);
+        while(true){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("text", dateInfo.getMonthValue() + "월" + dateInfo.getDayOfMonth() + "일");
+            commonItemList.add(new CommonItem(jsonObject));
+            if(dateInfo.getMonthValue() != date.getMonthValue())
+                break;
+            commonItemList.addAll(matchViewService.getMatchListByDate(userId, dateInfo, isAll));
+            dateInfo = dateInfo.plusDays(1);
         }
-        return new ResponseEntity<>(new MatchList(dateInfoList,commonItemListList), HttpStatus.OK);
+
+        return new ResponseEntity<>(commonItemList, HttpStatus.OK);
     }
 
 }
