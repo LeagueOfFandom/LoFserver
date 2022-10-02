@@ -19,7 +19,7 @@ public class TeamInfo {
     private String league;
 
     public TeamInfo(TeamEntity teamEntity, Boolean teamCheck , String league) {
-        this.teamId = teamEntity.getId();
+        this.teamId = teamEntity.getPk();
         this.teamName = teamEntity.getAcronym();
         this.teamImg = teamEntity.getImageUrl();
         this.teamCheck = teamCheck;
