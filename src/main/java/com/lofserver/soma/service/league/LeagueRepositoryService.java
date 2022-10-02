@@ -29,12 +29,11 @@ public class LeagueRepositoryService {
 
     public LeagueList getLeagueListByLeagueIdList(List<Long> leagueId) {
         List<LeagueEntity> leagueEntityList = leagueRepository.findAllById(leagueId);
-
+        
         List<String> leagueNameList = new ArrayList<>();
         List<LeagueInfo> leagueInfoList = new ArrayList<>();
         leagueEntityList.forEach(leagueEntity -> {
             leagueNameList.add(leagueEntity.getName());
-
             List<Long> teamList = getTeamListBySeriesId(leagueEntity.getLatestSeriesId());
             List<TeamInfo> teamInfoList = getTeamInfoListByTeamIdList(teamList);
 
